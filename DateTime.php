@@ -203,15 +203,6 @@ class SketchDateTime extends SketchObject {
      *
      * @return integer
      */
-    function getDayOfTheWeek() {
-        $day_of_the_week = date('w', $this->dateTime);
-        return $day_of_the_week == 0 ? 7 : $day_of_the_week;
-    }
-
-    /**
-     *
-     * @return integer
-     */
     function toUnixTimestamp() {
         return $this->dateTime;
     }
