@@ -60,29 +60,19 @@ class SketchResponsePart extends SketchObject {
 
     /**
      *
-     * @var array
-     */
-    private $attributes = array();
-
-    /**
-     * @static
-     * @param $file_name
-     * @param bool $etag
-     * @param array $attributes
-     * @param bool $update_include_path
+     * @param string $file_name
      * @return DOMDocument
      */
-    static function evaluate($file_name, $etag = false, $attributes = array(), $update_include_path = false) {
-        $part = new SketchResponsePart($file_name, $etag, $attributes, $update_include_path);
+    static function evaluate($file_name, $etag = false) {
+        $part = new SketchResponsePart($file_name, $etag);
         return $part->getDocument();
     }
 
     /**
      * Make sure that the encoding for the source file is UTF-8
      *
-     * @param $source
+     * @param string $string
      * @return string
-     * @throws Exception
      */
     private function encode($source) {
         if (function_exists('mb_detect_encoding')) {
@@ -106,12 +96,10 @@ class SketchResponsePart extends SketchObject {
     }
 
     /**
-     * @param $file_name
-     * @param $etag
-     * @param $attributes
-     * @param $update_include_path
+     *
+     * @param string $file_name
      */
-    private function __construct($file_name, $etag, $attributes, $update_include_path) {
+    private function __construct($file_name, $etag) {
         $document_root = $this->getApplication()->getRequest()->getDocumentRoot();
         if (substr($file_name, 0, 1) == '/') {
             list($request_uri) = explode('?', $this->getRequest()->getResolvedURI());
@@ -129,11 +117,6 @@ class SketchResponsePart extends SketchObject {
             }
         }
         $this->relativePath = str_replace($document_root, '', realpath(dirname($file_name)));
-        // Add to the include path the path to the layout
-        if ($update_include_path && strpos($this->relativePath, get_include_path()) === false) {
-            set_include_path(realpath(dirname($file_name)).PATH_SEPARATOR.get_include_path());
-        }
-        $this->attributes = $attributes;
         if (SketchUtils::Readable($file_name)) {
             try {
                 $response = $this->getController()->getResponse();
@@ -144,7 +127,7 @@ class SketchResponsePart extends SketchObject {
                 if ($source != '') {
                     // ETag
                     if ($etag && self::$etag == null) {
-                        self::$etag = md5(serialize($this->getSession()->getACL()).$source);
+                        self::$etag = md5($source);
                         self::$lastModified = SketchDateTime::Now();
                         header('Etag: '.self::$etag);
                         header('Last-Modified: '.gmdate('D, d M Y H:i:s', self::$lastModified->toUnixTimestamp()).' GMT');
@@ -288,23 +271,9 @@ class SketchResponsePart extends SketchObject {
     /**
      *
      * @param string $text
-     * @param integer $chars
      * @return string
      */
-    function formatPlainText($text, $chars=null) {
-
-        if ($chars) {
-            $counter = 0;
-            $text = trim($text);
-            $textArray = explode(' ',$text);
-            $text = '';
-
-            while($chars >= strlen($text) + strlen($textArray[$counter])){
-                $text .= ' '.$textArray[$counter];
-                $counter++;
-            }
-        }
-
+    function formatPlainText($text) {
         return $this->getFormatter()->formatPlainText($text);
     }
 
@@ -342,27 +311,5 @@ class SketchResponsePart extends SketchObject {
      */
     function formatDateAndTime(SketchDateTime $date) {
         return $this->getFormatter()->formatDateAndTime($date);
-    }
-
-    /**
-     *
-     * @return array
-     */
-    function getAttributes() {
-        return $this->attributes;
-    }
-
-    /**
-     *
-     * @param $key
-     * @param string $default
-     * @return string
-     */
-    function getAttribute($key, $default = '') {
-        if (array_key_exists($key, $this->attributes)) {
-            return $this->attributes[$key];
-        } else {
-            return $default;
-        }
     }
 }
