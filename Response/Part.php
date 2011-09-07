@@ -127,7 +127,7 @@ class SketchResponsePart extends SketchObject {
                 if ($source != '') {
                     // ETag
                     if ($etag && self::$etag == null) {
-                        self::$etag = md5($source);
+                        self::$etag = md5(serialize($this->getSession()->getACL()).$source);
                         self::$lastModified = SketchDateTime::Now();
                         header('Etag: '.self::$etag);
                         header('Last-Modified: '.gmdate('D, d M Y H:i:s', self::$lastModified->toUnixTimestamp()).' GMT');
