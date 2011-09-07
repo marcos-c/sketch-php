@@ -108,10 +108,14 @@ class SketchFactory extends SketchObject {
                         $contents[] = sprintf($table_definition['templates']['constructor'], $primary_key);
                         $contents[] = "\t\t}\n\t\tif (!is_array(\$mixed)) \$mixed = array();\n";
                         foreach ($table_definition['fields'] as $column => $definition) {
-                            $method_name = null; foreach (explode('_', $column) as $value) {
+                            $method_name = null;
+                            foreach (explode('_', $column) as $value) {
                                 $method_name .= ucfirst($value);
                             }
-                            if (preg_match('/^bool/', $definition['type']) || preg_match('/^enum\(\'f\',\'t\'|enum\(\'t\',\'f\'/', $definition['type'])) {
+                            if (preg_match('/^int/', $definition['type']) || preg_match('/^smallint/', $definition['type']) || preg_match('/^tinyint/', $definition['type'])) {
+                                $default = intval($definition['default']);
+                                $contents[] = ($column == $primary_key) ? "\t\t\$this->setId(array_key_exists('${column}', \$mixed) ? \$mixed['${column}'] : ${default});\n" : "\t\t\$this->set${method_name}(array_key_exists('${column}', \$mixed) ? \$mixed['${column}'] : ${default});\n";
+                            } elseif (preg_match('/^bool/', $definition['type']) || preg_match('/^enum\(\'f\',\'t\'|enum\(\'t\',\'f\'/', $definition['type'])) {
                                 $default = ($definition['default'] == 't') ? 'true' : 'false';
                                 $contents[] = "\t\t\$this->set${method_name}((array_key_exists('${column}', \$mixed) && \$mixed['${column}'] != null) ? \$mixed['${column}'] : ${default});\n";
                             } else {
@@ -172,31 +176,32 @@ class SketchFactory extends SketchObject {
                         }
                     }
                     // Update and remove action methods
-                    $contents[] = "\t\n\tfunction updateAction(SketchFormView \$form) {\n\t\t\$validate = method_exists(\$this, 'validate');\n\t\tif (!\$validate || (\$validate && \$this->validate(\$form))) {\n\t\t\t\$connection = \$this->getConnection();\n\t\t\t\$id = \$this->getId();\n";
+                    $contents[] = "\t\n\tfunction update() {\n\t\t\$connection = \$this->getConnection();\n\t\t\$id = \$this->getId();\n";
                     foreach ($table_definition['fields'] as $column => $definition) {
                         if ($column != $primary_key) {
                             $method_name = null; foreach (explode('_', $column) as $value) {
                                 $method_name .= ucfirst($value);
-                            } $attribute_name = strtolower(substr($method_name, 0, 1)).substr($method_name, 1);
+                            }
+                            $attribute_name = strtolower(substr($method_name, 0, 1)).substr($method_name, 1);
                             if (preg_match('/^int/', $definition['type']) || preg_match('/^smallint/', $definition['type']) || preg_match('/^tinyint/', $definition['type'])) {
-                                $contents[] = "\t\t\t\$${column} = \$this->get${method_name}(".($definition['null'] ? "'NULL'" : '').");\n";
+                                $contents[] = "\t\t\$${column} = \$this->get${method_name}(".($definition['null'] ? "'NULL'" : '').");\n";
                             } else if (preg_match('/^bool/', $definition['type']) || preg_match('/^enum\(\'f\',\'t\'|enum\(\'t\',\'f\'/', $definition['type'])) {
-                                $contents[] = "\t\t\t\$${column} = \$this->get${method_name}() ? 't' : 'f';\n";
+                                $contents[] = "\t\t\$${column} = \$this->get${method_name}() ? 't' : 'f';\n";
                             } else if (preg_match('/^(date|time)/', $definition['type']) && $definition['null']) {
-                                $contents[] = "\t\t\t\$${column} = \$this->get${method_name}()->isNull() ? 'NULL' : \"'\".\$this->get${method_name}()->toString().\"'\";\n";
+                                $contents[] = "\t\t\$${column} = \$this->get${method_name}()->isNull() ? 'NULL' : \"'\".\$this->get${method_name}()->toString().\"'\";\n";
                             } else if (preg_match('/^(date|time)/', $definition['type'])) {
-                                $contents[] = "\t\t\t\$${column} = \$this->get${method_name}()->toString();\n";
+                                $contents[] = "\t\t\$${column} = \$this->get${method_name}()->toString();\n";
                             } else if (preg_match('/^char/', $definition['type']) || preg_match('/^varchar/', $definition['type']) || preg_match('/^text/', $definition['type']) || preg_match('/^time/', $definition['type'])) {
                                 if ($definition['null']) {
-                                    $contents[] = "\t\t\t\$${column} = \$connection->escapeString(\$this->get${method_name}());\n";
-                                    $contents[] = "\t\t\t\$${column} = (\$${column} != null) ? \"'\$${column}'\" : 'NULL';\n";
+                                    $contents[] = "\t\t\$${column} = \$connection->escapeString(\$this->get${method_name}());\n";
+                                    $contents[] = "\t\t\$${column} = (\$${column} != null) ? \"'\$${column}'\" : 'NULL';\n";
                                 } else {
-                                    $contents[] = "\t\t\t\$${column} = \"'\".\$connection->escapeString(\$this->get${method_name}()).\"'\";\n";
+                                    $contents[] = "\t\t\$${column} = \"'\".\$connection->escapeString(\$this->get${method_name}()).\"'\";\n";
                                 }
                             } else {
-                                $contents[] = "\t\t\t\$${column} = \$this->get${method_name}();\n";
+                                $contents[] = "\t\t\$${column} = \$this->get${method_name}();\n";
                                 if ($definition['null']) {
-                                    $contents[] = "\t\t\tif (\$${column} == null) \$${column} = 'NULL';\n";
+                                    $contents[] = "\t\tif (\$${column} == null) \$${column} = 'NULL';\n";
                                 }
                             }
                         }
@@ -228,13 +233,13 @@ class SketchFactory extends SketchObject {
                             }
                         }
                     }
-                    $contents[] = "\t\t\tif (\$id) {\n";
+                    $contents[] = "\t\tif (\$id) {\n";
                     $contents[] = sprintf($table_definition['templates']['update'], $primary_key, implode(', ', $fields['update']));
-                    $contents[] = "\t\t\t} else {\n";
+                    $contents[] = "\t\t} else {\n";
                     $contents[] = sprintf($table_definition['templates']['insert'], $primary_key, implode(', ', $fields['insert']), implode(', ', $fields['values']));
-                    $contents[] = "\t\t\t}\n";
-                    $contents[] = "\t\t} else return false;\n";
+                    $contents[] = "\t\t}\n";
                     $contents[] = "\t}\n";
+                    $contents[] = "\t\n\tfunction updateAction(SketchFormView \$form) {\n\t\t\$validate = method_exists(\$this, 'validate');\n\t\tif (!\$validate || (\$validate && \$this->validate(\$form))) {\n\t\t\treturn \$this->update();\n\t\t} else return false;\n\t}\n";
                     $contents[] = "\t\n\tfunction removeAction(SketchFormView \$form) {\n\t\t\$connection = \$this->getConnection();\n\t\t\$id = \$this->getId();\n\t\tif (\$id) {\n";
                     $contents[] = sprintf($table_definition['templates']['delete'], $primary_key);
                     $contents[] = "\t\t} else return false;\n\t}\n";
