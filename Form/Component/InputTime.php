@@ -65,7 +65,7 @@ class SketchFormComponentInputTime extends SketchFormComponent {
         <span <?=$parameters['span']?>>
             <select name="<?=$field_name?>" <?=$parameters['input-time'].$disabled?>>
                 <? foreach ($options as $key => $value): ?>
-                    <option value="<?=htmlspecialchars($key)?>" <?=(($field_value instanceof SketchDateTime && sprintf('%02s:%02s', $hour, $minute) == $key) ? 'selected="selected" class="select-option selected"' : 'class="select-option"')?>><?=$value?></option>
+                    <option value="<?=htmlspecialchars($key)?>" <?=(($field_value instanceof SketchDateTime && !$field_value->isNull() && sprintf('%02s:%02s', $hour, $minute) == $key) ? 'selected="selected" class="select-option selected"' : 'class="select-option"')?>><?=$value?></option>
                 <? endforeach; ?>
             </select>
         </span>
