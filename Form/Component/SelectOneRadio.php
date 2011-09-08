@@ -51,11 +51,16 @@ class SketchFormComponentSelectOneRadio extends SketchFormComponent {
         $field_name = $form->getFieldName($attribute);
         $field_value = $form->getFieldValue($attribute);
         ob_start(); ?>
-        <? if (is_array($options)):
+        <? if (is_array($options) && count($options) > 1):
             $i = 1; ?>
             <? if ($parameters['wrapper']): ?>
                 <? foreach ($options as $key => $value): ?>
-                    <? if ($i  == count($options) || !($i++ % $parameters['columns'])): ?>
+                    <? if (count($options) == 1): ?>
+                        <div<?=$parameters['right-div'] != null ? $parameters['right-div'] : $parameters['div']?>>
+                            <label<?=$parameters['left-label'] != null ? $parameters['left-label'] : $parameters['div']?>><?=$value?></label>
+                            <p><input type="radio" name="<?=$field_name?>" value="<?=$key?>" <?=(($field_value == $key) ? 'checked="checked"' : '')?><?=$parameters['input']?> /></p>
+                        </div>
+                    <? elseif ($i  == count($options) || !($i++ % $parameters['columns'])): ?>
                         <div<?=$parameters['right-div'] != null ? $parameters['right-div'] : $parameters['div']?>>
                             <label<?=$parameters['right-label'] != null ? $parameters['right-label'] : $parameters['label']?>><?=$value?></label>
                             <p><input type="radio" name="<?=$field_name?>" value="<?=$key?>" <?=(($field_value == $key) ? 'checked="checked"' : '')?><?=$parameters['input']?> /></p>
@@ -78,6 +83,10 @@ class SketchFormComponentSelectOneRadio extends SketchFormComponent {
                     <?=$value?>
                 <? endforeach; ?>
             <? endif; ?>
+        <? else: ?>
+            <? foreach ($options as $key => $value): ?>
+                <input type="hidden" name="<?=$field_name?>" value="<?=$key?>"<?=$parameters['input']?> />
+            <? endforeach; ?>
         <? endif; ?>
         <?php return ob_get_clean();
     }
