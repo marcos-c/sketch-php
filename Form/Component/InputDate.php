@@ -30,19 +30,228 @@ require_once 'Sketch/Form/Component.php';
  * @package Components
  */
 class SketchFormComponentInputDate extends SketchFormComponent {
-    /**
-     *
-     * @return string
-     */
-    function javascript() {
-        $arguments = $this->getArguments();
-        $attribute = array_shift($arguments);
-        $parameters = $this->extend(array(
-            'from_current_date' => false,
-        ), array_shift($arguments));
-        $form_name = $this->getForm()->getFormName();
+    private function getDaySelector($field_name, $parameters, $days, $day) {
+        $disabled = ($parameters['disabled'] !== false) ? ' disabled="disabled"' : '';
         ob_start(); ?>
-        function <?=$form_name?>UpdateDays(h){var a,g,e,f,c,k,l,b,d;a=document.forms.<?=$form_name?>;g=a[h+"[day]"];e=a[h+"[year_month]"].value.substr(4,2)-1;f=a[h+"[year_month]"].value.substr(0,4);if(f!=0&&e>=0){c=new Date();k=1;l=0;if(l==0){b;l=31;do{b=new Date(f,e,l--)}while(e<b.getMonth())}if(<?=$parameters['from_current_date'] ? 'true' : 'false'?>&&e==c.getMonth()&&f==c.getFullYear()){k=(k>(c.getDate()))?k:c.getDate()}d=g.value;while(g.options.length){g.options[0]=null}for(i=k;i<l+2;i++){option=new Option(((i>9)?i:"0"+i),i,false,false);g.options[j=g.length]=option;if(i==d){g.selectedIndex=j}}}else{while(g.options.length){g.options[0]=null}g.options[0]=new Option("...",null,false,false)}}function <?=$form_name?>UpdateDate(c,d){var g,h,f,a,b,e;g=document.forms.<?=$form_name?>;h=d.getMonth()>8?String(d.getMonth()+1):"0"+String(d.getMonth()+1);f=String(d.getFullYear())+h;a=g[c+"[year_month]"];for(e=0;e<a.length;e++){if(a.options[e].value==f){a.options[e].selected=true;break}}<?=$form_name?>UpdateDays(c);b=g[c+"[day]"];for(e=0;e<b.length;e++){if(b.options[e].value==d.getDate()){b.options[e].selected=true;break}}}function <?=$form_name?>UpdateNights(d,c,e,a,f){var b,g,h,k;b=document.forms.<?=$form_name?>;g=new Date(b[d+"[year_month]"].value.substr(0,4),b[d+"[year_month]"].value.substr(4,2)-1,b[d+"[day]"].value);h=new Date(b[c+"[year_month]"].value.substr(0,4),b[c+"[year_month]"].value.substr(4,2)-1,b[c+"[day]"].value);k=Math.round((h-g)/86400000);b[e].value=k;<?=$form_name?>OnNightsChange(d,c,e,a,f)}function <?=$form_name?>OnDayChange(m,f,e,g,d,a,l){var b,k,h,c;if(m==f){<?=$form_name?>OnNightsChange(f,e,g,a,l)}else{if(g!=null){<?=$form_name?>UpdateNights(f,e,g,a,l)}else{b=document.forms.<?=$form_name?>;k=Number(b[m+"[day]"].value);h=b[m+"[year_month]"];c=new Date(h.value.substr(0,4),h.value.substr(4,2)-1,k);$("#"+d).val(c.getFullYear()+"-"+(c.getMonth()+1)+"-"+c.getDate())}}}function <?=$form_name?>OnMonthChange(a,e,b,d,g,f,c){<?=$form_name?>UpdateDays(a);<?=$form_name?>OnDayChange(a,e,b,d,g,f,c)}function <?=$form_name?>OnNightsChange(f,d,g,b,k){var c,a,l,h,e,m;c=document.forms.<?=$form_name?>;if(c[g].value<1){c[g].value=1}if(c[g].value>90){c[g].value=90}a=Number(c[f+"[day]"].value);l=a+Number(c[g].value);h=c[f+"[year_month]"];e=new Date(h.value.substr(0,4),h.value.substr(4,2)-1,a);m=new Date(h.value.substr(0,4),h.value.substr(4,2)-1,l);<?=$form_name?>UpdateDate(d,m);$("#"+b).val(e.getFullYear()+"-"+(e.getMonth()+1)+"-"+e.getDate());$("#"+k).val(m.getFullYear()+"-"+(m.getMonth()+1)+"-"+m.getDate())}function <?=$form_name?>OnCalendarChange(a,e,b,d,h,g,c){var f=jQuery("#"+h).val().split("-");jQuery(":input[name='"+a+"[year_month]']").val(f[0]+f[1]);<?=$form_name?>UpdateDays(a);jQuery(":input[name='"+a+"[day]']").val(f[2]);<?=$form_name?>OnDayChange(a,e,b,d,h,g,c)};
+        <select id="<?=$field_name?>[day]" name="<?=$field_name?>[day]"<?=$parameters['input-date-day'].$disabled?>>
+            <? foreach ($days as $key => $value): ?>
+                <option value="<?=htmlspecialchars($key)?>" <?=(($day == $key) ? 'selected="selected" class="select-option selected"' : 'class="select-option"')?>><?=htmlspecialchars($value)?></option>
+            <? endforeach; ?>
+        </select>
+        <?php return ob_get_clean();
+    }
+
+    private function getMonthSelector($field_name, $parameters, $months, $month) {
+        $disabled = ($parameters['disabled'] !== false) ? ' disabled="disabled"' : '';
+        ob_start(); ?>
+        <select name="<?=$field_name?>[month]"<?=$parameters['input-date-month'].$disabled?>>
+            <? foreach ($months as $key => $value): ?>
+                <option value="<?=htmlspecialchars($key)?>" <?=(($month == $key) ? 'selected="selected" class="select-option selected"' : 'class="select-option"')?>><?=htmlspecialchars($value)?></option>
+            <? endforeach; ?>
+        </select>
+        <?php return ob_get_clean();
+    }
+
+    private function getYearSelector($field_name, $parameters, $years, $year) {
+        $disabled = ($parameters['disabled'] !== false) ? ' disabled="disabled"' : '';
+        ob_start(); ?>
+        <select name="<?=$field_name?>[year]"<?=$parameters['input-date-year'].$disabled?>>
+            <? foreach ($years as $key => $value): ?>
+                <option value="<?=htmlspecialchars($key)?>" <?=(($year == $key) ? 'selected="selected" class="select-option selected"' : 'class="select-option"')?>><?=htmlspecialchars($value)?></option>
+            <? endforeach; ?>
+        </select>
+        <?php return ob_get_clean();
+    }
+
+    private function getYearMonthSelector($field_name, $parameters, $year_months, $year_month) {
+        $disabled = ($parameters['disabled'] !== false) ? ' disabled="disabled"' : '';
+        ob_start(); ?>
+        <select name="<?=$field_name?>[year_month]"<?=$parameters['input-date-year-month'].$disabled?>>
+            <? foreach ($year_months as $key => $value): ?>
+                <option value="<?=htmlspecialchars($key)?>" <?=(($year_month == $key) ? 'selected="selected" class="select-option selected"' : 'class="select-option"')?>><?=htmlspecialchars($value)?></option>
+            <? endforeach; ?>
+        </select>
+        <?php return ob_get_clean();
+    }
+
+    private function getCalendarAndOrJavascript($calendar_field_id, $field_name, $parameters, $year, $month, $day, $from_year, $from_month, $from_day, $to_year, $to_month, $to_day, $months, $year_month_days) {
+        ob_start(); ?>
+            <? if ($parameters['calendar']): ?>
+                <? if ($parameters['input-date-calendar']): ?><span<?=$parameters['input-date-calendar']?>><? endif; ?>
+                    <input type="hidden" value="<?=$year?>-<?=$month?>-<?=$day?>" id="<?=$calendar_field_id?>" />
+                    <script type="text/javascript">
+                        //<![CDATA[
+                            jQuery(function($){
+                                var months = <?=SketchUtils::encodeJSON($months)?>;
+                                var year_month_days = <?=SketchUtils::encodeJSON($year_month_days)?>;
+                                var calendar = $('#<?=$calendar_field_id?>');
+                                calendar.datepicker({firstDay: 1, minDate: new Date(<?=$from_year?>, <?=$from_month - 1?>, <?=$from_day?>), maxDate: new Date(<?=$to_year?>, <?=$to_month - 1?>, <?=$to_day?>), dayNamesMin: ['<?=$this->getTranslator()->_('Sun')?>', '<?=$this->getTranslator()->_('Mon')?>', '<?=$this->getTranslator()->_('Tue')?>', '<?=$this->getTranslator()->_('Wed')?>', '<?=$this->getTranslator()->_('Thu')?>', '<?=$this->getTranslator()->_('Fri')?>', '<?=$this->getTranslator()->_('Sat')?>'], monthNames: ['<?=$this->getTranslator()->_('January')?>', '<?=$this->getTranslator()->_('February')?>', '<?=$this->getTranslator()->_('March')?>', '<?=$this->getTranslator()->_('April')?>', '<?=$this->getTranslator()->_('May')?>', '<?=$this->getTranslator()->_('June')?>', '<?=$this->getTranslator()->_('July')?>', '<?=$this->getTranslator()->_('August')?>', '<?=$this->getTranslator()->_('September')?>', '<?=$this->getTranslator()->_('October')?>', '<?=$this->getTranslator()->_('November')?>', '<?=$this->getTranslator()->_('December')?>'], dateFormat: 'yy-mm-dd', showOn: 'button', buttonText: '<?=$this->getTranslator()->_('Calendar')?>'});
+                                var day = $(':input[name="<?=$field_name?>[day]"]');
+                                <? if (in_array($parameters['format'], array('mY', 'd-mY'))): ?>
+                                    var year_month = $(':input[name="<?=$field_name?>[year_month]"]');
+                                    day.change(function(e){
+                                        e.stopPropagation();
+                                        calendar.val(year_month.val().substr(0, 4) + '-' + year_month.val().substr(4, 2) + '-' + ((day.val() > 9) ? day.val() : '0' + day.val()));
+                                    });
+                                    year_month.change(function(){
+                                        var selected_day = day.val();
+                                        if (day.is(":visible")) {
+                                            day[0].options.length = 0;
+                                            if (year_month_days[year_month.val()] == undefined) {
+                                                day[0].options[j = day[0].options.length] = new Option('...', 0, false, false);
+                                            } else {
+                                                var i, j; for (i = year_month_days[year_month.val()][0]; i <= year_month_days[year_month.val()][1]; i++) {
+                                                    day[0].options[j = day[0].options.length] = new Option(((i > 9) ? i : '0' + i), i, false, false);
+                                                }
+                                                day.val(selected_day);
+                                            }
+                                        } else {
+                                           day.val(selected_day);
+                                        }
+                                        day.change();
+                                    });
+                                    year_month.change();
+                                    calendar.change(function(){
+                                        var new_date = calendar.val().split('-');
+                                        year_month.val(new_date[0] + new_date[1]);
+                                        if (day.is(":visible")) {
+                                            day[0].options.length = 0;
+                                            if (year_month_days[year_month.val()] == undefined) {
+                                                day[0].options[j = day[0].options.length] = new Option('...', 0, false, false);
+                                            } else {
+                                                var i, j; for (i = year_month_days[year_month.val()][0]; i <= year_month_days[year_month.val()][1]; i++) {
+                                                    day[0].options[j = day[0].options.length] = new Option(((i > 9) ? i : '0' + i), i, false, false);
+                                                }
+                                                day.val(parseInt(new_date[2]));
+                                            }
+                                        } else {
+                                            day.val(parseInt(new_date[2]));
+                                        }
+                                    });
+                                <? elseif (in_array($parameters['format'], array('m-Y', 'd-m-Y', 'M-d-Y', 'Y-m-d'))): ?>
+                                    var month = $(':input[name="<?=$field_name?>[month]"]');
+                                    var year = $(':input[name="<?=$field_name?>[year]"]');
+                                    day.change(function(){
+                                        calendar.val(year.val() + '-' + ((month.val() > 9) ? month.val() : '0' + month.val()) + '-' + ((day.val() > 9) ? day.val() : '0' + day.val()));
+                                    });
+                                    month.change(function(){
+                                        var selected_year_month = year.val() + ((month.val() > 9) ? month.val() : '0' + month.val());
+                                        var selected_day = day.val();
+                                        if (day.is(":visible")) {
+                                            day[0].options.length = 0;
+                                            if (year_month_days[selected_year_month] == undefined) {
+                                                day[0].options[j = day[0].options.length] = new Option('...', 0, false, false);
+                                            } else {
+                                                var i, j; for (i = year_month_days[selected_year_month][0]; i <= year_month_days[selected_year_month][1]; i++) {
+                                                    day[0].options[j = day[0].options.length] = new Option(((i > 9) ? i : '0' + i), i, false, false);
+                                                }
+                                                day.val(selected_day);
+                                            }
+                                        } else {
+                                            day.val(selected_day);
+                                        }
+                                        day.change();
+                                    });
+                                    year.change(function(){
+                                        var selected_month = month.val();
+                                        month[0].options.length = 0;
+                                        if (months[year.val()] == undefined) {
+                                            month[0].options[month[0].options.length] = new Option('...', 0, false, false);
+                                        } else {
+                                            for (var i in months[year.val()]) {
+                                                month[0].options[month[0].options.length] = new Option(months[year.val()][i], i, false, false);
+                                            }
+                                            month.val(selected_month);
+                                        }
+                                        month.change();
+                                    });
+                                    year.change();
+                                    calendar.change(function(){
+                                        var new_date = calendar.val().split('-');
+                                        year.val(new_date[0]);
+                                        year.change();
+                                        month.val(parseInt(new_date[1]));
+                                        var selected_year_month = year.val() + ((month.val() > 9) ? month.val() : '0' + month.val());
+                                        if (day.is(":visible")) {
+                                            day[0].options.length = 0;
+                                            if (year_month_days[selected_year_month] == undefined) {
+                                                day[0].options[j = day[0].options.length] = new Option('...', 0, false, false);
+                                            } else {
+                                                var i, j; for (i = year_month_days[selected_year_month][0]; i <= year_month_days[selected_year_month][1]; i++) {
+                                                    day[0].options[j = day[0].options.length] = new Option(((i > 9) ? i : '0' + i), i, false, false);
+                                                }
+                                                day.val(parseInt(new_date[2]));
+                                            }
+                                        } else {
+                                            day.val(parseInt(new_date[2]));
+                                        }
+                                    });
+                                <? endif; ?>
+                            });
+                        //]]>
+                    </script>
+                <? if ($parameters['input-date-calendar']): ?></span><? endif; ?>
+            <? else: ?>
+                <script type="text/javascript">
+                    //<![CDATA[
+                        jQuery(function($){
+                            var months = <?=SketchUtils::encodeJSON($months)?>;
+                            var year_month_days = <?=SketchUtils::encodeJSON($year_month_days)?>;
+                            var day = $(':input[name="<?=$field_name?>[day]"]');
+                            <? if (in_array($parameters['format'], array('mY', 'd-mY'))): ?>
+                                var year_month = $(':input[name="<?=$field_name?>[year_month]"]');
+                                year_month.change(function(){
+                                    var selected_day = day.val();
+                                    if (day.is(":visible")) {
+                                        day[0].options.length = 0;
+                                        if (year_month_days[year_month.val()] == undefined) {
+                                            day[0].options[j = day[0].options.length] = new Option('...', 0, false, false);
+                                        } else {
+                                            var i, j; for (i = year_month_days[year_month.val()][0]; i <= year_month_days[year_month.val()][1]; i++) {
+                                                day[0].options[j = day[0].options.length] = new Option(((i > 9) ? i : '0' + i), i, false, false);
+                                            }
+                                            day.val(selected_day);
+                                        }
+                                    } else {
+                                        day.val(selected_day);
+                                    }
+                                });
+                                year_month.change();
+                            <? elseif (in_array($parameters['format'], array('m-Y', 'd-m-Y', 'Y-m-d', 'M-d-Y'))): ?>
+                                var month = $(':input[name="<?=$field_name?>[month]"]');
+                                var year = $(':input[name="<?=$field_name?>[year]"]');
+                                month.change(function(){
+                                    var selected_year_month = year.val() + ((month.val() > 9) ? month.val() : '0' + month.val());
+                                    var selected_day = day.val();
+                                    if (day.is(":visible")) {
+                                        day[0].options.length = 0;
+                                        if (year_month_days[selected_year_month] == undefined) {
+                                            day[0].options[j = day[0].options.length] = new Option('...', 0, false, false);
+                                        } else {
+                                            var i, j; for (i = year_month_days[selected_year_month][0]; i <= year_month_days[selected_year_month][1]; i++) {
+                                                day[0].options[j = day[0].options.length] = new Option(((i > 9) ? i : '0' + i), i, false, false);
+                                            }
+                                            day.val(selected_day);
+                                        }
+                                    } else {
+                                        day.val(selected_day);
+                                    }
+                                });
+                                year.change(function(){
+                                    var selected_month = month.val();
+                                    month[0].options.length = 0;
+                                    for (var i in months[year.val()]) {
+                                        month[0].options[month[0].options.length] = new Option(months[year.val()][i], i, false, false);
+                                    }
+                                    month.val(selected_month);
+                                    month.change();
+                                });
+                                year.change();
+                            <? endif; ?>
+                        });
+                    //]]>
+                </script>
+            <? endif; ?>
         <?php return ob_get_clean();
     }
 
@@ -57,105 +266,95 @@ class SketchFormComponentInputDate extends SketchFormComponent {
         $parameters = $this->extend(array(
             'disabled' => false,
             'null' => false,
-            'show_day_selector' => true,
+            'format' => 'd-mY',
+            'month_count' => 35,
             'from_current_date' => false,
-            'from_attribute' => null,
-            'to_attribute' => null,
-            'nights_attribute' => null,
             'calendar' => false,
             'input-date-day' => array('id' => null, 'class' => 'input-date-day', 'style' => null),
-            'input-date-year-month-count' => 252,
+            'input-date-month' => array('id' => null, 'class' => 'input-date-month', 'style' => null),
+            'input-date-year' => array('id' => null, 'class' => 'input-date-year', 'style' => null),
             'input-date-year-month' => array('id' => null, 'class' => 'input-date-year-month', 'style' => null),
             'input-date-calendar' => array('id' => null, 'class' => 'input-date-calendar', 'style' => null)
         ), array_shift($arguments));
         $form_name = $form->getFormName();
+        // Field names
         $field_name = $form->getFieldName($attribute);
         $calendar_field_id = md5($field_name);
-        if ($parameters['from_attribute'] != null) {
-            $from_field_name = "'".$form->getFieldName($parameters['from_attribute'])."'";
-            $from_calendar_field_id = "'".md5($form->getFieldName($parameters['from_attribute']))."'";
-            $to_field_name = "'".$field_name."'";
-            $to_calendar_field_id = "'".md5($field_name)."'";
-        } elseif ($parameters['to_attribute'] != null) {
-            $from_field_name = "'".$field_name."'";
-            $from_calendar_field_id = "'".md5($field_name)."'";
-            $to_field_name = "'".$form->getFieldName($parameters['to_attribute'])."'";
-            $to_calendar_field_id = "'".md5($form->getFieldName($parameters['to_attribute']))."'";
-        } else {
-            $from_field_name = 'null';
-            $from_calendar_field_id = 'null';
-            $to_field_name = 'null';
-            $to_calendar_field_id = 'null';
-        }
-        $nights_field_name = ($parameters['nights_attribute'] != null) ? "'".$form->getFieldName($parameters['nights_attribute'])."'" : 'null';
-        $field_value = $form->getFieldValue($attribute);
-        if ($field_value instanceof SketchDateTime) list($year, $month, $day) = $field_value->toArray();
-        elseif (!$parameters['null']) list($year, $month, $day) = SketchDateTime::Today()->toArray();
-        $year_month = sprintf('%04d%02d', $year, $month);
-        $disabled = ($parameters['disabled'] !== false) ? ' disabled="disabled"' : '';
+        // From and to dates
         if ($parameters['from_current_date']) {
-            $from_year = intval(date('Y'));
-            $from_month = intval(date('m', mktime(0, 0, 0, date('m'), date('d'), date('Y'))));
-            $from_year_month = sprintf('%04d%02d', $from_year, $from_month);
-            $from_day = ($from_year_month == $year_month) ? intval(date('d')) : 1;
-            if ($from_day > date('t')) $from_day = 1;
-            $count = 24;
-        } else {
-            $from_year = intval(date('Y')) - floor($parameters['input-date-year-month-count'] / 24);
-            $from_month = $from_day = 1;
-            $count = $parameters['input-date-year-month-count'];
+            $parameters['from_date'] = SketchDateTime::Today();
         }
-        $stamp = mktime(12, 0, 0, $count, 15, $from_year);
-        $last_year = date('Y', $stamp);
-        $last_month = date('m', $stamp);
-        $last_day = date('t', $stamp);
+        if (!($parameters['from_date'] instanceof SketchDateTime)) {
+            $month_count = ceil($parameters['month_count'] / 2);
+            $parameters['from_date'] = SketchDateTime::Today()->addInterval('-'.$month_count.' months');
+        }
+        if (!($parameters['to_date'] instanceof SketchDateTime)) {
+            $month_count = intval($parameters['month_count']);
+            $parameters['to_date'] = $parameters['from_date']->addInterval($month_count.' months');
+        }
+        // Field value
+        $field_value = $form->getFieldValue($attribute);
+        if ($field_value instanceof SketchDateTime) {
+            list($year, $month, $day) = $field_value->toArray();
+        } else if (is_array($field_value)) {
+            $year = $field_value['year'];
+            $month = $field_value['month'];
+            $day = $field_value['day'];
+        } else if ($parameters['null'] == false) {
+            list($year, $month, $day) = $parameters['from_date']->toArray();
+        }
+        $year_month = sprintf('%04d%02d', $year, $month);
+        $year = sprintf('%04d', $year);
+        $from_year = $parameters['from_date']->getYear();
+        $from_month = $parameters['from_date']->getMonth();
+        $from_day = $parameters['from_date']->getDay();
+        $to_year = $parameters['to_date']->getYear();
+        $to_month = $parameters['to_date']->getMonth();
+        $to_day = $parameters['to_date']->getDay();
         if ($parameters['null']) {
-            $months = array('...'); $month_days = array('000000' => 0);
+            $days = array('...'); $months = array('0000' => array('...')); $years = array('...'); $year_months = array('000000' => '...');
         } else {
-            $months = array(); $month_days = array();
+            $days = array(); $months = array(); $years = array(); $year_months = array();
         }
-        for ($i = $from_month; $i <= $count; $i++) {
-            $stamp = mktime(12, 0, 0, $i, 15, $from_year);
-            $syear = date('Y', $stamp);
-            $month_days[$syear.date('m', $stamp)] = date('t', $stamp);
-            $months[$syear.date('m', $stamp)] = date('m', $stamp).' - '.$syear;
-        }
-        if ($month_days[$year_month] > 0) {
-            for ($i = $from_day; $i <= $month_days[$year_month]; $i++) $days[$i] = sprintf('%02d', $i);
+        $year_month_days = array();
+        $date = $parameters['from_date'];
+        $month_names = SketchLocaleISO::getMonthNames();
+        do {
+            $years[$date->getYear()] = $date->getYear();
+            $months[$date->getYear()][intval($date->getMonth())] = ($parameters['format'] == 'M-d-Y') ? $month_names[intval($date->getMonth())] : sprintf('%02d', $date->getMonth());
+            $key = sprintf('%04d%02d', $date->getYear(), $date->getMonth());
+            $year_months[$key] = sprintf('%02d - %04d', $date->getMonth(), $date->getYear());
+            $year_month_days[$key] = array($date->equals($parameters['from_date']) ? $date->getDay() : 1, $date->getLastDay());
+            $date = $date->addInterval('1 month');
+        } while ($parameters['to_date']->equals($date) || $parameters['to_date']->greater($date));
+        $year_month_days[$key][1] = $parameters['to_date']->getDay();
+        if (is_array($year_month_days[$year_month])) {
+            for ($i = $year_month_days[$year_month][0]; $i <= $year_month_days[$year_month][1]; $i++) $days[$i] = sprintf('%02d', $i);
         } else {
-            $days[$i] = '...';
+            $days[0] = '...';
         }
-        ob_start(); ?>
-        <select id="<?=$field_name?>[day]" name="<?=$field_name?>[day]" onchange="<?=$form_name?>OnDayChange('<?=$field_name?>', <?=$from_field_name?>, <?=$to_field_name?>, <?=$nights_field_name?>, '<?=$calendar_field_id?>', <?=$from_calendar_field_id?>, <?=$to_calendar_field_id?>)"<?=$parameters['input-date-day'].$disabled?>>
-            <? foreach ($days as $key => $value): ?>
-                <option value="<?=htmlspecialchars($key)?>" <?=(($day == $key) ? 'selected="selected" class="select-option selected"' : 'class="select-option"')?>><?=htmlspecialchars($value)?></option>
-            <? endforeach; ?>
-        </select>
-        <?php $day_selector = ob_get_clean();
-        ob_start(); ?>
-        <input type="hidden" name="<?=$field_name?>[day]" value="1" />
-        <?php $day_hidden = ob_get_clean();
-        ob_start(); ?>
-        <select name="<?=$field_name?>[year_month]" onchange="<?=$form_name?>OnMonthChange('<?=$field_name?>', <?=$from_field_name?>, <?=$to_field_name?>, <?=$nights_field_name?>, '<?=$calendar_field_id?>', <?=$from_calendar_field_id?>, <?=$to_calendar_field_id?>)"<?=$parameters['input-date-year-month'].$disabled?>>
-            <? foreach ($months as $key => $value): ?>
-                <option value="<?=htmlspecialchars($key)?>" <?=(($year_month == $key) ? 'selected="selected" class="select-option selected"' : 'class="select-option"')?>><?=htmlspecialchars($value)?></option>
-            <? endforeach; ?>
-        </select>
-        <?php $year_month_selector = ob_get_clean();
-        if ($parameters['calendar']) {
-            ob_start(); ?>
-                <? if ($parameters['input-date-calendar']): ?><span<?=$parameters['input-date-calendar']?>><? endif; ?>
-                    <input type="hidden" value="<?=$year?>-<?=$month?>-<?=$day?>" onchange="<?=$form->getFormName()?>OnCalendarChange('<?=$field_name?>', <?=$from_field_name?>, <?=$to_field_name?>, <?=$nights_field_name?>, '<?=$calendar_field_id?>', <?=$from_calendar_field_id?>, <?=$to_calendar_field_id?>);" id="<?=$calendar_field_id?>" />
-                    <script type="text/javascript">
-                        jQuery(function($){
-                            $('#<?=$calendar_field_id?>').datepicker({firstDay: 1, minDate: new Date(<?=$from_year?>, <?=$from_month - 1?>, <?=$from_day?>), maxDate: new Date(<?=$last_year?>, <?=$last_month - 1?>, <?=$last_day?>), dayNamesMin: ['<?=$this->getTranslator()->_('Sun')?>', '<?=$this->getTranslator()->_('Mon')?>', '<?=$this->getTranslator()->_('Tue')?>', '<?=$this->getTranslator()->_('Wed')?>', '<?=$this->getTranslator()->_('Thu')?>', '<?=$this->getTranslator()->_('Fri')?>', '<?=$this->getTranslator()->_('Sat')?>'], monthNames: ['<?=$this->getTranslator()->_('January')?>', '<?=$this->getTranslator()->_('February')?>', '<?=$this->getTranslator()->_('March')?>', '<?=$this->getTranslator()->_('April')?>', '<?=$this->getTranslator()->_('May')?>', '<?=$this->getTranslator()->_('June')?>', '<?=$this->getTranslator()->_('July')?>', '<?=$this->getTranslator()->_('August')?>', '<?=$this->getTranslator()->_('September')?>', '<?=$this->getTranslator()->_('October')?>', '<?=$this->getTranslator()->_('November')?>', '<?=$this->getTranslator()->_('December')?>'], dateFormat: 'yy-mm-dd', showOn: 'button', buttonText: '<?=$this->getTranslator()->_('Calendar')?>'});
-                        });
-                    </script>
-                <? if ($parameters['input-date-calendar']): ?></span><? endif; ?>
-            <?php $calendar = ob_get_clean();
+        $calendar = $this->getCalendarAndOrJavascript($calendar_field_id, $field_name, $parameters, $year, $month, $day, $from_year, $from_month, $from_day, $to_year, $to_month, $to_day, $months, $year_month_days);
+        if (in_array($parameters['format'], array('mY', 'd-mY'))) {
+            $year_month_selector = $this->getYearMonthSelector($field_name, $parameters, $year_months, $year_month);
+            if ($parameters['format'] == 'd-mY') {
+                return $this->getDaySelector($field_name, $parameters, $days, $day).$year_month_selector.$calendar;
+            } else {
+                return '<input type="hidden" name="'.$field_name.'[day]" value="1" />'.$year_month_selector.$calendar;
+            }
+        } elseif (in_array($parameters['format'], array('m-Y', 'd-m-Y', 'Y-m-d', 'M-d-Y'))) {
+            $month_selector = $this->getMonthSelector($field_name, $parameters, $months[$year], $month);
+            $year_selector = $this->getYearSelector($field_name, $parameters, $years, $year);
+            if ($parameters['format'] == 'd-m-Y') {
+                return $this->getDaySelector($field_name, $parameters, $days, $day).$month_selector.$year_selector.$calendar;
+            } elseif ($parameters['format'] == 'M-d-Y') {
+                return $month_selector.$this->getDaySelector($field_name, $parameters, $days, $day).$year_selector.$calendar;
+            } elseif ($parameters['format'] == 'Y-m-d') {
+                return $year_selector.$month_selector.$this->getDaySelector($field_name, $parameters, $days, $day).$calendar;
+            } else {
+                return $month_selector.'<input type="hidden" name="'.$field_name.'[day]" value="1" />'.$year_selector.$calendar;
+            }
         } else {
-            $calendar = '';
+            throw new Exception(sprintf($this->getTranslator()->_('%s is not a supported format for SketchFormComponentInputDate'), $parameters['format']));
         }
-        return ($parameters['show_day_selector'] ? $day_selector : $day_hidden).$year_month_selector.$calendar;
     }
 }
