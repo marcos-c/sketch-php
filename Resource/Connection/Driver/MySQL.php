@@ -147,7 +147,7 @@ class MySQLConnectionDriver extends SketchConnectionDriver {
      */
     function executeUpdate($expression) {
         if ($this->getContext()->getLayerName() == 'development') {
-            $this->getLogger()->log($expression, 3);
+            $this->getLogger()->log(trim($expression).' ('.number_format(microtime(true) - $this->getApplication()->getStartTime(), 3).')', 4);
         }
         @mysql_query($expression, $this->connection);
         $error = mysql_error($this->connection);

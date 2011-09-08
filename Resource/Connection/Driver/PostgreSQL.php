@@ -139,6 +139,9 @@ class PostgreSQLConnectionDriver extends SketchConnectionDriver {
      * @return PostgreSQLResultSet
      */
     function executeQuery($expression) {
+        if ($this->getContext()->getLayerName() == 'development') {
+            $this->getLogger()->log(trim($expression).' ('.number_format(microtime(true) - $this->getApplication()->getStartTime(), 3).')', 4);
+        }
         if (!pg_connection_busy($this->connection)) {
             @pg_send_query($this->connection, $expression);
         }
@@ -160,6 +163,9 @@ class PostgreSQLConnectionDriver extends SketchConnectionDriver {
      * @return boolean
      */
     function executeUpdate($expression) {
+        if ($this->getContext()->getLayerName() == 'development') {
+            $this->getLogger()->log(trim($expression).' ('.number_format(microtime(true) - $this->getApplication()->getStartTime(), 3).')', 4);
+        }
         if (!pg_connection_busy($this->connection)) {
             @pg_send_query($this->connection, $expression);
         }
