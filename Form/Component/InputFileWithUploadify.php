@@ -35,6 +35,7 @@ class SketchFormComponentInputFileWithUploadify extends SketchFormComponent {
         $uri = array_shift($arguments);
         $command = array_shift($arguments);
         $attribute = array_shift($arguments);
+        $on_complete = array_shift($arguments);
         $form_name = $this->getForm()->getFormName();
         $field_name = str_replace('[attributes]', "[$form_name]", $this->getForm()->getFieldName($attribute));
         $field_id = substr(md5(uniqid()), 0, 8);
@@ -46,7 +47,7 @@ class SketchFormComponentInputFileWithUploadify extends SketchFormComponent {
         } elseif (preg_match('/\d+G/', $size_limit)) {
             $size_limit = intval($size_limit) * 1073741824;
         }
-        $on_complete = method_exists($this->getForm()->getInstance(), 'partialUpdateAction') ? 'partialUpdateAction' : 'updateAction';
+        $on_complete = ($on_complete != null) ? $on_complete : (method_exists($this->getForm()->getInstance(), 'partialUpdateAction') ? 'partialUpdateAction' : 'updateAction');
         ob_start(); ?>
             <input type="file" id="<?=$field_id?>" name="<?=$field_name?>" />
             <script type="text/javascript">
