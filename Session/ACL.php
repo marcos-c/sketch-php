@@ -3,7 +3,7 @@
  * This file is part of the Sketch Framework
  * (http://code.google.com/p/sketch-framework/)
  *
- * Copyright (C) 2010 Marcos Albaladejo Cooper
+ * Copyright (C) 2011 Marcos Albaladejo Cooper
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -27,64 +27,75 @@ require_once 'Sketch/Session/ACL.php';
 
 /**
  * SketchSessionACL
- *
- * @package Sketch
  */
 class SketchSessionACL extends SketchObject {
-    /**
-     *
-     * @var array
-     */
+    /** @var array */
     private $attributes = array();
 
-    /**
-     *
-     * @var array
-     */
-    private $rules = array();
+    /** @var array */
+    private $roles = array();
 
     /**
+     * Get attribute
      *
-     * @param string $key
-     * @return string
+     * @param $key
+     * @return bool
      */
     function getAttribute($key) {
-        if (array_key_exists($key, $this -> attributes)) {
-            return $this -> attributes[$key];
+        if (array_key_exists($key, $this->attributes)) {
+            return $this->attributes[$key];
         } else return false;
     }
 
     /**
+     * Set attribute
      *
-     * @param string $key
-     * @param string $value
+     * @param $key
+     * @param $value
+     * @return void
      */
     function setAttribute($key, $value) {
         if ($value != null) {
-            $this -> attributes[$key] = $value;
-        } else unset($this -> attributes[$key]);
+            $this->attributes[$key] = $value;
+        } else unset($this->attributes[$key]);
     }
 
     /**
+     * Add role
      *
-     * @param string $rule
+     * @param $role
+     * @return void
      */
-    function addRule($rule) {
-        if (!in_array($rule, $this -> rules)) {
-            $this -> rules[] = $rule;
+    function addRole($role) {
+        if (!in_array($role, $this->roles)) {
+            $this->roles[] = $role;
         }
     }
 
     /**
+     * Add rule
      *
-     * @param mixed $mixed
-     * @return boolean
+     * This method is now deprecated and only supported for backward compatibility.
+     *
+     * @deprecated Use addRole
+     * @param $rule
+     * @return void
+     */
+    function addRule($rule) {
+        $this->addRole($rule);
+    }
+
+    /**
+     * Check roles
+     *
+     * @param $mixed
+     * @return bool
      */
     function check($mixed) {
-        if (is_array($mixed)) foreach ($mixed as $rule) {
-            if (in_array($rule, $this -> rules)) return true;
+        if (is_array($mixed)) foreach ($mixed as $role) {
+            if (in_array($role, $this->roles)) return true;
         } else {
-            return ($mixed != null) ? (in_array($mixed, $this -> rules)) : true;
+            return ($mixed != null) ? (in_array($mixed, $this->roles)) : true;
         } return false;
     }
 }
