@@ -3,7 +3,7 @@
  * This file is part of the Sketch Framework
  * (http://code.google.com/p/sketch-framework/)
  *
- * Copyright (C) 2010 Marcos Albaladejo Cooper
+ * Copyright (C) 2011 Marcos Albaladejo Cooper
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -36,91 +36,52 @@ define('WITH_PROTOCOL_AND_DOMAIN', 1);
 
 /**
  * SketchApplication
- *
- * @package Sketch
  */
 class SketchApplication {
-    /**
-     *
-     * @var SketchApplication
-     */
+    /** @var null|SketchApplication */
     private static $instance = null;
 
-    /**
-     *
-     * @var float
-     */
+    /** @var float */
     private $startTime;
 
-    /**
-     *
-     * @var SketchResourceContext
-     */
+    /** @var SketchResourceContext */
     private $context;
 
-    /**
-     *
-     * @var SketchLogger
-     */
+    /** @var SketchLogger */
     private $logger;
 
-    /**
-     *
-     * @var SketchResourceConnection
-     */
+    /** @var SketchResourceConnection */
     private $connection;
 
-    /**
-     *
-     * @var SketchController
-     */
+    /** @var SketchController */
     private $controller;
 
-    /**
-     *
-     * @var SketchRequest
-     */
+    /** @var SketchRequest */
     private $request;
 
-    /**
-     *
-     * @var SketchSession
-     */
+    /** @var SketchSession */
     private $session;
 
-    /**
-     *
-     * @var array
-     */
+    /** @var array */
     private $sessionNotices = array();
 
-    /**
-     *
-     * @var array
-     */
+    /** @var array */
     private $notices = array();
 
-    /**
-     *
-     * @var SketchLocale
-     */
+    /** @var SketchLocale */
     private $locale;
 
-    /**
-     *
-     * @var string
-     */
+    /** @var string */
     private $documentRoot;
 
-    /**
-     *
-     * @var string
-     */
+    /** @var string */
     private $uri;
 
     /**
+     * Return SketchApplication singleton instance
      *
-     * @return SketchApplication
+     * @static
+     * @return null|SketchApplication
      */
     static function getInstance() {
         if (self::$instance == null) {
@@ -130,11 +91,15 @@ class SketchApplication {
     }
 
     /**
+     * Exception error handler
      *
-     * @param <type> $errno
-     * @param <type> $errstr
-     * @param <type> $errfile
-     * @param <type> $errline
+     * @static
+     * @throws ErrorException
+     * @param $errno
+     * @param $errstr
+     * @param $errfile
+     * @param $errline
+     * @return void
      */
     static function exceptionErrorHandler($errno, $errstr, $errfile, $errline) {
         if (version_compare(PHP_VERSION, '5.3') === 1) {
@@ -149,7 +114,7 @@ class SketchApplication {
     }
 
     /**
-     *
+     * Constructor
      */
     private function __construct() {
         date_default_timezone_set('UCT');
@@ -160,6 +125,7 @@ class SketchApplication {
     }
 
     /**
+     * Get start time
      *
      * @return float
      */
@@ -168,14 +134,17 @@ class SketchApplication {
     }
 
     /**
+     * Set start time
      *
-     * @param float $start_time
+     * @param $start_time
+     * @return void
      */
     function setStartTime($start_time) {
         $this->startTime = $start_time;
     }
 
     /**
+     * Get resource context
      *
      * @return SketchResourceContext
      */
@@ -184,14 +153,17 @@ class SketchApplication {
     }
 
     /**
+     * Set resource context
      *
      * @param SketchResourceContext $context
+     * @return void
      */
     function setContext(SketchResourceContext $context) {
         $this->context = $context;
     }
 
     /**
+     * Get logger
      *
      * @return SketchLogger
      */
@@ -200,14 +172,17 @@ class SketchApplication {
     }
 
     /**
+     * Set logger
      *
-     * @param SketchLogger $logger 
+     * @param SketchLogger $logger
+     * @return void
      */
     function setLogger(SketchLogger $logger) {
         $this->logger = $logger;
     }
 
     /**
+     * Get resource connection
      *
      * @return SketchResourceConnection
      */
@@ -216,14 +191,17 @@ class SketchApplication {
     }
 
     /**
+     * Set resource connection
      *
-     * @param SketchResourceConnection $connection 
+     * @param null|SketchResourceConnection $connection
+     * @return void
      */
     function setConnection(SketchResourceConnection $connection = null) {
         $this->connection = $connection;
     }
 
     /**
+     * Get controller
      *
      * @return SketchController
      */
@@ -232,14 +210,17 @@ class SketchApplication {
     }
 
     /**
+     * Set controller
      *
      * @param SketchController $controller
+     * @return void
      */
     function setController(SketchController $controller) {
         $this->controller = $controller;
     }
 
     /**
+     * Get request
      *
      * @return SketchRequest
      */
@@ -248,14 +229,17 @@ class SketchApplication {
     }
 
     /**
+     * Set request
      *
      * @param SketchRequest $request
+     * @return void
      */
     function setRequest(SketchRequest $request) {
         $this->request = $request;
     }
 
     /**
+     * Get session
      *
      * @return SketchSession
      */
@@ -264,8 +248,10 @@ class SketchApplication {
     }
 
     /**
+     * Set session
      *
      * @param SketchSession $session
+     * @return void
      */
     function setSession(SketchSession $session) {
         $this->session = $session;
@@ -276,7 +262,9 @@ class SketchApplication {
     }
 
     /**
+     * Get notices
      *
+     * @param bool $skipFormNotices
      * @return array
      */
     function getNotices($skipFormNotices = true) {
@@ -301,8 +289,10 @@ class SketchApplication {
     }
 
     /**
+     * Add a notice
      *
-     * @param SketchApplicationNotice $notice 
+     * @param SketchApplicationNotice $notice
+     * @return void
      */
     function addNotice(SketchApplicationNotice $notice) {
         if ($notice->getNoticeType() == A_ERROR) {
@@ -313,16 +303,19 @@ class SketchApplication {
     }
 
     /**
+     * Get the application locale
      *
-     * @return SketchLocale 
+     * @return SketchLocale
      */
     function getLocale() {
         return $this->locale;
     }
 
     /**
+     * Set the application locale
      *
-     * @param SketchLocale $locale 
+     * @param SketchLocale $locale
+     * @return void
      */
     function setLocale(SketchLocale $locale) {
         $this->locale = $locale;
@@ -330,8 +323,10 @@ class SketchApplication {
     }
 
     /**
+     * Set the default locale
      *
-     * @param SketchLocale $locale 
+     * @param SketchLocale $default_locale
+     * @return void
      */
     function setDefaultLocale(SketchLocale $default_locale) {
         try {
@@ -346,6 +341,7 @@ class SketchApplication {
     }
 
     /**
+     * Get the application document root
      *
      * @return string
      */
@@ -354,19 +350,25 @@ class SketchApplication {
     }
 
     /**
+     * Set the application document root
      *
-     * @param string $document_root
+     * @param $document_root
+     * @return void
      */
     function setDocumentRoot($document_root) {
         $this->documentRoot = $document_root;
-        // Can't rely on $_SERVER['DOCUMENT_ROOT'] because it doesn't return what you would
-        // expect on all situations (symbolic links, server configuration, etc.)
+        /**
+         * Can't rely on $_SERVER['DOCUMENT_ROOT'] because it doesn't return what you would expect on all situations
+         * (symbolic links, server configuration, etc.)
+         */
         $server_document_root = str_replace($_SERVER['SCRIPT_NAME'], '', realpath(basename($_SERVER['SCRIPT_NAME'])));
         $this->uri = str_replace($server_document_root, '', $document_root);
     }
     
     /**
+     * Get the application URI
      *
+     * @param null $options
      * @return string
      */
     function getURI($options = null) {
