@@ -33,11 +33,13 @@ class SketchFormComponentInputHidden extends SketchFormComponent {
     function saveHTML() {
         $arguments = $this->getArguments();
         $attribute = array_shift($arguments);
+        $parameters = array_shift($arguments);
+        $parameters = (($parameters != null && strpos(" $parameters", 'class="')) ? $parameters : implode(' ', array($parameters, 'class="input-hidden"')));
         $field_name = $this->getForm()->getFieldName($attribute);
         $field_value = $this->getForm()->getFieldValue($attribute);
         if ($field_value instanceof SketchDateTime) {
             $field_value = $field_value->toString('Y-m-d');
         }
-        return '<input type="hidden" name="'.$field_name.'" value="'.$field_value.'" />';
+        return '<input type="hidden" name="'.$field_name.'" value="'.$field_value.'" '.$parameters.' />';
     }
 }
