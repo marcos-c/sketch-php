@@ -176,7 +176,7 @@ class SketchFactory extends SketchObject {
                             if (preg_match('/^int/', $definition['type']) || preg_match('/^smallint/', $definition['type']) || preg_match('/^tinyint/', $definition['type'])) {
                                 $contents[] = "\t\t\$this->${attribute_name} = intval(\$${column});\n";
                             } else if (preg_match('/^char/', $definition['type']) || preg_match('/^varchar/', $definition['type']) || preg_match('/^text/', $definition['type'])) {
-                                $contents[] = "\t\t\$this->${attribute_name} = trim(\$${column});\n";
+                                $contents[] = "\t\t\$this->${attribute_name} = \$${column};\n";
                             } else if (preg_match('/^bool/', $definition['type']) || preg_match('/^enum\(\'f\',\'t\'|enum\(\'t\',\'f\'/', $definition['type'])) {
                                 $contents[] = "\t\t\$this->${attribute_name} = is_bool(\$${column}) ? \$${column} : (\$${column} == 't');\n";
                             } else if (preg_match('/^(date|time)/', $definition['type'])) {
