@@ -204,7 +204,11 @@ class SketchResourceFolder extends SketchResource {
         header('Last-Modified: '.gmdate ('D, d M Y H:i:s', filemtime($file)).' GMT');
         header('Cache-Control: private', false);
         header('Content-Type: '.$descriptor->getFileType());
-        header('Content-Disposition: attachment; filename="'.$descriptor->getSourceFileName().'"');
+        if ($descriptor->isImage()) {
+            header('Content-Disposition: inline; filename="'.$descriptor->getSourceFileName().'"');
+        } else {
+            header('Content-Disposition: attachment; filename="'.$descriptor->getSourceFileName().'"');
+        }
         header('Content-Transfer-Encoding: binary');
         header('Content-Length: '.filesize($file));
         header('Connection: close');
