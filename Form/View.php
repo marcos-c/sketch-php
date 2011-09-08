@@ -3,7 +3,7 @@
  * This file is part of the Sketch Framework
  * (http://code.google.com/p/sketch-framework/)
  *
- * Copyright (C) 2010 Marcos Albaladejo Cooper
+ * Copyright (C) 2011 Marcos Albaladejo Cooper
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -28,55 +28,36 @@ require_once 'Sketch/Form/Iterator.php';
 /**
  * SketchFormView
  *
- * @package Sketch
+ * @throws Exception|SketchResponsePartStopParseException
  */
 class SketchFormView extends SketchObject {
-    /**
-     *
-     * @var boolean
-     */
+    /** @var bool */
     private static $executeCommand = true;
 
-    /**
-     *
-     * @var SketchObjectView
-     */
+    /** @var \SketchObjectView */
     protected $fromInstance;
 
-    /**
-     *
-     * @var SketchObjectView
-     */
+    /** @var \SketchObjectView */
     protected $instance;
 
-    /**
-     *
-     * @var string
-     */
+    /** @var string */
     protected $formName;
 
-    /**
-     *
-     * @var string
-     */
+    /** @var string */
     protected $action;
 
-    /**
-     *
-     * @var boolean
-     */
+    /** @var bool */
     protected $javascript = false;
 
-    /**
-     *
-     * @var SketchFormCommand
-     */
+    /** @var null */
     protected $defaultCommand = null;
 
     /**
+     * Call form components
      *
-     * @param string $name
-     * @param array $arguments
+     * @throws Exception
+     * @param $name
+     * @param $arguments
      * @return string
      */
     function __call($name, $arguments) {
@@ -94,9 +75,10 @@ class SketchFormView extends SketchObject {
     }
 
     /**
+     * Constructor
      *
      * @param SketchObjectView $data_view
-     * @param string $form_name
+     * @param $form_name
      */
     final function __construct(SketchObjectView $data_view, $form_name) {
         $this->fromInstance = clone($data_view);
@@ -138,9 +120,10 @@ class SketchFormView extends SketchObject {
     }
 
     /**
+     * Resolve instance parameters
      *
-     * @param string $location
-     * @return string
+     * @param $location
+     * @return mixed|string
      */
     public function resolveInstanceParameters($location) {
         // Add dinamic parameters to location
@@ -163,10 +146,13 @@ class SketchFormView extends SketchObject {
     }
 
     /**
+     * Forward requests
      *
-     * @param string $location
-     * @param array $attributes
-     * @param boolean $set_and_clear
+     * @throws SketchResponsePartStopParseException
+     * @param $location
+     * @param null $attributes
+     * @param bool $set_and_clear
+     * @return void
      */
     private function requestForward($location, $attributes = null, $set_and_clear = false) {
         // Add notices, log and attributes to session
@@ -192,16 +178,24 @@ class SketchFormView extends SketchObject {
         }
         // If it's a JSON request then add the forward to the response object
         if ($this->getRequest()->isJSON()) {
-            $this->getApplication()->getController()->getResponse()->forward = ($location != null) ? $location : "";
+            if ($location != null) {
+                $this->getApplication()->getController()->getResponse()->forward = $location;
+                throw new SketchResponsePartStopParseException();
+            } else {
+                $this->getApplication()->getController()->getResponse()->forward = "";
+            }
         } else {
             $this->getController()->forward($location);
         }
     }
 
     /**
+     * Execute commands
      *
-     * @param mixed $command
-     * @param string $target
+     * @throws Exception
+     * @param SketchFormCommand $command
+     * @param $target
+     * @return void
      */
     function executeCommand(SketchFormCommand $command, $target) {
         if ($command instanceof SketchFormCommand && $command->getCommand() != null) {
@@ -246,9 +240,10 @@ class SketchFormView extends SketchObject {
     }
 
     /**
+     * Encode command
      *
-     * @param string $mixed
-     * @return string
+     * @param $mixed
+     * @return SketchFormCommand|string
      */
     function encodeCommand($mixed) {
         if ($mixed != null) {
@@ -264,9 +259,10 @@ class SketchFormView extends SketchObject {
     }
 
     /**
+     * Decode command
      *
-     * @param string $mixed
-     * @return string
+     * @param $mixed
+     * @return SketchFormCommand|SketchFormCommandPropagate
      */
     private function decodeCommand($mixed) {
         if ($mixed != null) {
@@ -283,8 +279,9 @@ class SketchFormView extends SketchObject {
     }
 
     /**
+     * Encode location
      *
-     * @param string $mixed
+     * @param $mixed
      * @return string
      */
     private function encodeLocation($mixed) {
@@ -293,45 +290,98 @@ class SketchFormView extends SketchObject {
         } else return $mixed;
     }
 
+    /**
+     * Decode location
+     *
+     * @param $mixed
+     * @return mixed
+     */
     private function decodeLocation($mixed) {
         if ($mixed != null) {
             return unserialize(base64_decode($mixed));
         } else return $mixed;
     }
 
+    /**
+     * Decode attribute path expression
+     *
+     * @param $ape
+     * @return array
+     */
     private function decodeAttributePathExpression($ape) {
         return ($ape != null) ? explode('.', strtolower($ape)) : array();
     }
 
+    /**
+     * Get form name
+     *
+     * @return string
+     */
     function getFormName() {
         return $this->formName;
     }
 
+    /**
+     * Get form action
+     *
+     * @return string
+     */
     function getAction() {
         return $this->action;
     }
 
+    /**
+     * Set form action
+     *
+     * @param $action
+     * @return void
+     */
     function setAction($action) {
         $this->action = $this->resolveInstanceParameters($action);
     }
 
+    /**
+     * Get instance before POST, GET
+     *
+     * @return SketchObjectView
+     */
     function getFromInstance() {
         return $this->fromInstance;
     }
 
+    /**
+     * Get instance after POST, GET
+     *
+     * @return SketchObjectView
+     */
     function getInstance() {
         return $this->instance;
     }
 
+    /**
+     * Get field name
+     *
+     * @param $attribute
+     * @return string
+     */
     function getFieldName($attribute) {
         return $this->getFormName().'[attributes]['.base64_encode($attribute).']';
     }
 
+    /**
+     * Get field value
+     *
+     * Field is defined using a attribute path expression.
+     *
+     * @throws Exception
+     * @param $ape
+     * @return null|SketchObjectView
+     */
     function getFieldValue($ape) {
         $path = $this->decodeAttributePathExpression($ape);
         $instance = $this->instance;
         foreach ($path as $attribute) {
-            if (preg_match('/(\w+)\[([\w-]+)\]/i', $attribute, $matches)) {
+            if (preg_match('/(\w+)\[([\w-|]+)\]/i', $attribute, $matches)) {
                 $attribute = $matches[1];
                 $key = $matches[2];
             } else {
@@ -346,15 +396,24 @@ class SketchFormView extends SketchObject {
         } return $instance;
     }
 
+    /**
+     * Set field value
+     *
+     * Field is defined using a attribute path expression.
+     *
+     * @throws Exception
+     * @param $ape
+     * @param $value
+     * @return void
+     */
     function setFieldValue($ape, $value) {
         $path = $this->decodeAttributePathExpression($ape);
         $set = array_pop($path);
         $instance = $this->getFieldValue(implode('.', $path));
-        // if (!($instance instanceof SketchObjectView)) $instance = $this->instance;
         if ($value instanceof SketchResourceFolderDescriptor && method_exists($instance, "addDescriptor")) {
             // addDescriptor has to be called after the command is executed
         } else {
-            if (preg_match('/(\w+)\[([\w-]+)\]/i', $set, $matches)) {
+            if (preg_match('/(\w+)\[([\w-|]+)\]/i', $set, $matches)) {
                 $set = $matches[1];
                 $tmp = $this->getFieldValue(implode('.', array_merge($path, array($set))));
                 $tmp[$matches[2]] = $value;
@@ -371,9 +430,10 @@ class SketchFormView extends SketchObject {
     }
 
     /**
+     * Get field notices
      *
-     * @param string $attribute
-     * @return SketchFormNotice
+     * @param $attribute
+     * @return bool
      */
     function getFieldNotices($attribute) {
         foreach ($this->getApplication()->getNotices(false) as $notice) {
@@ -386,6 +446,13 @@ class SketchFormView extends SketchObject {
         return false;
     }
 
+    /**
+     * Get instance iterator
+     *
+     * @throws Exception
+     * @param $attribute
+     * @return SketchFormIterator
+     */
     function getIterator($attribute) {
         $attribute = strtolower($attribute);
         $object = eval('return $this->instance->get'.$attribute.'();');
@@ -397,18 +464,38 @@ class SketchFormView extends SketchObject {
         return new SketchFormIterator($iterator);
     }
 
-    function openForm($parameters = null) {
+    /**
+     * Open form
+     *
+     * @param null $parameters
+     * @param null $force_command
+     * @return string
+     */
+    function openForm($parameters = null, $force_command = null) {
         $this->javascript = true;
         $form_name = $this->getFormName();
         $action = $this->getAction();
+        $force_command = $this->encodeCommand($force_command);
         $parameters = (($parameters != null && strpos(" $parameters", 'class="')) ? $parameters : implode(' ', array($parameters, 'class="open-form"')));
-        return "<script type=\"text/javascript\"><!--\n(function($) { var stack = new Array(); ${form_name}Stack = function(method) { stack[stack.length] = method; }; ${form_name}Command = function(command, location) { $(\"input[name='${form_name}[command]']\").val(command); $(\"input[name='${form_name}[location]']\").val(location); $(\"form[name='${form_name}']\").submit(); return false; }; $(\"form[name='${form_name}']\").ready(function() { $(\"form[name='${form_name}']\").submit(function() { for (var i = 0; i < stack.length; i++) { eval(stack[i]); } }); }); })(jQuery);\n// --></script><form name=\"${form_name}\" action=\"${action}\" method=\"post\" enctype=\"multipart/form-data\" ${parameters}><input type=\"hidden\" id=\"${form_name}[command]\" name=\"${form_name}[command]\" /><input type=\"hidden\" id=\"${form_name}[location]\" name=\"${form_name}[location]\" />\n";
+        return "<script type=\"text/javascript\"><!--\n(function($) { var stack = new Array(); ${form_name}Stack = function(method) { stack[stack.length] = method; }; ${form_name}Command = function(command, location) { $(\"input[name='${form_name}[command]']\").val(command); $(\"input[name='${form_name}[location]']\").val(location); $(\"form[name='${form_name}']\").submit(); return false; }; $(\"form[name='${form_name}']\").ready(function() { $(\"form[name='${form_name}']\").submit(function() { for (var i = 0; i < stack.length; i++) { eval(stack[i]); } }); }); })(jQuery);\n// --></script><form name=\"${form_name}\" action=\"${action}\" method=\"post\" enctype=\"multipart/form-data\" ${parameters}><input type=\"hidden\" id=\"${form_name}[command]\" name=\"${form_name}[command]\" value=\"${force_command}\" /><input type=\"hidden\" id=\"${form_name}[location]\" name=\"${form_name}[location]\" />\n";
     }
 
+    /**
+     * Close form
+     *
+     * @return string
+     */
     function closeForm() {
         return ($this->defaultCommand != null) ? '<input type="submit" onclick="'.$this->defaultCommand.'" style="display: none"/></form>' : '</form>';
     }
 
+    /**
+     * Set default location
+     *
+     * @param $command
+     * @param null $location
+     * @return void
+     */
     function setDefaultCommand($command, $location = null) {
         $form_name = $this->getFormName();
         $command = $this->encodeCommand($command);
@@ -416,6 +503,13 @@ class SketchFormView extends SketchObject {
         $this->defaultCommand = "${form_name}Command('${command}', '${location}')";
     }
 
+    /**
+     * Returns JavaScript to send a command
+     *
+     * @param null $command
+     * @param null $location
+     * @return string
+     */
     function command($command = null, $location = null) {
         $form_name = $this->getFormName();
         $command = $this->encodeCommand($command);
@@ -423,33 +517,84 @@ class SketchFormView extends SketchObject {
         return $form_name.'Command(\''.$command.'\', \''.$location.'\');';
     }
 
+    /**
+     * Returns HTML and JavaScript to add a command button
+     *
+     * @param $command
+     * @param null $location
+     * @param null $label
+     * @param null $parameters
+     * @return string
+     */
     function commandButton($command, $location = null, $label = null, $parameters = null) {
         $label = ($label != null) ? $label : $command;
         return '<span><input type="button" value="'.$label.'" onclick="return '.$this->command($command, $location).'" '.trim(!strpos(" $parameters", 'class="') ? "$parameters class=\"command-button\"" : $parameters).' /></span>';
     }
 
+    /**
+     * Returns HTML and JavaScript to add a command link
+     *
+     * @param $command
+     * @param null $location
+     * @param null $label
+     * @param null $parameters
+     * @return string
+     */
     function commandLink($command, $location = null, $label = null, $parameters = null) {
         $label = ($label != null) ? $label : $command;
         $action = $this->getAction();
         return '<a href="'.$action.'" onclick="return '.$this->command($command, $location).'" '.trim(!strpos(" $parameters", 'class="') ? "$parameters class=\"command-link\"" : $parameters).'>'.$label.'</a>';
     }
 
+    /**
+     * Returns HTML and JavaScript to add a command link with confirmation
+     *
+     * @param $command
+     * @param null $location
+     * @param null $label
+     * @param null $confirmation_message
+     * @param null $parameters
+     * @return string
+     */
     function commandLinkWithConfirmation($command, $location = null, $label = null, $confirmation_message = null, $parameters = null) {
         $label = ($label != null) ? $label : $command;
         return '<a href="'.$this->getAction().'" onclick="if (confirm(\''.$confirmation_message.'\')) { return '.$this->command($command, $location).'; } else { return false; }" '.trim(!strpos(" $parameters", 'class="') ? "$parameters class=\"command-link\"" : $parameters).'>'.$label.'</a>';
     }
 
+    /**
+     * Returns HTML and JavaScript to add a command link that submits to another window
+     *
+     * @param $command
+     * @param null $location
+     * @param null $label
+     * @param null $parameters
+     * @return string
+     */
     function commandLinkNewWindow($command, $location = null, $label = null, $parameters = null) {
         $form_name = $this->getFormName();
         $label = ($label != null) ? $label : $command;
         return '<a href="'.$this->getAction().'" onclick="jQuery(\'form[name=\\\''.$form_name.'\\\']\').attr(\'target\', \'_blank\'); '.$this->command($command, $location).'; jQuery(\'form[name=\\\''.$form_name.'\\\']\').attr(\'target\', \'_self\'); return false;" '.trim(!strpos(" $parameters", 'class="') ? "$parameters class=\"command-link\"" : $parameters).'>'.$label.'</a>';
     }
 
+    /**
+     * Returns routed link
+     *
+     * @param null $location
+     * @param null $label
+     * @param null $parameters
+     * @return string
+     */
     function link($location = null, $label = null, $parameters = null) {
         $location = $this->resolveInstanceParameters($location);
         return '<a href="'.$location.'" '.trim(!strpos(" $parameters", 'class="') ? "$parameters class=\"link\"" : $parameters).'>'.$label.'</a>';
     }
 
+    /**
+     * Returns a routed location
+     *
+     * @param $location
+     * @return mixed|string
+     */
     function resolveLocation($location) {
         return $this->resolveInstanceParameters($location);
     }
