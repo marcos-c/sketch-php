@@ -40,6 +40,13 @@ require_once 'Sketch/DateTime/Iterator.php';
 require_once 'Sketch/Mail/Message.php';
 require_once 'Sketch/Mail/Transport.php';
 
+if (!defined('CONTEXT_XML')) {
+    define('CONTEXT_XML', APPLICATION_PATH.'/config/context.xml');
+}
+if (!defined('DETACH_CONTROLLER')) {
+    define('DETACH_CONTROLLER', false);
+}
+
 try {
     // Initialize application and context
     $application = SketchApplication::getInstance();
@@ -47,9 +54,7 @@ try {
     set_error_handler(array('SketchApplication', 'exceptionErrorHandler'));
     $application->setStartTime(microtime(true));
     $application->setDocumentRoot(APPLICATION_PATH);
-    $application->setContext(
-        SketchResourceFactory::getContext(defined('CONTEXT_XML') ? CONTEXT_XML : APPLICATION_PATH.'/config/context.xml')
-    );
+    $application->setContext(SketchResourceFactory::getContext(CONTEXT_XML));
     // Initialize request
     $application->setRequest(new SketchRequest());
     // Initialize session and ACL
@@ -71,19 +76,21 @@ try {
     $application->setConnection(
         SketchResourceFactory::getConnection($application->getContext())
     );
-    // Initialize controller
-    $application->setController(new SketchController());
-    $application->getController()->setRouter(
-        SketchRouterFactory::getRouter($application->getRequest())
-    );
-    // Output response
-    if ($application->getRequest()->isJSON()) {
-        $application->getController()->setResponse(new SketchResponseJSON());
-        print SketchUtils::encodeJSON($application->getController()->getResponse());
-    } else {
-        $application->getController()->setResponse(new SketchResponse());
-        $application->getController()->setResponseFilters($application->getContext());
-        print $application->getController()->getResponse();
+    if (!DETACH_CONTROLLER) {
+        // Initialize controller
+        $application->setController(new SketchController());
+        $application->getController()->setRouter(
+            SketchRouterFactory::getRouter($application->getRequest())
+        );
+        // Output response
+        if ($application->getRequest()->isJSON()) {
+            $application->getController()->setResponse(new SketchResponseJSON());
+            print SketchUtils::encodeJSON($application->getController()->getResponse());
+        } else {
+            $application->getController()->setResponse(new SketchResponse());
+            $application->getController()->setResponseFilters($application->getContext());
+            print $application->getController()->getResponse();
+        }
     }
 } catch (Exception $e) {
     /**
