@@ -3,7 +3,7 @@
  * This file is part of the Sketch Framework
  * (http://code.google.com/p/sketch-framework/)
  *
- * Copyright (C) 2010 Marcos Albaladejo Cooper
+ * Copyright (C) 2011 Marcos Albaladejo Cooper
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -32,11 +32,10 @@ require_once 'Sketch/Locale.php';
 
 /**
  * SketchObject
- *
- * @package Sketch
  */
 abstract class SketchObject {
     /**
+     * Get the application instance
      *
      * @return SketchApplication
      */
@@ -45,6 +44,7 @@ abstract class SketchObject {
     }
 
     /**
+     * Get the resource context instance
      *
      * @return SketchResourceContext
      */
@@ -53,6 +53,7 @@ abstract class SketchObject {
     }
 
     /**
+     * Get the logger instance
      *
      * @return SketchLogger
      */
@@ -61,6 +62,7 @@ abstract class SketchObject {
     }
 
     /**
+     * Get the connection instance
      *
      * @return SketchResourceConnection
      */
@@ -69,6 +71,7 @@ abstract class SketchObject {
     }
 
     /**
+     * Get the controller instance
      *
      * @return SketchController
      */
@@ -77,6 +80,7 @@ abstract class SketchObject {
     }
 
     /**
+     * Get the request instance
      *
      * @return SketchRequest
      */
@@ -85,6 +89,7 @@ abstract class SketchObject {
     }
 
     /**
+     * Get the session instance
      *
      * @return SketchSession
      */
@@ -93,6 +98,7 @@ abstract class SketchObject {
     }
 
     /**
+     * Get the locale instance
      *
      * @return SketchLocale
      */
@@ -101,6 +107,7 @@ abstract class SketchObject {
     }
 
     /**
+     * Get the locale translator instance
      *
      * @param string $reference
      * @return SketchLocaleTranslator
@@ -110,6 +117,7 @@ abstract class SketchObject {
     }
 
     /**
+     * Get the locale formatter instance
      *
      * @return SketchLocaleFormatter
      */
@@ -118,6 +126,7 @@ abstract class SketchObject {
     }
 
     /**
+     * Extend attributes method
      *
      * @return array
      */
@@ -152,6 +161,30 @@ abstract class SketchObject {
     }
 
     /**
+     *
+     * @return array
+     */
+    function expand() {
+        $o = array();
+        for ($i = 0; $i < func_num_args(); $i++) {
+            $t = func_get_arg($i);
+            if (is_array($t)) {
+                foreach ($t as $k1 => $v1) {
+                    if (is_array($v1)) {
+                        foreach ($v1 as $k2 => $v2) {
+                            $o[$k1][$k2] = $v2;
+                        }
+                    } else {
+                        $o[$k1] = $v1;
+                    }
+                }
+            }
+        }
+        return $o;
+    }
+
+    /**
+     * Expand attributes method
      *
      * @return array
      */
