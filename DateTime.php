@@ -3,7 +3,7 @@
  * This file is part of the Sketch Framework
  * (http://code.google.com/p/sketch-framework/)
  *
- * Copyright (C) 2010 Marcos Albaladejo Cooper
+ * Copyright (C) 2011 Marcos Albaladejo Cooper
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -27,8 +27,6 @@ require_once 'Sketch/DateTime/Exception.php';
 
 /**
  * SketchDateTime
- *
- * @package Sketch
  */
 class SketchDateTime extends SketchObject {
     /** @var \DateTime|null */
@@ -58,6 +56,24 @@ class SketchDateTime extends SketchObject {
      */
     static function Today() {
         return new SketchDateTime(self::Now()->toString('Y-m-d'));
+    }
+
+    /**
+     * Get available time zone identifiers
+     *
+     * @static
+     * @return array
+     */
+    static function getTimeZoneIdentifiers() {
+        $time_zones = array();
+        foreach (timezone_identifiers_list() as $s) {
+            $r = explode('/', $s);
+            if (in_array($r[0], array('GMT', 'Africa', 'America', 'Antarctica', 'Arctic', 'Asia', 'Atlantic', 'Australia', 'Europe', 'Indian', 'Pacific'))) {
+                $time_zones[$s] = $s;
+            }
+        }
+        ksort($time_zones);
+        return $time_zones;
     }
 
     /**

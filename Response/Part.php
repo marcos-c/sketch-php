@@ -302,6 +302,17 @@ class SketchResponsePart extends SketchObject {
     }
 
     /**
+     * Format a date using the current formatter with the provided time zone
+     *
+     * @param SketchDateTime $date
+     * @param $time_zone
+     * @return string
+     */
+    function formatDateWithTimeZone(SketchDateTime $date, $time_zone) {
+        return $this->getFormatter()->formatDateWithTimeZone($date, $time_zone);
+    }
+
+    /**
      * Format a time using the current formatter
      *
      * @param SketchDateTime $date
@@ -319,5 +330,16 @@ class SketchResponsePart extends SketchObject {
      */
     function formatDateAndTime(SketchDateTime $date) {
         return $this->getFormatter()->formatDateAndTime($date);
+    }
+
+    /**
+     * Format date and time using the current formatter with the provided time zone
+     *
+     * @param SketchDateTime $date
+     * @param string $time_zone
+     * @return string
+     */
+    function formatDateAndTimeWithTimeZone(SketchDateTime $date, $time_zone) {
+        return $this->getFormatter()->formatDateAndTimeWithTimeZone($date, $time_zone);
     }
 }

@@ -3,7 +3,7 @@
  * This file is part of the Sketch Framework
  * (http://code.google.com/p/sketch-framework/)
  *
- * Copyright (C) 2010 Marcos Albaladejo Cooper
+ * Copyright (C) 2011 Marcos Albaladejo Cooper
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -26,25 +26,22 @@ require_once 'Sketch/Object.php';
 
 /**
  * SketchLocaleFormatter
- *
- * @package Sketch
  */
 class SketchLocaleFormatter extends SketchObject {
-    /**
-     *
-     * @var string
-     */
+    /** @var string */
     private $localeString;
 
     /**
+     * Constructor
      *
-     * @param string $locale_string
+     * @param $locale_string
      */
     function  __construct($locale_string) {
         $this->setLocaleString($locale_string);
     }
 
     /**
+     * Get locale string
      *
      * @return string
      */
@@ -53,16 +50,19 @@ class SketchLocaleFormatter extends SketchObject {
     }
 
     /**
+     * Set locale string
      *
-     * @param string $locale_string
+     * @param $locale_string
+     * @return void
      */
     function setLocaleString($locale_string) {
         $this->localeString = $locale_string;
     }
 
     /**
+     * Escape string
      *
-     * @param string $string
+     * @param $string
      * @return string
      */
     function escapeString($string) {
@@ -70,8 +70,9 @@ class SketchLocaleFormatter extends SketchObject {
     }
 
     /**
+     * Format plain text
      *
-     * @param string $string
+     * @param $text
      * @return string
      */
     function formatPlainText($text) {
@@ -79,8 +80,9 @@ class SketchLocaleFormatter extends SketchObject {
     }
 
     /**
+     * Format number
      *
-     * @param float $number
+     * @param $number
      * @return string
      */
     function formatNumber($number) {
@@ -92,29 +94,66 @@ class SketchLocaleFormatter extends SketchObject {
     }
 
     /**
+     * Format date
      *
      * @param SketchDateTime $date
-     * @return string
+     * @return null|string
      */
     function formatDate(SketchDateTime $date) {
         return $date->toString('d/m/Y');
     }
 
     /**
+     * Format date with the provided time zone
      *
      * @param SketchDateTime $date
+     * @param $time_zone
      * @return string
+     */
+    function formatDateWithTimeZone(SketchDateTime $date, $time_zone) {
+        $t = new DateTime($date->toString('Y-m-d'), new DateTimeZone('GMT'));
+        try {
+            $t->setTimeZone(new DateTimeZone($time_zone));
+        } catch (Exception $e) {
+            $t->setTimeZone(new DateTimeZone('GMT'));
+        }
+        return $t->format('d/m/Y');
+    }
+
+    /**
+     * Format time
+     *
+     * @param SketchDateTime $date
+     * @return null|string
      */
     function formatTime(SketchDateTime $date) {
         return $date->toString('H:i');
     }
 
     /**
+     * Format date and time
      *
      * @param SketchDateTime $date
-     * @return string
+     * @return null|string
      */
     function formatDateAndTime(SketchDateTime $date) {
         return $date->toString('d/m/Y H:i');
+    }
+
+    /**
+     * Format date and time with the provided time zone
+     *
+     * @param SketchDateTime $date
+     * @param $time_zone
+     * @return string
+     */
+    function formatDateAndTimeWithTimeZone(SketchDateTime $date, $time_zone) {
+        $t = new DateTime($date->toString('Y-m-d H:i'), new DateTimeZone('GMT'));
+        try {
+            $t->setTimeZone(new DateTimeZone($time_zone));
+        } catch (Exception $e) {
+            $t->setTimeZone(new DateTimeZone('GMT'));
+        }
+        return $t->format('d/m/Y H:i');
     }
 }
