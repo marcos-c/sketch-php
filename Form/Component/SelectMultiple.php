@@ -68,10 +68,11 @@ class SketchFormComponentSelectMultiple extends SketchFormComponent {
             foreach ($options as $object) {
                 $key = $object->getId();
                 $value = method_exists($object, '__toString') ? $object->__toString() : (method_exists($object, 'getDefaultDescription') ? $object->getDefaultDescription() : $object->getDescription());
+                $value_styles = method_exists($object, '__toStringStyles') ? $object->__toStringStyles() : '';
                 if (is_array($field_value) && in_array($key, $field_value)) {
-                    $to[array_search($key, $field_value)] = '<option value="'.htmlspecialchars($key).'" selected="selected" class="select-option selected">'.htmlspecialchars($value).'</option>';
+                    $to[array_search($key, $field_value)] = '<option value="'.htmlspecialchars($key).'" selected="selected" class="'.$value_styles.' select-option selected">'.htmlspecialchars($value).'</option>';
                 } else {
-                    $from[] = '<option value="'.htmlspecialchars($key).'" class="select-option">'.htmlspecialchars($value).'</option>';
+                    $from[] = '<option value="'.htmlspecialchars($key).'" class="'.$value_styles.' select-option">'.htmlspecialchars($value).'</option>';
                 }
             }
         } elseif (is_array($options)) {
