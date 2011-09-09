@@ -50,6 +50,26 @@ class SketchResponseJSON extends SketchResponse {
 
     /**
      *
+     * @static
+     * @return SketchResponse
+     */
+    static function HTML() {
+        $response = new SketchResponseJSON();
+        $response->setIsXHTML(false);
+        return $response;
+    }
+
+    /**
+     *
+     * @static
+     * @return SketchResponse
+     */
+    static function XHTML() {
+        return new SketchResponseJSON();
+    }
+
+    /**
+     *
      * @param DOMDocument $document
      */
     function setDocument(DOMDocument $document) {

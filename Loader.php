@@ -22,6 +22,19 @@
  * @package Sketch
  */
 
+if (!defined('APPLICATION_PATH')) {
+    define('APPLICATION_PATH', realpath(dirname(__FILE__).'/../../'));
+}
+set_include_path(realpath(APPLICATION_PATH.'/library').PATH_SEPARATOR.get_include_path());
+
+if (!defined('CONTEXT_XML')) {
+    define('CONTEXT_XML', APPLICATION_PATH.'/config/context.xml');
+}
+
+if (!defined('DETACH_CONTROLLER')) {
+    define('DETACH_CONTROLLER', false);
+}
+
 require_once 'Sketch/Application.php';
 require_once 'Sketch/Resource/Factory.php';
 require_once 'Sketch/Resource/Context.php';
@@ -39,13 +52,6 @@ require_once 'Sketch/DateTime.php';
 require_once 'Sketch/DateTime/Iterator.php';
 require_once 'Sketch/Mail/Message.php';
 require_once 'Sketch/Mail/Transport.php';
-
-if (!defined('CONTEXT_XML')) {
-    define('CONTEXT_XML', APPLICATION_PATH.'/config/context.xml');
-}
-if (!defined('DETACH_CONTROLLER')) {
-    define('DETACH_CONTROLLER', false);
-}
 
 try {
     // Initialize application and context
@@ -84,10 +90,10 @@ try {
         );
         // Output response
         if ($application->getRequest()->isJSON()) {
-            $application->getController()->setResponse(new SketchResponseJSON());
+            $application->getController()->setResponse(SketchResponseJSON::HTML());
             print SketchUtils::encodeJSON($application->getController()->getResponse());
         } else {
-            $application->getController()->setResponse(new SketchResponse());
+            $application->getController()->setResponse(SketchResponse::HTML());
             $application->getController()->setResponseFilters($application->getContext());
             print $application->getController()->getResponse();
         }

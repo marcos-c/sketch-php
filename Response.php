@@ -50,6 +50,26 @@ class SketchResponse extends SketchObject {
     protected $document;
 
     /**
+     * 
+     * @static
+     * @return SketchResponse
+     */
+    static function HTML() {
+        $response = new SketchResponse();
+        $response->setIsXHTML(false);
+        return $response;
+    }
+
+    /**
+     * 
+     * @static
+     * @return SketchResponse
+     */
+    static function XHTML() {
+        return new SketchResponse();
+    }
+
+    /**
      *
      * @return string
      */
