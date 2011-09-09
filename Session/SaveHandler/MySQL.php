@@ -3,7 +3,7 @@
  * This file is part of the Sketch Framework
  * (http://code.google.com/p/sketch-framework/)
  *
- * Copyright (C) 2010 Marcos Albaladejo Cooper
+ * Copyright (C) 2011 Marcos Albaladejo Cooper
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -26,38 +26,27 @@ require_once 'Sketch/Object.php';
 
 /**
  * SketchSessionSaveHandlerMySQL
- *
- * @package Sketch
  */
 class SketchSessionSaveHandlerMySQL extends SketchObject {
-    /**
-     *
-     * @var string
-     */
+    /** @var string */
     static private $savePath;
 
-    /**
-     *
-     * @var string
-     */
+    /** @var string */
     static private $sessionName;
 
-    /**
-     *
-     * @var string
-     */
+    /** @var string */
     static private $prefix;
 
-    /**
-     *
-     * @var resource
-     */
+    /** @var resource */
     static private $connection;
 
     /**
+     * Open
      *
-     * @param string $save_path
-     * @param string $session_name
+     * @static
+     * @param $save_path
+     * @param $session_name
+     * @return bool
      */
     static function open($save_path, $session_name) {
         self::$savePath = $save_path;
@@ -82,41 +71,80 @@ class SketchSessionSaveHandlerMySQL extends SketchObject {
         }
     }
 
+    /**
+     * Close
+     *
+     * @static
+     * @return bool
+     */
     static function close() {
         mysql_close(self::$connection);
         return true;
     }
 
+    /**
+     * Read
+     *
+     * @static
+     * @param $id
+     * @return string
+     */
     static function read($id) {
-        $id = "'".mysql_escape_string($id)."'";
-        $save_path = "'".mysql_escape_string(self::$savePath)."'";
-        $session_name = "'".mysql_escape_string(self::$sessionName)."'";
-        $q = mysql_query("SELECT data FROM gbook_session WHERE id = $id AND save_path = $save_path AND session_name = $session_name", self::$connection);
+        $prefix = mysql_real_escape_string(self::$prefix, self::$connection);
+        $id = "'".mysql_real_escape_string($id, self::$connection)."'";
+        $save_path = "'".mysql_real_escape_string(self::$savePath, self::$connection)."'";
+        $session_name = "'".mysql_real_escape_string(self::$sessionName, self::$connection)."'";
+        $q = mysql_query("SELECT data FROM ${prefix}_session WHERE id = $id AND save_path = $save_path AND session_name = $session_name", self::$connection);
         $r = mysql_fetch_array($q, MYSQL_ASSOC);
         return (string) $r['data'];
     }
 
+    /**
+     * Write
+     *
+     * @static
+     * @param $id
+     * @param $data
+     * @return bool
+     */
     static function write($id, $data) {
-        $id = "'".mysql_escape_string($id)."'";
-        $data = "'".mysql_escape_string($data)."'";
-        $save_path = "'".mysql_escape_string(self::$savePath)."'";
-        $session_name = "'".mysql_escape_string(self::$sessionName)."'";
-        mysql_query("REPLACE INTO gbook_session (id, data, save_path, session_name) VALUES ($id, $data, $save_path, $session_name)", self::$connection);
+        $prefix = mysql_real_escape_string(self::$prefix, self::$connection);
+        $id = "'".mysql_real_escape_string($id, self::$connection)."'";
+        $data = "'".mysql_real_escape_string($data, self::$connection)."'";
+        $save_path = "'".mysql_real_escape_string(self::$savePath, self::$connection)."'";
+        $session_name = "'".mysql_real_escape_string(self::$sessionName, self::$connection)."'";
+        mysql_query("REPLACE INTO ${prefix}_session (id, data, save_path, session_name) VALUES ($id, $data, $save_path, $session_name)", self::$connection);
         return true;
     }
 
+    /**
+     * Destroy
+     *
+     * @static
+     * @param $id
+     * @return bool
+     */
     static function destroy($id) {
-        $id = "'".mysql_escape_string($id)."'";
-        $save_path = "'".mysql_escape_string(self::$savePath)."'";
-        $session_name = "'".mysql_escape_string(self::$sessionName)."'";
-        mysql_query("DELETE FROM gbook_session WHERE id = $id AND save_path = $save_path AND session_name = $session_name", self::$connection);
+        $prefix = mysql_real_escape_string(self::$prefix, self::$connection);
+        $id = "'".mysql_real_escape_string($id, self::$connection)."'";
+        $save_path = "'".mysql_real_escape_string(self::$savePath, self::$connection)."'";
+        $session_name = "'".mysql_real_escape_string(self::$sessionName, self::$connection)."'";
+        mysql_query("DELETE FROM ${prefix}_session WHERE id = $id AND save_path = $save_path AND session_name = $session_name", self::$connection);
         return true;
     }
 
+    /**
+     * Garbage collect
+     *
+     * @static
+     * @param $maxlifetime
+     * @return bool
+     */
     static function gc($maxlifetime) {
-        $save_path = "'".mysql_escape_string(self::$savePath)."'";
-        $session_name = "'".mysql_escape_string(self::$sessionName)."'";
-        mysql_query("DELETE FROM gbook_session WHERE save_path = $save_path AND session_name = $session_name AND DATE_ADD(creation_timestamp, INTERVAL ".SESSION_LIFETIME." SECOND) < CURRENT_TIMESTAMP()", self::$connection);
+        $prefix = mysql_real_escape_string(self::$prefix, self::$connection);
+        $save_path = "'".mysql_real_escape_string(self::$savePath, self::$connection)."'";
+        $session_name = "'".mysql_real_escape_string(self::$sessionName, self::$connection)."'";
+        mysql_query("DELETE FROM ${prefix}_session WHERE save_path = $save_path AND session_name = $session_name AND DATE_ADD(creation_timestamp, INTERVAL ".SESSION_LIFETIME." SECOND) < CURRENT_TIMESTAMP()", self::$connection);
         return true;
     }
 }
