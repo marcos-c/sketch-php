@@ -97,15 +97,15 @@ class GetTextLocaleTranslatorDriver extends SketchLocaleTranslatorDriver {
     function  __construct($locale_string, SketchResourceXML $resource) {
         $folder = $resource->queryCharacterData('//folder');
         foreach ($resource->query('//domain') as $domain) {
-            $domain = $domain->getCharacterData();
+            $this->domain = $domain->getCharacterData();
             try {
                 $this->setLocaleString($locale_string);
-                $this->readData($folder, $domain);
+                $this->readData($folder, $this->domain);
             } catch (Exception $e) {
                 // If there's any problem to read a full locale_string try with only the language
                 list($locale_string) = explode('_', $locale_string);
                 $this->setLocaleString($locale_string);
-                $this->readData($folder, $domain);
+                $this->readData($folder, $this->domain);
             }
         }
     }
@@ -117,6 +117,6 @@ class GetTextLocaleTranslatorDriver extends SketchLocaleTranslatorDriver {
      */
     function translate($text) {
         $md5 = md5($text);
-        return (array_key_exists($md5, $this->data[$this->domain])) ? $this->data[$this->domain][$md5] : $text;
+        return (is_array($this->data[$this->domain]) && array_key_exists($md5, $this->data[$this->domain])) ? $this->data[$this->domain][$md5] : $text;
     }
 }
