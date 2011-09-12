@@ -3,7 +3,7 @@
  * This file is part of the Sketch Framework
  * (http://code.google.com/p/sketch-framework/)
  *
- * Copyright (c) 2011 Marcos Cooper | http://marcoscooper.com
+ * Copyright (C) 2011 Marcos Albaladejo Cooper
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -26,14 +26,21 @@ require_once 'Sketch/Form/Component.php';
 
 /**
  * SketchFormComponentInputDate
- *
- * @package Components
  */
 class SketchFormComponentInputDate extends SketchFormComponent {
+    /**
+     * Get day selector
+     *
+     * @param $field_name
+     * @param $parameters
+     * @param $days
+     * @param $day
+     * @return string
+     */
     private function getDaySelector($field_name, $parameters, $days, $day) {
         $disabled = ($parameters['disabled'] !== false) ? ' disabled="disabled"' : '';
         ob_start(); ?>
-        <select id="<?=$field_name?>[day]" name="<?=$field_name?>[day]"<?=$parameters['input-date-day'].($parameters['onchange'] != null ? 'onchange="'.$parameters['onchange'].'"' : '').$disabled?>>
+        <select id="<?=$field_name?>[day]" name="<?=$field_name?>[day]"<?=$parameters['input-date-day'].$disabled?>>
             <? foreach ($days as $key => $value): ?>
                 <option value="<?=htmlspecialchars($key)?>" <?=(($day == $key) ? 'selected="selected" class="select-option selected"' : 'class="select-option"')?>><?=htmlspecialchars($value)?></option>
             <? endforeach; ?>
@@ -41,10 +48,19 @@ class SketchFormComponentInputDate extends SketchFormComponent {
         <?php return ob_get_clean();
     }
 
+    /**
+     * Get month selector
+     *
+     * @param $field_name
+     * @param $parameters
+     * @param $months
+     * @param $month
+     * @return string
+     */
     private function getMonthSelector($field_name, $parameters, $months, $month) {
         $disabled = ($parameters['disabled'] !== false) ? ' disabled="disabled"' : '';
         ob_start(); ?>
-        <select name="<?=$field_name?>[month]"<?=$parameters['input-date-month'].($parameters['onchange'] != null ? 'onchange="'.$parameters['onchange'].'"' : '').$disabled?>>
+        <select name="<?=$field_name?>[month]"<?=$parameters['input-date-month'].$disabled?>>
             <? foreach ($months as $key => $value): ?>
                 <option value="<?=htmlspecialchars($key)?>" <?=(($month == $key) ? 'selected="selected" class="select-option selected"' : 'class="select-option"')?>><?=htmlspecialchars($value)?></option>
             <? endforeach; ?>
@@ -52,10 +68,19 @@ class SketchFormComponentInputDate extends SketchFormComponent {
         <?php return ob_get_clean();
     }
 
+    /**
+     * Get year selector
+     *
+     * @param $field_name
+     * @param $parameters
+     * @param $years
+     * @param $year
+     * @return string
+     */
     private function getYearSelector($field_name, $parameters, $years, $year) {
         $disabled = ($parameters['disabled'] !== false) ? ' disabled="disabled"' : '';
         ob_start(); ?>
-        <select name="<?=$field_name?>[year]"<?=$parameters['input-date-year'].($parameters['onchange'] != null ? 'onchange="'.$parameters['onchange'].'"' : '').$disabled?>>
+        <select name="<?=$field_name?>[year]"<?=$parameters['input-date-year'].$disabled?>>
             <? foreach ($years as $key => $value): ?>
                 <option value="<?=htmlspecialchars($key)?>" <?=(($year == $key) ? 'selected="selected" class="select-option selected"' : 'class="select-option"')?>><?=htmlspecialchars($value)?></option>
             <? endforeach; ?>
@@ -63,10 +88,19 @@ class SketchFormComponentInputDate extends SketchFormComponent {
         <?php return ob_get_clean();
     }
 
+    /**
+     * Get year and month selector
+     *
+     * @param $field_name
+     * @param $parameters
+     * @param $year_months
+     * @param $year_month
+     * @return string
+     */
     private function getYearMonthSelector($field_name, $parameters, $year_months, $year_month) {
         $disabled = ($parameters['disabled'] !== false) ? ' disabled="disabled"' : '';
         ob_start(); ?>
-        <select name="<?=$field_name?>[year_month]"<?=$parameters['input-date-year-month'].($parameters['onchange'] != null ? 'onchange="'.$parameters['onchange'].'"' : '').$disabled?>>
+        <select name="<?=$field_name?>[year_month]"<?=$parameters['input-date-year-month'].$disabled?>>
             <? foreach ($year_months as $key => $value): ?>
                 <option value="<?=htmlspecialchars($key)?>" <?=(($year_month == $key) ? 'selected="selected" class="select-option selected"' : 'class="select-option"')?>><?=htmlspecialchars($value)?></option>
             <? endforeach; ?>
@@ -74,6 +108,25 @@ class SketchFormComponentInputDate extends SketchFormComponent {
         <?php return ob_get_clean();
     }
 
+    /**
+     * Get calendar and or javascript
+     *
+     * @param $calendar_field_id
+     * @param $field_name
+     * @param $parameters
+     * @param $year
+     * @param $month
+     * @param $day
+     * @param $from_year
+     * @param $from_month
+     * @param $from_day
+     * @param $to_year
+     * @param $to_month
+     * @param $to_day
+     * @param $months
+     * @param $year_month_days
+     * @return string
+     */
     private function getCalendarAndOrJavascript($calendar_field_id, $field_name, $parameters, $year, $month, $day, $from_year, $from_month, $from_day, $to_year, $to_month, $to_day, $months, $year_month_days) {
         ob_start(); ?>
             <? if ($parameters['calendar']): ?>
@@ -101,9 +154,12 @@ class SketchFormComponentInputDate extends SketchFormComponent {
                                                 day[0].options[j = day[0].options.length] = new Option('...', 0, false, false);
                                             } else {
                                                 var i, j; for (i = year_month_days[year_month.val()][0]; i <= year_month_days[year_month.val()][1]; i++) {
-                                                    day[0].options[j = day[0].options.length] = new Option(((i > 9) ? i : '0' + i), i, false, i == selected_day);
+                                                    day[0].options[j = day[0].options.length] = new Option(((i > 9) ? i : '0' + i), i, false, false);
                                                 }
+                                                day.val(selected_day);
                                             }
+                                        } else {
+                                           day.val(selected_day);
                                         }
                                         day.change();
                                     });
@@ -117,8 +173,9 @@ class SketchFormComponentInputDate extends SketchFormComponent {
                                                 day[0].options[j = day[0].options.length] = new Option('...', 0, false, false);
                                             } else {
                                                 var i, j; for (i = year_month_days[year_month.val()][0]; i <= year_month_days[year_month.val()][1]; i++) {
-                                                    day[0].options[j = day[0].options.length] = new Option(((i > 9) ? i : '0' + i), i, false, i == parseInt(new_date[2]));
+                                                    day[0].options[j = day[0].options.length] = new Option(((i > 9) ? i : '0' + i), i, false, false);
                                                 }
+                                                day.val(parseInt(new_date[2]));
                                             }
                                         } else {
                                             day.val(parseInt(new_date[2]));
@@ -139,9 +196,12 @@ class SketchFormComponentInputDate extends SketchFormComponent {
                                                 day[0].options[j = day[0].options.length] = new Option('...', 0, false, false);
                                             } else {
                                                 var i, j; for (i = year_month_days[selected_year_month][0]; i <= year_month_days[selected_year_month][1]; i++) {
-                                                    day[0].options[j = day[0].options.length] = new Option(((i > 9) ? i : '0' + i), i, false, i == selected_day);
+                                                    day[0].options[j = day[0].options.length] = new Option(((i > 9) ? i : '0' + i), i, false, false);
                                                 }
+                                                day.val(selected_day);
                                             }
+                                        } else {
+                                            day.val(selected_day);
                                         }
                                         day.change();
                                     });
@@ -152,8 +212,9 @@ class SketchFormComponentInputDate extends SketchFormComponent {
                                             month[0].options[month[0].options.length] = new Option('...', 0, false, false);
                                         } else {
                                             for (var i in months[year.val()]) {
-                                                month[0].options[month[0].options.length] = new Option(months[year.val()][i], i, false, i == selected_month);
+                                                month[0].options[month[0].options.length] = new Option(months[year.val()][i], i, false, false);
                                             }
+                                            month.val(selected_month);
                                         }
                                         month.change();
                                     });
@@ -170,8 +231,9 @@ class SketchFormComponentInputDate extends SketchFormComponent {
                                                 day[0].options[j = day[0].options.length] = new Option('...', 0, false, false);
                                             } else {
                                                 var i, j; for (i = year_month_days[selected_year_month][0]; i <= year_month_days[selected_year_month][1]; i++) {
-                                                    day[0].options[j = day[0].options.length] = new Option(((i > 9) ? i : '0' + i), i, false, i == parseInt(new_date[2]));
+                                                    day[0].options[j = day[0].options.length] = new Option(((i > 9) ? i : '0' + i), i, false, false);
                                                 }
+                                                day.val(parseInt(new_date[2]));
                                             }
                                         } else {
                                             day.val(parseInt(new_date[2]));
@@ -199,9 +261,12 @@ class SketchFormComponentInputDate extends SketchFormComponent {
                                             day[0].options[j = day[0].options.length] = new Option('...', 0, false, false);
                                         } else {
                                             var i, j; for (i = year_month_days[year_month.val()][0]; i <= year_month_days[year_month.val()][1]; i++) {
-                                                day[0].options[j = day[0].options.length] = new Option(((i > 9) ? i : '0' + i), i, false, i == selected_day);
+                                                day[0].options[j = day[0].options.length] = new Option(((i > 9) ? i : '0' + i), i, false, false);
                                             }
+                                            day.val(selected_day);
                                         }
+                                    } else {
+                                        day.val(selected_day);
                                     }
                                 });
                                 year_month.change();
@@ -217,17 +282,21 @@ class SketchFormComponentInputDate extends SketchFormComponent {
                                             day[0].options[j = day[0].options.length] = new Option('...', 0, false, false);
                                         } else {
                                             var i, j; for (i = year_month_days[selected_year_month][0]; i <= year_month_days[selected_year_month][1]; i++) {
-                                                day[0].options[j = day[0].options.length] = new Option(((i > 9) ? i : '0' + i), i, false, i == selected_day);
+                                                day[0].options[j = day[0].options.length] = new Option(((i > 9) ? i : '0' + i), i, false, false);
                                             }
+                                            day.val(selected_day);
                                         }
+                                    } else {
+                                        day.val(selected_day);
                                     }
                                 });
                                 year.change(function(){
                                     var selected_month = month.val();
                                     month[0].options.length = 0;
                                     for (var i in months[year.val()]) {
-                                        month[0].options[month[0].options.length] = new Option(months[year.val()][i], i, false, i == selected_month);
+                                        month[0].options[month[0].options.length] = new Option(months[year.val()][i], i, false, false);
                                     }
+                                    month.val(selected_month);
                                     month.change();
                                 });
                                 year.change();
@@ -240,7 +309,9 @@ class SketchFormComponentInputDate extends SketchFormComponent {
     }
 
     /**
+     * Save HTML
      *
+     * @throws Exception
      * @return string
      */
     function saveHTML() {
@@ -250,17 +321,15 @@ class SketchFormComponentInputDate extends SketchFormComponent {
         $parameters = $this->extend(array(
             'disabled' => false,
             'null' => false,
-            'format' => 'd-m-Y',
-            'inverse' => false,
+            'format' => 'd-mY',
             'month_count' => 35,
             'from_current_date' => false,
-            'calendar' => true,
+            'calendar' => false,
             'input-date-day' => array('id' => null, 'class' => 'input-date-day', 'style' => null),
             'input-date-month' => array('id' => null, 'class' => 'input-date-month', 'style' => null),
             'input-date-year' => array('id' => null, 'class' => 'input-date-year', 'style' => null),
             'input-date-year-month' => array('id' => null, 'class' => 'input-date-year-month', 'style' => null),
-            'input-date-calendar' => array('id' => null, 'class' => 'input-date-calendar', 'style' => null),
-            'onchange' => null
+            'input-date-calendar' => array('id' => null, 'class' => 'input-date-calendar', 'style' => null)
         ), array_shift($arguments));
         $form_name = $form->getFormName();
         // Field names
@@ -270,18 +339,13 @@ class SketchFormComponentInputDate extends SketchFormComponent {
         if ($parameters['from_current_date']) {
             $parameters['from_date'] = SketchDateTime::Today();
         }
-        if ($parameters['to_current_date']) {
-            $parameters['to_date'] = SketchDateTime::Today();
-            $parameters['from_date'] = $parameters['to_date']->addInterval('-'.$parameters['month_count'].' months');
-        } else {
-            if (!($parameters['from_date'] instanceof SketchDateTime)) {
-                $month_count = ceil($parameters['month_count'] / 2);
-                $parameters['from_date'] = SketchDateTime::Today()->addInterval('-'.$month_count.' months');
-            }
-            if (!($parameters['to_date'] instanceof SketchDateTime)) {
-                $month_count = intval($parameters['month_count']);
-                $parameters['to_date'] = $parameters['from_date']->addInterval($month_count.' months');
-            }
+        if (!($parameters['from_date'] instanceof SketchDateTime)) {
+            $month_count = ceil($parameters['month_count'] / 2);
+            $parameters['from_date'] = SketchDateTime::Today()->addInterval('-'.$month_count.' months');
+        }
+        if (!($parameters['to_date'] instanceof SketchDateTime)) {
+            $month_count = intval($parameters['month_count']);
+            $parameters['to_date'] = $parameters['from_date']->addInterval($month_count.' months');
         }
         // Field value
         $field_value = $form->getFieldValue($attribute);
@@ -303,7 +367,7 @@ class SketchFormComponentInputDate extends SketchFormComponent {
         $to_month = $parameters['to_date']->getMonth();
         $to_day = $parameters['to_date']->getDay();
         if ($parameters['null']) {
-            $days = array('...'); $months = array('0000' => array('00' => '...')); $years = array('0000' => '...'); $year_months = array('000000' => '...');
+            $days = array('...'); $months = array('0000' => array('...')); $years = array('...'); $year_months = array('000000' => '...');
         } else {
             $days = array(); $months = array(); $years = array(); $year_months = array();
         }
@@ -334,7 +398,6 @@ class SketchFormComponentInputDate extends SketchFormComponent {
             }
         } elseif (in_array($parameters['format'], array('m-Y', 'd-m-Y', 'Y-m-d', 'M-d-Y'))) {
             $month_selector = $this->getMonthSelector($field_name, $parameters, $months[$year], $month);
-            if ($parameters['inverse']) $years = array_reverse($years, true);
             $year_selector = $this->getYearSelector($field_name, $parameters, $years, $year);
             if ($parameters['format'] == 'd-m-Y') {
                 return $this->getDaySelector($field_name, $parameters, $days, $day).$month_selector.$year_selector.$calendar;

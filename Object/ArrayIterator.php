@@ -3,7 +3,7 @@
  * This file is part of the Sketch Framework
  * (http://code.google.com/p/sketch-framework/)
  *
- * Copyright (C) 2010 Marcos Albaladejo Cooper
+ * Copyright (C) 2011 Marcos Albaladejo Cooper
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -22,23 +22,24 @@
  * @package Sketch
  */
 
-/**
- * SketchArrayIterator
- *
- * @package Sketch
- */
-class SketchArrayIterator extends ArrayIterator {
-    /**
-     * @param $array
-     */
-    function __construct($array) {
-        parent::__construct(is_array($array) ? $array : array());
-    }
+require_once 'Sketch/Form/Component.php';
 
+/**
+ * SketchFormComponentInputRichText
+ */
+class SketchFormComponentInputRichText extends SketchFormComponent {
     /**
-     * @return int
+     * Save HTML
+     *
+     * @return string
      */
-    function size() {
-        return $this->count();
+    function saveHTML() {
+        $arguments = $this->getArguments();
+        $attribute = array_shift($arguments);
+        $parameters = array_shift($arguments);
+        $field_name = $this->getForm()->getFieldName($attribute);
+        $field_value = htmlspecialchars($this->getForm()->getFieldValue($attribute));
+        $parameters = (($parameters != null && strpos(" $parameters", 'class="')) ? $parameters : implode(' ', array($parameters, 'class="input-text"')));
+        return '<textarea name="'.$field_name.'" '.$parameters.'>'.$field_value.'</textarea>';
     }
 }
