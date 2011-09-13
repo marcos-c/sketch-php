@@ -275,9 +275,23 @@ class SketchResponsePart extends SketchObject {
      * Escape a plant text using the current formatter
      *
      * @param string $text
+     * @param integer $chars
      * @return string
      */
-    function formatPlainText($text) {
+    function formatPlainText($text, $chars=null) {
+
+        if ($chars) {
+            $counter = 0;
+            $text = trim($text);
+            $textArray = explode(' ',$text);
+            $text = '';
+
+            while($chars >= strlen($text) + strlen($textArray[$counter])){
+                $text .= ' '.$textArray[$counter];
+                $counter++;
+            }
+        }
+
         return $this->getFormatter()->formatPlainText($text);
     }
 
