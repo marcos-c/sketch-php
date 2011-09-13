@@ -288,9 +288,23 @@ class SketchResponsePart extends SketchObject {
     /**
      *
      * @param string $text
+     * @param integer $chars
      * @return string
      */
-    function formatPlainText($text) {
+    function formatPlainText($text, $chars=null) {
+
+        if ($chars) {
+            $counter = 0;
+            $text = trim($text);
+            $textArray = explode(' ',$text);
+            $text = '';
+
+            while($chars >= strlen($text) + strlen($textArray[$counter])){
+                $text .= ' '.$textArray[$counter];
+                $counter++;
+            }
+        }
+
         return $this->getFormatter()->formatPlainText($text);
     }
 
