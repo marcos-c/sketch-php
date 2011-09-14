@@ -28,6 +28,22 @@ require_once 'Sketch/Form/Iterator.php';
 /**
  * SketchFormView
  *
+ * @method string inputCheckbox() inputCheckbox($attribute, $parameters = null, $true = 't', $checked = false) Input checkbox
+ * @method string inputDate() inputDate($attribute, $parameters = null) Input date
+ * @method string inputFile() inputFile($attribute, $parameters = null) Input file
+ * @method string inputFileWithPreview($attribute, $preview_attribute = null, $parameters = null) inputFileWithPreview() Input file with preview
+ * @method string inputFileWithUploadify() inputFileWithUploadify($uri, $command, $attribute, $on_complete = 'updateAction') Input file with uploadify
+ * @method string inputHidden() inputHidden($attribute, $parameters = null) Input hidden
+ * @method string inputNights() inputNights($attribute, $parameters = null) Input nights
+ * @method string inputSecret() inputSecret($attribute, $parameters = null, $default = null) Input secret
+ * @method string inputText() inputText($attribute, $parameters = null, $default = null) Input text
+ * @method string inputTextArea() inputTextArea($attribute, $parameters = null) Input text area
+ * @method string inputTime() inputTime($attribute, $parameters = null) Input time
+ * @method string selectCheckbox() selectCheckbox($attribute, $reference = null, $parameters = null) Select checkbox
+ * @method string selectMultiple() selectMultiple($options, $attribute, $parameters = null) Select multiple
+ * @method string selectOne() selectOne($options, $attribute, $parameters) Select one
+ * @method string selectOneRadio() selectOneRadio($options, $attribute, $parameters) Select one radio
+ * @method string selectRadio() selectRadio($attribute, $reference, $parameters = null) Select radio
  * @throws Exception|SketchResponsePartStopParseException
  */
 class SketchFormView extends SketchObject {

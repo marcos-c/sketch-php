@@ -44,7 +44,6 @@ class SketchFormComponentInputNights extends SketchFormComponent {
             'span' => array('id' => null, 'class' => 'input-date', 'style' => null),
             'input-nights' => array('id' => null, 'class' => 'input-nights', 'style' => null)
         ), array_shift($arguments));
-        $default = array_shift($arguments);
         $form_name = $form->getFormName();
         $from_field_name = $form->getFieldName($parameters['from_attribute']);
         $from_calendar_field_id = md5($form->getFieldName($parameters['from_attribute']));
