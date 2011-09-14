@@ -36,6 +36,9 @@ define('QUOTED_IDENTIFIERS', 1);
  * SketchFactory
  */
 class SketchFactory extends SketchObject {
+    /** @var string */
+    static private $version = '1.1';
+
     /**
      * Scaffold
      *
@@ -82,7 +85,7 @@ class SketchFactory extends SketchObject {
     private static function scaffoldFrom($class_name, $table_name, $prefix, $primary_key, $table_definition) {
         $application = SketchApplication::getInstance();
         $translator = $application->getLocale()->getTranslator();
-        $signature = md5(serialize(array($class_name, $table_definition['fields'])));
+        $signature = md5(serialize(array(self::$version, $class_name, $table_definition['fields'])));
         $filename = substr($signature, 0, 16).".php";
         $document_root = $application->getDocumentRoot();
         if ($document_root != null) {
