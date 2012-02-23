@@ -180,12 +180,15 @@ class SketchResourceContext extends SketchResourceXML {
      * @param string $source
      * @param array $parameters
      */
-    function addExtension($type, $class, $source, array $parameters = null) {
+    function addExtension($type, $class, $source, $excludes = null, array $parameters = null) {
         $context = $this->document->getElementsByTagName('context')->item(0);
         $extension = $this->document->createElement('extension');
         $extension->setAttribute('type', $type);
         $extension->setAttribute('class', $class);
         $extension->setAttribute('source', $source);
+        if ($excludes != null) {
+            $extension->setAttribute('excludes', $excludes);
+        }
         if (is_array($parameters)) foreach ($parameters as $value) {
             $parameter = $this->document->createDocumentFragment();
             $parameter->appendXML($value);
