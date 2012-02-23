@@ -40,21 +40,32 @@ define('QUOTED_IDENTIFIERS', 1);
 class SketchFactory extends SketchObject {
     /**
      *
+     * @var string
+     */
+    static private $version = null;
+
+    /**
+     *
      * @return SketchObject
      */
     static function scaffold($table_name, $options = null) {
+        $metadata_table_name = 'metadata';
         if (is_array($options)) {
             if (!array_key_exists('prefix', $options)) $options['prefix'] = 'Abstract';
             if (!array_key_exists('primary_key', $options)) $options['primary_key'] = 'id';
+            if (!array_key_exists('generate_iterator', $options)) $options['generate_iterator'] = true;
         } else {
-            $options = array('prefix' => 'Abstract', 'primary_key' => 'id');
+            $options = array('prefix' => 'Abstract', 'primary_key' => 'id', 'generate_iterator' => true);
         }
         $application = SketchApplication::getInstance();
         $connection = $application->getConnection();
         $prefix = $connection->getTablePrefix();
         if ($prefix != null) {
             $table_name = "${prefix}_${table_name}";
+            $metadata_table_name = "${prefix}_${metadata_table_name}";
         }
+        $metadata = $connection->getTableDefinition($metadata_table_name);
+        $version = ($metadata['fields']['key'] != null) ? $connection->queryFirst("SELECT value FROM $metadata_table_name WHERE `key` = 'version'") : self::$version;
         if (array_key_exists('class_name', $options)) {
             $class_name = $options['class_name'];
         } else {
@@ -62,7 +73,7 @@ class SketchFactory extends SketchObject {
                 $class_name .= ucfirst($value);
             }
         }
-        return self::scaffoldFrom($class_name, $table_name, $options['prefix'], $options['primary_key'], $connection->getTableDefinition($table_name));
+        return self::scaffoldFrom($version, $class_name, $table_name, $options['prefix'], $options['primary_key'], $options['generate_iterator'], $connection->getTableDefinition($table_name));
     }
 
     /**
@@ -72,15 +83,15 @@ class SketchFactory extends SketchObject {
      * @param string $primary_key
      * @param array $definition
      */
-    private static function scaffoldFrom($class_name, $table_name, $prefix, $primary_key, $table_definition) {
+    private static function scaffoldFrom($version, $class_name, $table_name, $prefix, $primary_key, $generate_iterator, $table_definition) {
         $application = SketchApplication::getInstance();
         $translator = $application->getLocale()->getTranslator();
-        $signature = md5(serialize(array($class_name, $table_definition['fields'])));
-        $filename = substr($signature, 0, 16).".php";
+        $signature = md5(serialize(array($version, $class_name, $table_definition['fields'])));
+        $filename = $class_name.'_'.substr($signature, 0, 8).".php";
         $document_root = $application->getDocumentRoot();
         if ($document_root != null) {
             $cache_path = $document_root.DIRECTORY_SEPARATOR.'cache';
-            $write_path = $cache_path.DIRECTORY_SEPARATOR.'library';
+            $write_path = $cache_path.DIRECTORY_SEPARATOR.'library'.(($version != null) ? DIRECTORY_SEPARATOR.$version : '');
             if (is_readable($write_path.DIRECTORY_SEPARATOR.$filename)) {
                 return $write_path.DIRECTORY_SEPARATOR.$filename;
             } else if (is_writable($cache_path)) {
@@ -244,22 +255,24 @@ class SketchFactory extends SketchObject {
                     $contents[] = sprintf($table_definition['templates']['delete'], $primary_key);
                     $contents[] = "\t\t} else return false;\n\t}\n";
                     // Generate Iterator
-                    $contents[] = "}\n\nclass ${class_name}Iterator extends SketchObjectIterator {\n";
-                    $contents[] = "\tfunction rows() {\n";
-                    $contents[] = "\t\tif (\$this->result instanceof SketchObjectIterator) {\n";
-                    $contents[] = "\t\t\treturn \$this->result->rows();\n";
-                    $contents[] = "\t\t} else return 0;\n";
-                    $contents[] = "\t}\n\t\t\n";
-                    $contents[] = "\tfunction fetch(\$key) {\n";
-                    $contents[] = "\t\tif (\$this->result instanceof SketchObjectIterator) {\n";
-                    $contents[] = "\t\t\treturn new ${class_name}(\$this->result->fetch(\$key));\n";
-                    $contents[] = "\t\t} else return false;\n";
-                    $contents[] = "\t}\n\t\t\n";
-                    $contents[] = "\tfunction free() {\n";
-                    $contents[] = "\t\tif (\$this->result instanceof SketchObjectIterator) {\n";
-                    $contents[] = "\t\t\treturn \$this->result->free();\n";
-                    $contents[] = "\t\t}\n";
-                    $contents[] = "\t}\n";
+                    if ($generate_iterator) {
+                        $contents[] = "}\n\nclass ${class_name}Iterator extends SketchObjectIterator {\n";
+                        $contents[] = "\tfunction rows() {\n";
+                        $contents[] = "\t\tif (\$this->result instanceof SketchObjectIterator) {\n";
+                        $contents[] = "\t\t\treturn \$this->result->rows();\n";
+                        $contents[] = "\t\t} else return 0;\n";
+                        $contents[] = "\t}\n\t\t\n";
+                        $contents[] = "\tfunction fetch(\$key) {\n";
+                        $contents[] = "\t\tif (\$this->result instanceof SketchObjectIterator) {\n";
+                        $contents[] = "\t\t\treturn new ${class_name}(\$this->result->fetch(\$key));\n";
+                        $contents[] = "\t\t} else return false;\n";
+                        $contents[] = "\t}\n\t\t\n";
+                        $contents[] = "\tfunction free() {\n";
+                        $contents[] = "\t\tif (\$this->result instanceof SketchObjectIterator) {\n";
+                        $contents[] = "\t\t\treturn \$this->result->free();\n";
+                        $contents[] = "\t\t}\n";
+                        $contents[] = "\t}\n";
+                    }
                     $contents[] = "}";
                     if (!file_exists($write_path)) mkdir($write_path);
                     $handle = fopen($write_path.DIRECTORY_SEPARATOR.$filename, 'w');
