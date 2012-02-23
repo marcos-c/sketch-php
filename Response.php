@@ -47,7 +47,7 @@ class SketchResponse extends SketchObject {
      *
      * @var DOMDocument
      */
-    private $document;
+    protected $document;
 
     /**
      *
