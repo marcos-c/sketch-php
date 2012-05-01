@@ -102,7 +102,8 @@ class SketchResponsePart extends SketchObject {
     private function __construct($file_name, $etag) {
         $document_root = $this->getApplication()->getRequest()->getDocumentRoot();
         if (substr($file_name, 0, 1) == '/') {
-            $t1 = dirname($this->getRequest()->getResolvedURI());
+            list($request_uri) = explode('?', $this->getRequest()->getResolvedURI());
+            $t1 = dirname($request_uri);
             $path = '';
             while (strpos(" $file_name", " $t1") === false) {
                 $t1 = dirname($t1);
