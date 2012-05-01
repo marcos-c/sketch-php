@@ -35,7 +35,7 @@ class SketchResponse extends SketchObject {
      *
      * @var boolean
      */
-    private $isXHTML = true;
+    private $isXHTML = false;
 
     /**
      *
