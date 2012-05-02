@@ -25,7 +25,7 @@
 require_once 'Sketch/Object.php';
 require_once 'Sketch/Session/ACL.php';
 
-define('SESSION_LIFETIME', 3600);
+define('SESSION_LIFETIME', 0);
 
 /**
  * SketchSession
@@ -72,7 +72,7 @@ class SketchSession extends SketchObject {
             header("Cache-Control: private, max-age=0, post-check=0, pre-check=0");
             $this->attributes = &$_SESSION;
             if (isset($_COOKIE[$session_name])) {
-                setcookie($session_name, $_COOKIE[$session_name], time() + SESSION_LIFETIME, "/");
+                setcookie($session_name, $_COOKIE[$session_name], SESSION_LIFETIME > 0 ? time() + SESSION_LIFETIME : 0, "/");
             }
         } else {
             throw new Exception();
