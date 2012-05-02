@@ -90,7 +90,27 @@ class LayoutResponseFilter extends SketchResponseFilter {
      */
     function apply(SketchResourceXML $resource) {
         $layout_path = null;
-        foreach ($resource->query("//layout[@for]") as $layout) {
+        $attributes = array();
+        if ($this->getContext()->getLayerName() != 'installer') {
+            foreach ($resource->query("//layout[@for][@class][@source]") as $layout) {
+                $for = $layout->getAttribute('for');
+                if (strpos($this->getRequest()->getResolvedURI(), $for) !== false) {
+                    $context = $this->getContext();
+                    $class = $layout->getAttribute('class');
+                    $source = $layout->getAttribute('source');
+                    if (SketchUtils::Readable($source)) {
+                        require_once $source;
+                        if (class_exists($class)) {
+                            eval('$instance = '.$class.'::getCurrentlySelectedLayout();');
+                            /** @var $instance SketchObjectView */
+                            $attributes = $instance->getAttributes() + $instance->getDescriptors(true);
+                            $layout_path = $instance->getPath();
+                        } else throw new Exception(sprintf($context->getTranslator()->_("Can't instantiate class %s"), $class));
+                    } else throw new Exception(sprintf($context->getTranslator()->_("File %s can't be found"), $source));
+                }
+            }
+        }
+        foreach ($resource->query("//layout[@for][not(@class)]") as $layout) {
             $for = $layout->getAttribute('for');
             if (strpos($this->getRequest()->getResolvedURI(), $for) !== false) {
                 $layout_path = $layout->getCharacterData();
@@ -103,7 +123,7 @@ class LayoutResponseFilter extends SketchResponseFilter {
             $q = $context->query('//s:template');
             if ($q instanceof DOMNodeList) foreach ($q as $template) {
                 if ($template->hasAttribute('layout')) {
-                    $layout = SketchResponsePart::evaluate($layout_path.DIRECTORY_SEPARATOR.$template->getAttribute('layout'));
+                    $layout = SketchResponsePart::evaluate($layout_path.DIRECTORY_SEPARATOR.$template->getAttribute('layout'), false, $attributes, true);
                     $layout_context = new DOMXPath($layout);
                     $layout_context->registerNamespace('h', 'http://www.w3.org/1999/xhtml');
                     $r = $context->query('//s:append[@tag]');
@@ -143,7 +163,7 @@ class LayoutResponseFilter extends SketchResponseFilter {
             $q = $context->query('//template');
             if ($q instanceof DOMNodeList) foreach ($q as $template) {
                 if ($template->hasAttribute('layout')) {
-                    $layout = SketchResponsePart::evaluate($layout_path.DIRECTORY_SEPARATOR.$template->getAttribute('layout'));
+                    $layout = SketchResponsePart::evaluate($layout_path.DIRECTORY_SEPARATOR.$template->getAttribute('layout'), false, $attributes, true);
                     $layout_context = new DOMXPath($layout);
                     $r = $context->query('//append[@tag]');
                     if ($r instanceof DOMNodeList) foreach ($r as $append) {

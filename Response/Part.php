@@ -60,19 +60,29 @@ class SketchResponsePart extends SketchObject {
 
     /**
      *
-     * @param string $file_name
+     * @var array
+     */
+    private $attributes = array();
+
+    /**
+     * @static
+     * @param $file_name
+     * @param bool $etag
+     * @param array $attributes
+     * @param bool $update_include_path
      * @return DOMDocument
      */
-    static function evaluate($file_name, $etag = false) {
-        $part = new SketchResponsePart($file_name, $etag);
+    static function evaluate($file_name, $etag = false, $attributes = array(), $update_include_path = false) {
+        $part = new SketchResponsePart($file_name, $etag, $attributes, $update_include_path);
         return $part->getDocument();
     }
 
     /**
      * Make sure that the encoding for the source file is UTF-8
      *
-     * @param string $string
+     * @param $source
      * @return string
+     * @throws Exception
      */
     private function encode($source) {
         if (function_exists('mb_detect_encoding')) {
@@ -96,10 +106,12 @@ class SketchResponsePart extends SketchObject {
     }
 
     /**
-     *
-     * @param string $file_name
+     * @param $file_name
+     * @param $etag
+     * @param $attributes
+     * @param $update_include_path
      */
-    private function __construct($file_name, $etag) {
+    private function __construct($file_name, $etag, $attributes, $update_include_path) {
         $document_root = $this->getApplication()->getRequest()->getDocumentRoot();
         if (substr($file_name, 0, 1) == '/') {
             list($request_uri) = explode('?', $this->getRequest()->getResolvedURI());
@@ -117,6 +129,11 @@ class SketchResponsePart extends SketchObject {
             }
         }
         $this->relativePath = str_replace($document_root, '', realpath(dirname($file_name)));
+        // Add to the include path the path to the layout
+        if ($update_include_path && strpos($this->relativePath, get_include_path()) === false) {
+            set_include_path(realpath(dirname($file_name)).PATH_SEPARATOR.get_include_path());
+        }
+        $this->attributes = $attributes;
         if (SketchUtils::Readable($file_name)) {
             try {
                 $response = $this->getController()->getResponse();
@@ -311,5 +328,27 @@ class SketchResponsePart extends SketchObject {
      */
     function formatDateAndTime(SketchDateTime $date) {
         return $this->getFormatter()->formatDateAndTime($date);
+    }
+
+    /**
+     *
+     * @return array
+     */
+    function getAttributes() {
+        return $this->attributes;
+    }
+
+    /**
+     *
+     * @param $key
+     * @param string $default
+     * @return string
+     */
+    function getAttribute($key, $default = '') {
+        if (array_key_exists($key, $this->attributes)) {
+            return $this->attributes[$key];
+        } else {
+            return $default;
+        }
     }
 }
