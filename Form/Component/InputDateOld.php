@@ -39,118 +39,112 @@ class SketchFormComponentInputDateOld extends SketchFormComponent {
         $attribute = array_shift($arguments);
         $form_name = $this->getForm()->getFormName();
         ob_start(); ?>
-    function <?=$form_name?>UpdateDays(input) {
-    var form = document.forms['<?=$form_name?>'];
-    var day = form[input + '[day]'];
-    var month = form[input + '[year_month]'].value.substr(4, 2) - 1;
-    var year = form[input + '[year_month]'].value.substr(0, 4);
-    if (year != 0 && month >= 0) {
-    // 28 to 31 days
-    var td = new Date();
-    var from = 1;
-    var value = 0;
-    if (value == 0) {
-    var value = 31; do {
-    var date = new Date(year, month, value--);
-    } while (month < date.getMonth());
-    }
-    // Check if from stamp is greater than today + release
-    if (month == td.getMonth() && year == td.getFullYear()) {
-    from = (from > (td.getDate())) ? from : td.getDate();
-    }
-    // Update the selector
-    var selectedValue = day.value;
-    while (day.options.length) day.options[0] = null;
-    for (i = from; i < value + 2; i++) {
-    option = new Option(((i > 9) ? i : '0' + i), i, false, false);
-    day.options[j = day.length] = option;
-    if (i == selectedValue) day.selectedIndex = j;
-    }
-    } else {
-    while (day.options.length) day.options[0] = null;
-    day.options[0] = new Option('...', null, false, false);
-    }
-    }
-
-    function <?=$form_name?>UpdateDate(input, date) {
-    var form = document.forms['<?=$form_name?>'];
-    var month = date.getMonth() > 8 ? String(date.getMonth() + 1) : '0' + String(date.getMonth() + 1);
-    var selectedValue = String(date.getFullYear()) + month;
-    var year_month = form[input + '[year_month]'];
-    for (i = 0; i < year_month.length; i++) {
-    if (year_month.options[i].value == selectedValue) {
-    year_month.options[i].selected = true;
-    break;
-    }
-    } <?=$form_name?>UpdateDays(input);
-    var day = form[input + '[day]'];
-    for (var i = 0; i < day.length; i++) {
-    if (day.options[i].value == date.getDate()) {
-    day.options[i].selected = true;
-    break;
-    }
-    }
-    }
-
-    function <?=$form_name?>UpdateNights(from_input, to_input, nights_input) {
-    var form = document.forms['<?=$form_name?>'];
-    var from = new Date(form[from_input + '[year_month]'].value.substr(0, 4), form[from_input + '[year_month]'].value.substr(4, 2) - 1, form[from_input + '[day]'].value);
-    var to = new Date(form[to_input + '[year_month]'].value.substr(0, 4), form[to_input + '[year_month]'].value.substr(4, 2) - 1, form[to_input + '[day]'].value);
-    var nights = Math.round((to - from) / 86400000);
-    if (nights < 1) nights = 1; if (nights > 31) nights = 31;
-    form[nights_input].value = nights;
-        <?=$form_name?>OnNightsChange(from_input, to_input, nights_input);
-    }
-
-    function <?=$form_name?>OnDayChange(input, from_input, to_input, nights_input) {
-    var form = document.forms['<?=$form_name?>'];
-    if (input == from_input) {
-        <?=$form_name?>OnNightsChange(from_input, to_input, nights_input);
-    // Check if from date is valid
-    var day = Number(form[to_input + '[day]'].value) - Number(form[nights_input].value);
-    var year_month = form[to_input + '[year_month]'];
-    var month = year_month.value.substr(4, 2) - 1;
-    var year = year_month.value.substr(0, 4);
-    var from = new Date(year, month, day);
-        <?=$form_name?>UpdateDate(from_input, from);
-    } else if (nights_input != null) {
-        <?=$form_name?>UpdateNights(from_input, to_input, nights_input);
-    }
-    }
-
-    function <?=$form_name?>OnMonthChange(input, from_input, to_input, nights_input) {
-        <?=$form_name?>UpdateDays(input);
-    if (input == from_input) {
-        <?=$form_name?>OnNightsChange(from_input, to_input, nights_input);
-    } else if (nights_input != null) {
-        <?=$form_name?>UpdateNights(from_input, to_input, nights_input);
-    }
-    }
-
-    function <?=$form_name?>OnDateChange(input, from_input, to_input, nights_input, calendar_input) {
-    var new_date = jQuery('#' + calendar_input).val().split('-');
-    jQuery(':input[name=\'' + input + '[year_month]\']').val(new_date[0] + new_date[1]);
-        <?=$form_name?>UpdateDays(input);
-    jQuery(':input[name=\'' + input + '[day]\']').val(parseInt(new_date[2], 10));
-    if (input == from_input) {
-        <?=$form_name?>OnNightsChange(from_input, to_input, nights_input);
-    } else if (nights_input != null) {
-        <?=$form_name?>UpdateNights(from_input, to_input, nights_input);
-    }
-    }
-
-    function <?=$form_name?>OnNightsChange(from_input, to_input, nights_input) {
-    var form = document.forms['<?=$form_name?>'];
-    if (form[nights_input].value < 1) form[nights_input].value = 1;
-    if (form[nights_input].value > 90) form[nights_input].value = 90;
-    var day = Number(form[from_input + '[day]'].value) + Number(form[nights_input].value);
-    var year_month = form[from_input + '[year_month]'];
-    var month = year_month.value.substr(4, 2) - 1;
-    var year = year_month.value.substr(0, 4);
-    var to = new Date(year, month, day);
-        <?=$form_name?>UpdateDate(to_input, to);
-    }
-    <?php return ob_get_clean();
+        function <?=$form_name?>UpdateDays(input) {
+            var form = document.forms['<?=$form_name?>'];
+            var day = form[input + '[day]'];
+            var month = form[input + '[year_month]'].value.substr(4, 2) - 1;
+            var year = form[input + '[year_month]'].value.substr(0, 4);
+            if (year != 0 && month >= 0) {
+                // 28 to 31 days
+                var td = new Date();
+                var from = 1;
+                var value = 0;
+                if (value == 0) {
+                    var value = 31; do {
+                        var date = new Date(year, month, value--);
+                    } while (month < date.getMonth());
+                }
+                // Check if from stamp is greater than today + release
+                if (month == td.getMonth() && year == td.getFullYear()) {
+                    from = (from > (td.getDate())) ? from : td.getDate();
+                }
+                // Update the selector
+                var selectedValue = day.value;
+                while (day.options.length) day.options[0] = null;
+                for (i = from; i < value + 2; i++) {
+                    option = new Option(((i > 9) ? i : '0' + i), i, false, false);
+                    day.options[j = day.length] = option;
+                    if (i == selectedValue) day.selectedIndex = j;
+                }
+            } else {
+                while (day.options.length) day.options[0] = null;
+                day.options[0] = new Option('...', null, false, false);
+            }
+        }
+        function <?=$form_name?>UpdateDate(input, date) {
+            var form = document.forms['<?=$form_name?>'];
+            var month = date.getMonth() > 8 ? String(date.getMonth() + 1) : '0' + String(date.getMonth() + 1);
+            var selectedValue = String(date.getFullYear()) + month;
+            var year_month = form[input + '[year_month]'];
+            for (i = 0; i < year_month.length; i++) {
+                if (year_month.options[i].value == selectedValue) {
+                    year_month.options[i].selected = true;
+                    break;
+                }
+            } <?=$form_name?>UpdateDays(input);
+            var day = form[input + '[day]'];
+            for (var i = 0; i < day.length; i++) {
+                if (day.options[i].value == date.getDate()) {
+                    day.options[i].selected = true;
+                    break;
+                }
+            }
+        }
+        function <?=$form_name?>UpdateNights(from_input, to_input, nights_input) {
+            var form = document.forms['<?=$form_name?>'];
+            var from = new Date(form[from_input + '[year_month]'].value.substr(0, 4), form[from_input + '[year_month]'].value.substr(4, 2) - 1, form[from_input + '[day]'].value);
+            var to = new Date(form[to_input + '[year_month]'].value.substr(0, 4), form[to_input + '[year_month]'].value.substr(4, 2) - 1, form[to_input + '[day]'].value);
+            var nights = Math.round((to - from) / 86400000);
+            if (nights < 1) nights = 1; if (nights > 31) nights = 31;
+            form[nights_input].value = nights;
+            <?=$form_name?>OnNightsChange(from_input, to_input, nights_input);
+        }
+        function <?=$form_name?>OnDayChange(input, from_input, to_input, nights_input) {
+            var form = document.forms['<?=$form_name?>'];
+            if (input == from_input) {
+                <?=$form_name?>OnNightsChange(from_input, to_input, nights_input);
+                // Check if from date is valid
+                var day = Number(form[to_input + '[day]'].value) - Number(form[nights_input].value);
+                var year_month = form[to_input + '[year_month]'];
+                var month = year_month.value.substr(4, 2) - 1;
+                var year = year_month.value.substr(0, 4);
+                var from = new Date(year, month, day);
+                <?=$form_name?>UpdateDate(from_input, from);
+            } else if (nights_input != null) {
+                <?=$form_name?>UpdateNights(from_input, to_input, nights_input);
+            }
+        }
+        function <?=$form_name?>OnMonthChange(input, from_input, to_input, nights_input) {
+            <?=$form_name?>UpdateDays(input);
+            if (input == from_input) {
+                <?=$form_name?>OnNightsChange(from_input, to_input, nights_input);
+            } else if (nights_input != null) {
+                <?=$form_name?>UpdateNights(from_input, to_input, nights_input);
+            }
+        }
+        function <?=$form_name?>OnDateChange(input, from_input, to_input, nights_input, calendar_input) {
+            var new_date = jQuery('#' + calendar_input).val().split('-');
+            jQuery(':input[name=\'' + input + '[year_month]\']').val(new_date[0] + new_date[1]);
+            <?=$form_name?>UpdateDays(input);
+            jQuery(':input[name=\'' + input + '[day]\']').val(parseInt(new_date[2], 10));
+            if (input == from_input) {
+                <?=$form_name?>OnNightsChange(from_input, to_input, nights_input);
+            } else if (nights_input != null) {
+                <?=$form_name?>UpdateNights(from_input, to_input, nights_input);
+            }
+        }
+        function <?=$form_name?>OnNightsChange(from_input, to_input, nights_input) {
+            var form = document.forms['<?=$form_name?>'];
+            if (form[nights_input].value < 1) form[nights_input].value = 1;
+            if (form[nights_input].value > 90) form[nights_input].value = 90;
+            var day = Number(form[from_input + '[day]'].value) + Number(form[nights_input].value);
+            var year_month = form[from_input + '[year_month]'];
+            var month = year_month.value.substr(4, 2) - 1;
+            var year = year_month.value.substr(0, 4);
+            var to = new Date(year, month, day);
+            <?=$form_name?>UpdateDate(to_input, to);
+        }
+        <?php return ob_get_clean();
     }
 
     /**

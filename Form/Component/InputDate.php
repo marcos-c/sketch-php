@@ -161,7 +161,15 @@ class SketchFormComponentInputDate extends SketchFormComponent {
                                     calendar.change(function(){
                                         var new_date = calendar.val().split('-');
                                         year.val(new_date[0]);
-                                        year.change();
+                                        var selected_month = month.val();
+                                        month[0].options.length = 0;
+                                        if (months[year.val()] == undefined) {
+                                            month[0].options[month[0].options.length] = new Option('...', 0, false, false);
+                                        } else {
+                                            for (var i in months[year.val()]) {
+                                                month[0].options[month[0].options.length] = new Option(months[year.val()][i], i, false, i == selected_month);
+                                            }
+                                        }
                                         month.val(parseInt(new_date[1]));
                                         var selected_year_month = year.val() + ((month.val() > 9) ? month.val() : '0' + month.val());
                                         if (day.is(":visible")) {
