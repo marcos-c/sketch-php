@@ -111,12 +111,18 @@ try {
             }
             print "</pre>";
         }
+        if ($application->getRequest()->isJSON()) {
+            print SketchUtils::encodeJSON(array('html' => ob_get_clean()));
+        } else {
+            print ob_get_clean();
+        }
     } else {
         $parameters = $application->getContext()->getParametersFor('library', 'Stub.php');
+        $name = $application->getContext()->getName();
         if ($parameters['send-exceptions-to']['email-address'] != null) {
             ob_start();
             print '<pre>';
-            print "<b>You have an exception!</b>\n".trim($e->getMessage())."\n<i>Thrown on line ".$e->getLine()." ($file_name)</i>\n";
+            print "<b>An exception was thrown in $name!</b>\n".trim($e->getMessage())."\n<i>Thrown on line ".$e->getLine()." ($file_name)</i>\n";
             print "<b>Trace</b>\n";
             foreach ($e->getTrace() as $r) {
                 if (array_key_exists('class', $r) && $r['function'] != 'exceptionErrorHandler') {
@@ -152,11 +158,15 @@ try {
             if ($parameters['send-exceptions-to']['email-address-5'] != null) {
                 $message->addRecipient(MESSAGE_CC, new SketchMailAddress($parameters['send-exceptions-to']['email-address-5']));
             }
-            $message->setSubject('Exception in Sketch');
+            $message->setSubject("An exception was thrown in $name!");
             $message->setContent(ob_get_clean());
             SketchMailTransport::sendMessage($message);
         }
-        print "An error has occurred, please try again later.";
+        if ($application->getRequest()->isJSON()) {
+            print SketchUtils::encodeJSON(array('html' => "An error has occurred, please try again later."));
+        } else {
+            print "An error has occurred, please try again later.";
+        }
     }
 }
 exit();
