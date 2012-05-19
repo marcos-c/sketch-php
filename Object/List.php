@@ -84,6 +84,21 @@ abstract class SketchObjectList extends SketchObjectView {
 
     /**
      *
+     * @param SketchFormView $form
+     * @param mixed $parameters
+     * @return boolean
+     */
+    final function setOrderByAction(SketchFormView $form, $parameters = null) {
+        if (is_array($parameters)) {
+            if (array_key_exists('order_by', $parameters)) {
+                $form->setFieldValue('orderBy', $parameters['order_by']);
+            }
+        }
+        return true;
+    }
+
+    /**
+     *
      * @param string $order_by
      */
     final function setDefaultOrderBy($order_by) {
@@ -170,5 +185,15 @@ abstract class SketchObjectList extends SketchObjectView {
         if ($this->getUseSessionObject()) {
             $this->setSessionObjectAttribute('offset', $offset);
         }
+    }
+
+    /**
+     *
+     * @param SketchFormView $form
+     * @return boolean
+     */
+    final function clearOffsetAction(SketchFormView $form) {
+        $form->setFieldValue('offset', 0);
+        return true;
     }
 }
