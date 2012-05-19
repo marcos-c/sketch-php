@@ -101,6 +101,14 @@ class SketchDateTime extends SketchObject {
 
     /**
      *
+     * @return string
+     */
+    function __toString() {
+        return $this->toString();
+    }
+
+    /**
+     *
      * @return boolean
      */
     function isNull() {
