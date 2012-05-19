@@ -57,6 +57,11 @@ class FirebugResponseFilter extends SketchResponseFilter {
                 $message = $this->formatMessage(print_r($this->getRequest(), true));
                 $script .= "\t\tconsole.log('$message'); ";
             case 3:
+                // Logged messages
+                foreach ($this->getLogger()->getMessages() as $message) {
+                    $message = $this->formatMessage($message);
+                    $script .= "\t\tconsole.log('$message'); ";
+                }
             case 2:
                 // Notices
                 foreach ($this->getApplication()->getNotices() as $notice) {
@@ -64,11 +69,6 @@ class FirebugResponseFilter extends SketchResponseFilter {
                     $script .= "\t\tconsole.log('$notice'); ";
                 }
             case 1:
-                // Logged messages
-                foreach ($this->getLogger()->getMessages() as $message) {
-                    $message = $this->formatMessage($message);
-                    $script .= "\t\tconsole.log('$message'); ";
-                }
                 // PHP and LIBXML versions
                 $php_version = phpversion();
                 $script .= "\t\tconsole.log('PHP Version: $php_version'); ";
