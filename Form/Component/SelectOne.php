@@ -43,7 +43,7 @@ class SketchFormComponentSelectOne extends SketchFormComponent {
             <? if ($options instanceof SketchObjectIterator): ?>
                 <? foreach ($options as $object):
                     $key = $object->getId();
-                    $value = (method_exists($object, 'getDefaultDescription')) ? $object->getDefaultDescription() : $object->getDescription(); ?>
+                    $value = method_exists($object, '__toString') ? $object->__toString() : (method_exists($object, 'getDefaultDescription') ? $object->getDefaultDescription() : $object->getDescription()); ?>
                     <option value="<?=htmlspecialchars($key)?>" <?=(($field_value == $key) ? 'selected="selected" class="select-option selected"' : 'class="select-option"')?>><?=htmlspecialchars($value)?></option>
                 <? endforeach; ?>
             <? elseif (is_array($options)): ?>
