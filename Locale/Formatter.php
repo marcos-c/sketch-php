@@ -62,6 +62,24 @@ class SketchLocaleFormatter extends SketchObject {
 
     /**
      *
+     * @param string $string
+     * @return string
+     */
+    function escapeString($string) {
+        return htmlspecialchars($string);
+    }
+
+    /**
+     *
+     * @param string $string
+     * @return string
+     */
+    function formatPlainText($text) {
+        return nl2br($this->escapeString($text));
+    }
+
+    /**
+     *
      * @param float $number
      * @return string
      */
@@ -80,6 +98,15 @@ class SketchLocaleFormatter extends SketchObject {
      */
     function formatDate(SketchDateTime $date) {
         return $date->toString('d/m/Y');
+    }
+
+    /**
+     *
+     * @param SketchDateTime $date
+     * @return string
+     */
+    function formatTime(SketchDateTime $date) {
+        return $date->toString('H:i');
     }
 
     /**

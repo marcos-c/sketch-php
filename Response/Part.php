@@ -261,6 +261,33 @@ class SketchResponsePart extends SketchObject {
 
     /**
      *
+     * @param string $string
+     * @return string
+     */
+    function escapeString($string) {
+        return $this->getFormatter()->escapeString($string);
+    }
+
+    /**
+     *
+     * @param string $text
+     * @return string
+     */
+    function formatPlainText($text) {
+        return $this->getFormatter()->formatPlainText($text);
+    }
+
+    /**
+     *
+     * @param float $number
+     * @return string
+     */
+    function formatNumber($number) {
+        return $this->getFormatter()->formatNumber($number);
+    }
+
+    /**
+     *
      * @param SketchDateTime $date
      * @return string
      */
@@ -273,16 +300,16 @@ class SketchResponsePart extends SketchObject {
      * @param SketchDateTime $date
      * @return string
      */
-    function formatDateAndTime(SketchDateTime $date) {
-        return $this->getFormatter()->formatDateAndTime($date);
+    function formatTime(SketchDateTime $date) {
+        return $this->getFormatter()->formatTime($date);
     }
 
     /**
      *
-     * @param float $number
+     * @param SketchDateTime $date
      * @return string
      */
-    function formatNumber($number) {
-        return $this->getFormatter()->formatNumber($number);
+    function formatDateAndTime(SketchDateTime $date) {
+        return $this->getFormatter()->formatDateAndTime($date);
     }
 }
