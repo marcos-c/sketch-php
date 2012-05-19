@@ -174,10 +174,17 @@ abstract class SketchConnectionDriver extends SketchResource {
      * @return array
      */
     function queryArray($expression) {
-        $array = array(); foreach ($this->executeQuery($expression) as $r) {
-            $key = array_shift($r); $value = array_shift($r);
-            if ($value != null) $array[$key] = $value; else $array[] = $key;
-        } return $array;
+        $array = array();
+        foreach ($this->executeQuery($expression) as $r) {
+            $key = array_shift($r);
+            if (count($r) > 0) {
+                $value = array_shift($r);
+                $array[$key] = $value;
+            } else {
+                $array[] = $key;
+            }
+        }
+        return $array;
     }
 
     /**
