@@ -28,9 +28,9 @@ require_once 'Sketch/Object.php';
  * SketchUtils
  *
  * All JSON related methods are based in Services_JSON by Michal Migurski <mike-json@teczno.com>
- * 
+ *
  * Unicode based in the following documentation: http://www.cl.cam.ac.uk/~mgk25/unicode.html#utf-8
- * 
+ *
  * @package Sketch
  */
 class SketchUtils extends SketchObject {
@@ -60,17 +60,16 @@ class SketchUtils extends SketchObject {
         } return false;
     }
 
-    static function Format($text) {
-        $text = preg_replace('/\[\[(.*)\]\]/', '<a href="word.php?value=\\1">\\1</a>', $text);
-        $text = preg_replace('/{{(.*);(.*)}}/', '<ruby><rb>\\1</rb><rp>(</rp><rt>\\2</rt><rp>)</rp></ruby>', $text);
-        return nl2br($text);
-    }
-
     private static function name_value($name, $value) {
         $encoded_value = self::encodeJSON($value);
         return self::encodeJSON(strval($name)).':'.$encoded_value;
     }
 
+    /**
+     *
+     * @param string $var
+     * @return string
+     */
     static function encodeJSONString($var) {
         $ascii = '';
         $strlen_var = strlen($var);
@@ -140,7 +139,12 @@ class SketchUtils extends SketchObject {
         return '"'.$ascii.'"';
     }
 
-    static function encodeJSONArray($var) {
+    /**
+     *
+     * @param array $var
+     * @return string
+     */
+    static function encodeJSONArray(array $var) {
         if (is_array($var) && count($var) && (array_keys($var) !== range(0, sizeof($var) - 1))) {
             $properties = array_map(array('SketchUtils', 'name_value'), array_keys($var), array_values($var));
             return '{'.join(',', $properties).'}';
@@ -149,22 +153,36 @@ class SketchUtils extends SketchObject {
         return '[' . join(',', $elements) . ']';
     }
 
+    /**
+     *
+     * @param object $var
+     * @return string
+     */
     static function encodeJSONObject($var) {
         $vars = get_object_vars($var);
         $properties = array_map(array('SketchUtils', 'name_value'), array_keys($vars), array_values($vars));
         return '{' . join(',', $properties) . '}';
     }
 
+    /**
+     *
+     * @param mixed $var
+     * @return string
+     */
     static function encodeJSON($var) {
-        switch (gettype($var)) {
-            case 'boolean': return ($var) ? 'true' : 'false';
-            case 'integer': return intval($var);
-            case 'double':
-            case 'float': return floatval($var);
-            case 'string': return self::encodeJSONString($var);
-            case 'array': return self::encodeJSONArray($var);
-            case 'object': return self::encodeJSONObject($var);
-            default: return 'null';
+        if (function_exists('json_encode')) {
+            return json_encode($var);
+        } else {
+            switch (gettype($var)) {
+                case 'boolean': return ($var) ? 'true' : 'false';
+                case 'integer': return intval($var);
+                case 'double':
+                case 'float': return floatval($var);
+                case 'string': return self::encodeJSONString($var);
+                case 'array': return self::encodeJSONArray($var);
+                case 'object': return self::encodeJSONObject($var);
+                default: return 'null';
+            }
         }
     }
 }
