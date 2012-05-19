@@ -215,11 +215,11 @@ class SketchResourceContext extends SketchResourceXML {
             if ($layer->hasChildNodes()) foreach ($layer->childNodes as $n1) {
                 $i = 0; if ($n1->hasChildNodes()) foreach ($n1->childNodes as $n2) {
                     /* @var $n2 DOMElement */
-                    if ($n2->nodeName == '#text') {
+                    if ($n2->nodeName == '#text' || $n2->nodeName == '#cdata-section') {
                         $parameters[$n1->nodeName] = $n2->textContent;
                     } else if ($n2->hasChildNodes()) foreach ($n2->childNodes as $n3) {
                         /* @var $n3 DOMElement */
-                        if ($n3->nodeName == '#text') {
+                        if ($n3->nodeName == '#text' || $n3->nodeName == '#cdata-section') {
                             $parameters[$n1->nodeName][$n2->nodeName] = $n3->textContent;
                         }
                     } else if ($n2->hasAttributes()) {
