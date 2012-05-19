@@ -46,11 +46,16 @@ class SketchSession extends SketchObject {
     private $contextName;
 
     function __construct($session_name = 'sketch_session') {
-        $this->setContextName(strtr($this->getContext()->getAttribute('name'), '.', '_'));
+        $context_name = strtr($this->getContext()->getAttribute('name'), '.', '_');
+        if (defined('CONTEXT_PREFIX')) {
+            $this->setContextName(CONTEXT_PREFIX.'_'.$context_name);
+        } else {
+            $this->setContextName($context_name);
+        }
         session_name($session_name);
         session_set_cookie_params(SESSION_LIFETIME);
         session_cache_expire(SESSION_LIFETIME / 60);
-        session_cache_limiter('private_no_expire');
+        session_cache_limiter('nocache');
         $drivers = $this->getContext()->query("//driver[@type='SketchSessionSaveHandler']");
         foreach ($drivers as $driver) {
             $type = $driver->getAttribute('type');
@@ -110,7 +115,7 @@ class SketchSession extends SketchObject {
      *
      * @return array
      */
-    function getAttributes($context_name = null) {
+    function getAttributes() {
         if (is_array($this->attributes) && array_key_exists($this->contextName, $this->attributes)) {
             return $this->attributes[$this->contextName];
         } else return array();
