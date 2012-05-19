@@ -36,6 +36,7 @@ require_once 'Sketch/Response/Exception.php';
 require_once 'Sketch/Session.php';
 require_once 'Sketch/Form.php';
 require_once 'Sketch/DateTime.php';
+require_once 'Sketch/DateTime/Iterator.php';
 require_once 'Sketch/Mail/Message.php';
 require_once 'Sketch/Mail/Transport.php';
 
@@ -89,7 +90,7 @@ try {
     // expect on all situations (symbolic links, server configuration, etc.)
     $server_document_root = str_replace($_SERVER['SCRIPT_NAME'], '', realpath(basename($_SERVER['SCRIPT_NAME'])));
     $file_name = str_replace($server_document_root, '', $e->getFile());
-    if ($application->getContext()->getLayerName() == 'development') {
+    if ($application->getContext()->getLayerName() != 'production') {
         print '<pre>';
         print "<b>You have an exception!</b>\n".trim($e->getMessage())."\n<i>Thrown on line ".$e->getLine()." ($file_name)</i>\n";
         print "<b>Trace</b>\n";
