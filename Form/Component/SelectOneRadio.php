@@ -31,19 +31,54 @@ require_once 'Sketch/Form/Component.php';
  */
 class SketchFormComponentSelectOneRadio extends SketchFormComponent {
     function saveHTML() {
+        $form = $this->getForm();
         $arguments = $this->getArguments();
         $options = array_shift($arguments);
         $attribute = array_shift($arguments);
-        $parameters = array_shift($arguments);
-        $field_name = $this->getForm()->getFieldName($attribute);
-        $field_value = $this->getForm()->getFieldValue($attribute);
-        $parameters = (($parameters != null && strpos(" $parameters", 'class="')) ? $parameters : implode(' ', array($parameters, 'class="input-text"')));
+        $parameters = $this->extend(array(
+            'wrapper' => true,
+            'columns' => 3,
+            'input' => array('id' => null, 'class' => null, 'style' => null),
+            'left-div' => array('id' => null, 'class' => null, 'style' => null),
+            'div' => array('id' => null, 'class' => null, 'style' => null),
+            'right-div' => array('id' => null, 'class' => null, 'style' => null),
+            'end-div' => array('id' => null, 'class' => null, 'style' => null),
+            'left-label' => array('id' => null, 'class' => null, 'style' => null),
+            'label' => array('id' => null, 'class' => null, 'style' => null),
+            'right-label' => array('id' => null, 'class' => null, 'style' => null),
+            'end-label' => array('id' => null, 'class' => null, 'style' => null),
+        ), array_shift($arguments));
+        $field_name = $form->getFieldName($attribute);
+        $field_value = $form->getFieldValue($attribute);
         ob_start(); ?>
-        <div <?=$parameters?>>
-            <? if (is_array($options)) foreach ($options as $key => $value): ?>
-                <input type="radio" name="<?=$field_name?>" value="<?=$key?>" <?=(($field_value == $key) ? 'checked="checked"' : '')?> /> <?=$value?>
-            <? endforeach; ?>
-        </div>
+        <? if (is_array($options)):
+            $i = 1; ?>
+            <? if ($parameters['wrapper']): ?>
+                <? foreach ($options as $key => $value): ?>
+                    <? if ($i  == count($options) || !($i++ % $parameters['columns'])): ?>
+                        <div<?=$parameters['right-div'] != null ? $parameters['right-div'] : $parameters['div']?>>
+                            <label<?=$parameters['right-label'] != null ? $parameters['right-label'] : $parameters['label']?>><?=$value?></label>
+                            <p><input type="radio" name="<?=$field_name?>" value="<?=$key?>" <?=(($field_value == $key) ? 'checked="checked"' : '')?><?=$parameters['input']?> /></p>
+                        </div>
+                    <? elseif (!($i % $parameters['columns'])): ?>
+                        <div<?=$parameters['div']?>>
+                            <label<?=$parameters['label']?>><?=$value?></label>
+                            <p><input type="radio" name="<?=$field_name?>" value="<?=$key?>" <?=(($field_value == $key) ? 'checked="checked"' : '')?><?=$parameters['input']?> /></p>
+                        </div>
+                    <? else: ?>
+                        <div<?=$parameters['left-div'] != null ? $parameters['left-div'] : $parameters['div']?>>
+                            <label<?=$parameters['left-label'] != null ? $parameters['left-label'] : $parameters['div']?>><?=$value?></label>
+                            <p><input type="radio" name="<?=$field_name?>" value="<?=$key?>" <?=(($field_value == $key) ? 'checked="checked"' : '')?><?=$parameters['input']?> /></p>
+                        </div>
+                    <? endif; ?>
+                <? endforeach; ?>
+            <? else: ?>
+                <? foreach ($options as $key => $value): ?>
+                    <input type="radio" name="<?=$field_name?>" value="<?=$key?>" <?=(($field_value == $key) ? 'checked="checked"' : '')?><?=$parameters['input']?> />
+                    <?=$value?>
+                <? endforeach; ?>
+            <? endif; ?>
+        <? endif; ?>
         <?php return ob_get_clean();
     }
 }
