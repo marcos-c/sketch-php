@@ -41,7 +41,7 @@ class SketchResponse extends SketchObject {
      *
      * @var boolean
      */
-    private $forceEncoding = true;
+    private $forceEncoding = false;
 
     /**
      *
