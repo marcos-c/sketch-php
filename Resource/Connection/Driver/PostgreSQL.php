@@ -60,12 +60,14 @@ class PostgreSQLConnectionDriver extends SketchConnectionDriver {
             $connection = pg_connect("dbname='$database' user='$user' password='$password'");
             if ($connection) {
                 $this->connection = $connection;
-                pg_set_client_encoding($this->connection, $encoding);
+                if (pg_set_client_encoding($this->connection, $encoding) === -1) {
+                    throw new SketchResourceConnectionException($this->getTranslator()->_("Unsupported encoding to $host and $database"));
+                }
             } else {
-                throw new Exception($this->getTranslator()->_("Couldn't open a connection to $host and $database"));
+                throw new SketchResourceConnectionException($this->getTranslator()->_("Couldn't open a connection to $host and $database"));
             }
         } else {
-            throw new Exception($this->getTranslator()->_("PostgreSQL functions are not available"));
+            throw new SketchResourceConnectionException($this->getTranslator()->_("PostgreSQL functions are not available"));
         }
     }
 
@@ -77,49 +79,132 @@ class PostgreSQLConnectionDriver extends SketchConnectionDriver {
         return array();
     }
 
-    function getTableDefinition($expression) {
-        preg_match('/^(\w+)(?:\.(\w+))?$/', $expression, $matches);
+    /**
+     *
+     * @param string $expression
+     * @return array
+     */
+    function getTableDefinition($table_name) {
+        preg_match('/^(\w+)(?:\.(\w+))?$/', $table_name, $matches);
         $nspname = (array_key_exists(2, $matches)) ? $matches[1] : 'public';
         $relnamespace = $this->queryFirst("SELECT oid FROM pg_namespace WHERE nspname = '$nspname'");
         $relname = (array_key_exists(2, $matches)) ? $matches[2] : $matches[1];
-        $o = array('fields' => array(), 'templates' => array(
-            'constructor' => "\t\t\t\$mixed = \$this->getConnection()->queryRow(\"SELECT * FROM `${table_name}` WHERE %1\$s = \".intval(\$mixed));\n",
-            'insert' => "\t\t\t\t\$this->setId(\$connection->queryFirst(\"SELECT nextval('${table_name}_%1\$s_seq')\"));\n\t\t\t\treturn \$connection->executeUpdate(\"INSERT INTO `${table_name}` (%2\$s) VALUES (%3\$s)\");\n",
-            'update' => "\t\t\t\treturn \$connection->executeUpdate(\"UPDATE `${table_name}` SET %2\$s WHERE %1\$s = \$id\");\n",
-            'delete' => "\t\t\treturn \$connection->executeUpdate(\"DELETE FROM `${table_name}` WHERE %1\$s = \$id\");\n"
-        )); foreach ($this->executeQuery("SELECT oid, relnatts FROM pg_class WHERE relnamespace = '$relnamespace' AND relname = '$relname'") as $row) {
-            foreach ($this->executeQuery("SELECT a.attname, t.typname, a.attnotnull FROM pg_type AS t JOIN pg_attribute AS a ON t.oid = a.atttypid WHERE a.attrelid = '".$row['oid']."' AND a.attnum > 0") as $column) {
-                // TODO Add default value
-                $o['fields'][$column['attname']] = array('type' => $column['typname'], 'null' => ($column['attnotnull'] == 't'), 'options' => QUOTED_IDENTIFIERS);
+        $o = array(
+            'fields' => array(),
+            'templates' => array(
+                'constructor' => "\t\t\t\$mixed = \$this->getConnection()->queryRow(\"SELECT * FROM ${table_name} WHERE %1\$s = \".intval(\$mixed));\n",
+                'insert' => "\t\t\t\$this->setId(\$connection->queryFirst(\"SELECT nextval('${table_name}_%1\$s_seq')\"));\n\t\t\treturn \$connection->executeUpdate(sprintf(\"INSERT INTO ${table_name} (%1\$s, %2\$s) VALUES (%%s, %3\$s)\", \$this->getId()));\n",
+                'update' => "\t\t\treturn \$connection->executeUpdate(\"UPDATE ${table_name} SET %2\$s WHERE %1\$s = \$id\");\n",
+                'delete' => "\t\t\treturn \$connection->executeUpdate(\"DELETE FROM ${table_name} WHERE %1\$s = \$id\");\n"
+            )
+        );
+        foreach ($this->executeQuery("SELECT oid, relnatts FROM pg_class WHERE relnamespace = '$relnamespace' AND relname = '$relname'") as $row) {
+            foreach ($this->executeQuery("SELECT a.attnum, a.attname, t.typname, a.attnotnull, a.atthasdef FROM pg_type AS t JOIN pg_attribute AS a ON t.oid = a.atttypid WHERE a.attrelid = '".$row['oid']."' AND a.attnum > 0") as $column) {
+                $default = null;
+                if ($column['atthasdef'] == 't') {
+                    foreach ($this->executeQuery("SELECT * FROM pg_attrdef WHERE adrelid = '".$row['oid']."' AND adnum = '".$column['attnum']."'") as $attrdef) {
+                        switch ($attrdef['adsrc']) {
+                            case 'true': $default = 't'; break;
+                            case 'false': $default = 'f'; break;
+                        }
+                    }
+                }
+                $o['fields'][$column['attname']] = array(
+                    'type' => $column['typname'],
+                    'default' => $default,
+                    'null' => ($column['attnotnull'] != 't'),
+                    'options' => QUOTED_IDENTIFIERS
+                );
             }
-        } return $o;
+        }
+        return $o;
     }
 
+    /**
+     *
+     * @param string $string
+     * @return string
+     */
     function escapeString($string) {
-        return pg_escape_string($this->connection, trim($string));
+        // I get one extrange error if I pass the connection
+        return pg_escape_string(trim($string));
     }
 
-    function createStatement($expression) {
-        return new PostgreSQLStatement($this->connection, $expression);
-    }
-
+    /**
+     * Execute query expression and return result set
+     *
+     * This version uses pg_result_error_field to get better error states so requires PHP v5.1 or later.
+     *
+     * @param string $expression
+     * @return PostgreSQLResultSet
+     */
     function executeQuery($expression) {
         if (!pg_connection_busy($this->connection)) {
-            pg_send_query($this->connection, $expression);
-        } $result = pg_get_result($this->connection);
-        $error = pg_result_error($result);
+            @pg_send_query($this->connection, $expression);
+        }
+        $result = pg_get_result($this->connection);
+        $error = pg_result_error_field($result, PGSQL_DIAG_SQLSTATE);
         if ($error) {
-            throw new Exception($error.' '.$expression);
-        } return new PostgreSQLResultSet($result);
+            pg_connection_reset($this->connection); // Reseting the connection fixes transaction problems
+            throw new SketchResourceConnectionException(pg_result_error_field($result, PGSQL_DIAG_MESSAGE_PRIMARY).' '.$expression, $error);
+        }
+        return new PostgreSQLResultSet($result);
     }
 
+    /**
+     * Execute update expression and return true on success
+     *
+     * This version uses pg_result_error_field to get better error states so requires PHP v5.1 or later.
+     * 
+     * @param string $expression
+     * @return boolean
+     */
     function executeUpdate($expression) {
         if (!pg_connection_busy($this->connection)) {
-            pg_send_query($this->connection, $expression);
-        } $result = pg_get_result($this->connection);
-        $error = pg_result_error($result);
+            @pg_send_query($this->connection, $expression);
+        }
+        $result = pg_get_result($this->connection);
+        $error = pg_result_error_field($result, PGSQL_DIAG_SQLSTATE);
         if ($error) {
-            throw new Exception($error.' '.$expression);
-        } return true;
+            pg_connection_reset($this->connection); // Reseting the connection fixes transaction problems
+            throw new SketchResourceConnectionException(pg_result_error_field($result, PGSQL_DIAG_MESSAGE_PRIMARY).' '.$expression, $error);
+        }
+        return true;
+    }
+
+    /**
+     *
+     * @return boolean
+     */
+    function beginTransaction() {
+        return $this->executeUpdate("BEGIN");
+    }
+
+    /**
+     *
+     * @return boolean
+     */
+    function commitTransaction() {
+        return $this->executeUpdate("COMMIT");
+    }
+
+    /**
+     *
+     * @return boolean
+     */
+    function rollbackTransaction() {
+        return $this->executeUpdate("ROLLBACK");
+    }
+
+    /**
+     *
+     * @param string $attribute
+     * @return boolean
+     */
+    function supports($attribute) {
+        switch ($attribute) {
+            case 'nextval': return true;
+        }
+        return false;
     }
 }

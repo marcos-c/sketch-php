@@ -32,18 +32,18 @@ require_once 'Sketch/Resource/Connection/Driver.php';
  */
 class MySQLResultSet extends SketchObjectIterator {
     function rows() {
-        return mysql_num_rows($this -> result);
+        return mysql_num_rows($this->result);
     }
 
     function fetch($key) {
-        mysql_data_seek($this -> result, $key);
-        return mysql_fetch_assoc($this -> result);
+        mysql_data_seek($this->result, $key);
+        return mysql_fetch_assoc($this->result);
     }
 
     protected function free() {
         // Ignore thrown exceptions
         try {
-            mysql_free_result($this -> result);
+            mysql_free_result($this->result);
         } catch (Exception $e) {}
     }
 }
@@ -60,25 +60,25 @@ class MySQLConnectionDriver extends SketchConnectionDriver {
         $connection = mysql_connect($host, $user, $password);
         if ($connection) {
             if (mysql_select_db($database)) {
-                $this -> databaseName = $database;
-                $this -> connection = $connection;
-                $this -> executeUpdate("set names '$encoding'");
+                $this->databaseName = $database;
+                $this->connection = $connection;
+                $this->executeUpdate("set names '$encoding'");
             } else {
-                throw new Exception($this->getTranslator()->_("Couldn't connect to database $database"));
+                throw new SketchResourceConnectionException($this->getTranslator()->_("Couldn't connect to database $database"));
             }
         } else {
-            throw new Exception($this->getTranslator()->_("Couldn't open a connection to $host"));
+            throw new SketchResourceConnectionException($this->getTranslator()->_("Couldn't open a connection to $host"));
         }
     }
 
     protected function close() {
-        @mysql_close($this -> connection);
+        @mysql_close($this->connection);
     }
 
     function getTables($do_not_show = null) {
         $do_not_show = (is_array($do_not_show)) ? array_merge(array('WB_cache'), $do_not_show) : array('WB_cache');
         $output = array();
-        foreach ($this -> queryArray("SHOW TABLES FROM `$this->databaseName`") as $table) {
+        foreach ($this->queryArray("SHOW TABLES FROM `$this->databaseName`") as $table) {
             if (!in_array($table, $do_not_show)) {
                 $output[$table] = $table;
             }
@@ -86,45 +86,107 @@ class MySQLConnectionDriver extends SketchConnectionDriver {
         return $output;
     }
 
+    /**
+     *
+     * @param string $table_name
+     * @return array
+     */
     function getTableDefinition($table_name) {
-        $result_set = $this -> executeQuery("SHOW COLUMNS FROM `$table_name`");
-        $o = array('fields' => array(), 'templates' => array(
-            'constructor' => "\t\t\t\$mixed = \$this->getConnection()->queryRow(\"SELECT * FROM `${table_name}` WHERE %1\$s = \".intval(\$mixed));\n",
-            'insert' => "\t\t\t\t\$test = \$connection->executeUpdate(\"INSERT INTO `${table_name}` (%2\$s) VALUES (%3\$s)\");\n\t\t\t\tif (\$test) \$this->setId(\$connection->queryFirst(\"SELECT LAST_INSERT_ID()\"));\n\t\t\t\treturn \$test;\n",
-            'update' => "\t\t\t\treturn \$connection->executeUpdate(\"UPDATE `${table_name}` SET %2\$s WHERE %1\$s = \$id\");\n",
-            'delete' => "\t\t\treturn \$connection->executeUpdate(\"DELETE FROM `${table_name}` WHERE %1\$s = \$id\");\n"
-        )); foreach ($result_set as $r) {
+        $result_set = $this->executeQuery("SHOW COLUMNS FROM `$table_name`");
+        $o = array(
+            'fields' => array(),
+            'templates' => array(
+                'constructor' => "\t\t\t\$mixed = \$this->getConnection()->queryRow(\"SELECT * FROM `${table_name}` WHERE %1\$s = \".intval(\$mixed));\n",
+                'insert' => "\t\t\t\$test = \$connection->executeUpdate(\"INSERT INTO `${table_name}` (%2\$s) VALUES (%3\$s)\");\n\t\t\tif (\$test) \$this->setId(\$connection->queryFirst(\"SELECT LAST_INSERT_ID()\"));\n\t\t\treturn \$test;\n",
+                'update' => "\t\t\treturn \$connection->executeUpdate(\"UPDATE `${table_name}` SET %2\$s WHERE %1\$s = \$id\");\n",
+                'delete' => "\t\t\treturn \$connection->executeUpdate(\"DELETE FROM `${table_name}` WHERE %1\$s = \$id\");\n"
+            )
+        );
+        foreach ($result_set as $r) {
             $o['fields'][$r['Field']] = array(
                 'type' => $r['Type'],
                 'default' => $r['Default'],
                 'null' => ($r['Null'] == 'YES')
             );
-        } return $o;
+        }
+        return $o;
     }
 
+    /**
+     *
+     * @param string $string
+     * @return string
+     */
     function escapeString($string) {
         return mysql_real_escape_string(trim($string), $this->connection);
     }
 
+    /**
+     * Execute query expression and return result set
+     *
+     * @param string $expression
+     * @return PostgreSQLResultSet
+     */
     function executeQuery($expression) {
         if ($this->getContext()->getLayerName() == 'development') {
             $this->getLogger()->log(trim($expression).' ('.number_format(microtime(true) - $this->getApplication()->getStartTime(), 3).')', 4);
         }
-        $result = mysql_query($expression, $this -> connection);
-        $error = mysql_error($this -> connection);
+        $result = @mysql_query($expression, $this->connection);
+        $error = mysql_error($this->connection);
         if ($error) {
-            throw new Exception($error.' '.$expression);
-        } return new MySQLResultSet($result);
+            throw new SketchResourceConnectionException($error.' '.$expression);
+        }
+        return new MySQLResultSet($result);
     }
 
+    /**
+     * Execute update expression and return true on success
+     *
+     * @param string $expression
+     * @return boolean
+     */
     function executeUpdate($expression) {
         if ($this->getContext()->getLayerName() == 'development') {
             $this->getLogger()->log($expression, 3);
         }
-        mysql_query($expression, $this -> connection);
-        $error = mysql_error($this -> connection);
+        @mysql_query($expression, $this->connection);
+        $error = mysql_error($this->connection);
         if ($error) {
-            throw new Exception($error.' '.$expression);
-        } else return true;
+            throw new SketchResourceConnectionException($error.' '.$expression);
+        }
+        return true;
+    }
+
+    /**
+     *
+     * @return boolean
+     */
+    function beginTransaction() {
+        return $this->executeUpdate("BEGIN");
+    }
+
+    /**
+     *
+     * @return boolean
+     */
+    function commitTransaction() {
+        return $this->executeUpdate("COMMIT");
+    }
+
+    /**
+     *
+     * @return boolean
+     */
+    function rollbackTransaction() {
+        return $this->executeUpdate("ROLLBACK");
+    }
+
+    /**
+     *
+     * @param string $attribute
+     * @return boolean
+     */
+    function supports($attribute) {
+        return false;
     }
 }

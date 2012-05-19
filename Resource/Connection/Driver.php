@@ -96,10 +96,10 @@ abstract class SketchConnectionDriver extends SketchResource {
     
     /**
      *
-     * @param string $table
+     * @param string $table_name
      * @return array
      */
-    abstract function getTableDefinition($table);
+    abstract function getTableDefinition($table_name);
 
     /**
      *
@@ -121,6 +121,24 @@ abstract class SketchConnectionDriver extends SketchResource {
      * @return boolean
      */
     abstract function executeUpdate($expression);
+
+    /**
+     *
+     * @return boolean
+     */
+    abstract function beginTransaction();
+
+    /**
+     *
+     * @return boolean
+     */
+    abstract function commitTransaction();
+
+    /**
+     *
+     * @return boolean
+     */
+    abstract function rollbackTransaction();
 
     /**
      *
@@ -161,4 +179,11 @@ abstract class SketchConnectionDriver extends SketchResource {
             if ($value != null) $array[$key] = $value; else $array[] = $key;
         } return $array;
     }
+
+    /**
+     *
+     * @param string $attribute
+     * @return boolean
+     */
+    abstract function supports($attribute);
 }

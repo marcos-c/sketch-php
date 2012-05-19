@@ -64,7 +64,7 @@ class SketchResourceConnection extends SketchResource {
     function getTablePrefix($default = null) {
         return $this->driver->getTablePrefix($default);
     }
-    
+
     /**
      *
      * @param mixed $do_not_show
@@ -76,11 +76,11 @@ class SketchResourceConnection extends SketchResource {
 
     /**
      *
-     * @param string $table
+     * @param string $table_name
      * @return array
      */
-    function getTableDefinition($table) {
-        return $this->driver->getTableDefinition($table);
+    function getTableDefinition($table_name) {
+        return $this->driver->getTableDefinition($table_name);
     }
 
     /**
@@ -90,6 +90,16 @@ class SketchResourceConnection extends SketchResource {
      */
     function escapeString($string) {
         return $this->driver->escapeString($string);
+    }
+
+    /**
+     *
+     * @param string $string
+     * @return string
+     */
+    function toASCII($string, $encoding) {
+        setlocale(LC_CTYPE, $encoding);
+        return strtoupper(iconv('UTF-8', 'ASCII//TRANSLIT', strtolower($this->driver->escapeString($string))));
     }
 
     /**
@@ -107,6 +117,30 @@ class SketchResourceConnection extends SketchResource {
      */
     function executeUpdate($expression) {
         return $this->driver->executeUpdate($expression);
+    }
+
+    /**
+     *
+     * @return boolean
+     */
+    function beginTransaction() {
+        return $this->driver->beginTransaction();
+    }
+
+    /**
+     *
+     * @return boolean
+     */
+    function commitTransaction() {
+        return $this->driver->commitTransaction();
+    }
+
+    /**
+     *
+     * @return boolean
+     */
+    function rollbackTransaction() {
+        return $this->driver->rollbackTransaction();
     }
 
     /**
@@ -143,5 +177,14 @@ class SketchResourceConnection extends SketchResource {
      */
     function queryArray($expression) {
         return $this->driver->queryArray($expression);
+    }
+
+    /**
+     *
+     * @param string $attribute
+     * @return boolean
+     */
+    function supports($attribute = null) {
+        return $this->getDriver()->supports($attribute);
     }
 }
