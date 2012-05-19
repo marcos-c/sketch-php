@@ -40,6 +40,12 @@ class SketchRequest extends SketchObject {
      *
      * @var string
      */
+    private $onForwardReturn = null;
+
+    /**
+     *
+     * @var string
+     */
     private $method;
 
     /**
@@ -135,6 +141,22 @@ class SketchRequest extends SketchObject {
      *
      * @return string
      */
+    function getOnForwardReturn() {
+        return ($this->onForwardReturn != null) ? $this->onForwardReturn : false;
+    }
+
+    /**
+     *
+     * @param string $on_forward_return
+     */
+    function setOnForwardReturn($on_forward_return) {
+        $this->onForwardReturn = $on_forward_return;
+    }
+
+    /**
+     *
+     * @return string
+     */
     function getMethod() {
         return $this->method;
     }
@@ -194,7 +216,7 @@ class SketchRequest extends SketchObject {
     function getResolvedURI() {
         return $this->resolvedURI;
     }
-    
+
     /**
      *
      * @return array

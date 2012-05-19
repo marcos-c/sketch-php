@@ -49,11 +49,11 @@ class SketchController extends SketchObject {
 
     /**
      *
-     * @param SketchResponse $response 
+     * @param SketchResponse $response
      */
     function setResponse(SketchResponse $response) {
         $this->response = $response;
-        $this->response->setDocument(SketchResponsePart::evaluate($this->getRouter()->getView()));
+        $this->response->setDocument(SketchResponsePart::evaluate($this->getRouter()->getView(), true));
     }
 
     /**
@@ -98,24 +98,35 @@ class SketchController extends SketchObject {
      * @param string $location
      */
     function forward($location = null) {
-        if (headers_sent()) {
-            throw new Exception($this->getTranslator()->_("Headers already sent"));
-        } else {
-            $request = $this->getRequest();
-            $server_name = $request->getServerName();
-            $server_port = $this->getRequest()->getServerPort();
-            $server_port = ($server_port != 80) ? ":$server_port" : "";
-            if ($location != null) {
-                // If relative path
-                if (substr($location, 0, 1) != DIRECTORY_SEPARATOR) {
-                    $base = rtrim(dirname($this->getRequest()->getResolvedURI()), DIRECTORY_SEPARATOR);
-                    $location = $base.DIRECTORY_SEPARATOR.$location;
-                }
-                header("Location: http://$server_name$server_port".$location, true, 303);
-            } else {
-                header("Location: http://$server_name$server_port".$request->getURI(), true, 303);
-            }
+        if ($this->getRequest()->isJSON()) {
+            $response = new SketchResponseJSON();
+            $response->forwardLocation = $location;
+            print SketchUtils::encodeJSON($response);
             exit();
+        } else {
+            if (headers_sent()) {
+                throw new Exception($this->getTranslator()->_("Headers already sent"));
+            } else {
+                $request = $this->getRequest();
+                if ($request->getOnForwardReturn()) {
+                    print $request->getOnForwardReturn();
+                } else {
+                    $server_name = $request->getServerName();
+                    $server_port = $this->getRequest()->getServerPort();
+                    $server_port = ($server_port != 80) ? ":$server_port" : "";
+                    if ($location != null) {
+                        // If relative path
+                        if (substr($location, 0, 1) != DIRECTORY_SEPARATOR) {
+                            $base = rtrim(dirname($this->getRequest()->getResolvedURI()), DIRECTORY_SEPARATOR);
+                            $location = $base.DIRECTORY_SEPARATOR.$location;
+                        }
+                        header("Location: http://$server_name$server_port".$location, true, 303);
+                    } else {
+                        header("Location: http://$server_name$server_port".$request->getURI(), true, 303);
+                    }
+                }
+                exit();
+            }
         }
     }
 }

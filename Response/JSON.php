@@ -30,7 +30,23 @@ require_once 'Sketch/Response.php';
  * @package Sketch
  */
 class SketchResponseJSON extends SketchResponse {
+    /**
+     *
+     * @var string
+     */
     public $html;
+
+    /**
+     *
+     * @var string
+     */
+    public $forward = "";
+
+    /**
+     *
+     * @var string
+     */
+    public $forwardLocation = "";
 
     /**
      *
@@ -50,7 +66,11 @@ class SketchResponseJSON extends SketchResponse {
                 if ($json_response->hasChildNodes()) foreach ($json_response->childNodes as $node) {
                     $document->appendChild($document->importNode($node, true));
                 }
-                $this->html = $document->saveXML();
+                if ($id = $json_response->getAttribute('id')) {
+                    $this->fragment[$id] = $document->saveXML();
+                } else {
+                    $this->html = $document->saveXML();
+                }
             }
         } else {
             $context = new DOMXPath($this->document);
@@ -63,8 +83,17 @@ class SketchResponseJSON extends SketchResponse {
                 if ($json_response->hasChildNodes()) foreach ($json_response->childNodes as $node) {
                     $document->appendChild($document->importNode($node, true));
                 }
-                $this->html = $document->saveHTML();
+                if ($id = $json_response->getAttribute('id')) {
+                    $this->fragment[$id] = $document->saveHTML();
+                } else {
+                    $this->html = $document->saveHTML();
+                }
             }
+        }
+        // Log
+        $this->log = array();
+        foreach ($this->getLogger()->getMessages() as $message) {
+            $this->log[] = $message;
         }
     }
 }

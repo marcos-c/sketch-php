@@ -42,11 +42,22 @@ class SketchLoggerSimple extends SketchLogger {
      */
     static private $md5 = array();
 
+    function __construct() {
+        $session = $this->getSession();
+        $messages = $session->getAttribute('__log');
+        if (is_array($messages)) {
+            foreach ($messages as $message) {
+                $this->log($message);
+            }
+            $session->setAttribute('__log', null);
+        }
+    }
+
     /**
      *
      * @param string $message
      */
-    function Log($message, $level = 5) {
+    function log($message, $level = 5) {
         if ($level >= self::$level) {
             $md5 = md5($message);
             if (array_key_exists($md5, self::$md5)) {

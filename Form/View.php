@@ -57,6 +57,12 @@ class SketchFormView extends SketchObject {
 
     /**
      *
+     * @var string
+     */
+    protected $action;
+
+    /**
+     *
      * @var boolean
      */
     protected $javascript = false;
@@ -96,6 +102,7 @@ class SketchFormView extends SketchObject {
         $this->fromInstance = clone($data_view);
         $this->instance = $data_view;
         $this->formName = $form_name;
+        $this->action = $this->getRequest()->getURI();
         // Update instance before calling action commands
         $this->form = $this->getRequest()->getAttribute($this->getFormName());
         $session = $this->getSession();
@@ -133,13 +140,39 @@ class SketchFormView extends SketchObject {
     /**
      *
      * @param string $location
+     * @return string
+     */
+    public function resolveInstanceParameters($location) {
+        // Add dinamic parameters to location
+        $explode = explode('?', $location);
+        $location = array_shift($explode);
+        $url_parameters = explode('&', array_shift($explode));
+        $add = array();
+        if (is_array($url_parameters)) foreach ($url_parameters as $parameter) {
+            if ($parameter != null && !strpos($parameter, '=')) {
+                $field = null; foreach (explode('_', $parameter) as $value) {
+                    $field .= ucfirst($value);
+                }
+                $add[] = $parameter.'='.urlencode($this->getFieldValue(strtolower(substr($field, 0, 1)).substr($field, 1)));
+            } else if ($parameter != null) {
+                $add[] = $parameter;
+            }
+        }
+        if (count($add) > 0) $location = $location.'?'.implode('&', $add);
+        return $location;
+    }
+
+    /**
+     *
+     * @param string $location
      * @param array $attributes
      * @param boolean $set_and_clear
      */
     private function requestForward($location, $attributes = null, $set_and_clear = false) {
-        // Add notices and attributes to session
+        // Add notices, log and attributes to session
         $session = $this->getSession();
         $session->setAttribute('__notices', $this->getApplication()->getNotices(false));
+        $session->setAttribute('__log', $this->getLogger()->getMessages());
         if (is_array($attributes)) {
             // Update all attributes before propagation because the action class could have modified them
             foreach ($attributes as $attribute => $value) {
@@ -154,27 +187,13 @@ class SketchFormView extends SketchObject {
             $session_attributes['set_and_clear'] = ($set_and_clear) ? true : false;
             $session->setAttribute('__form', $session_attributes);
         }
-        // If it's a JSON request then we don't need the forward
-        if (!$this->getRequest()->isJSON()) {
-            if ($location != null) {
-                // Add dinamic parameters to location
-                $explode = explode('?', $location);
-                $location = array_shift($explode);
-                $url_parameters = explode('&', array_shift($explode));
-                $add = array();
-                if (is_array($url_parameters)) foreach ($url_parameters as $parameter) {
-                    if ($parameter != null && !strpos($parameter, '=')) {
-                        $field = null; foreach (explode('_', $parameter) as $value) {
-                            $field .= ucfirst($value);
-                        }
-                        $add[] = $parameter.'='.$this->getFieldValue(strtolower(substr($field, 0, 1)).substr($field, 1));
-                    } else if ($parameter != null) {
-                        $add[] = $parameter;
-                    }
-                }
-                if (count($add) > 0) $location = $location.'?'.implode('&', $add);
-            }
-            // Forward
+        if ($location != null) {
+            $location = $this->resolveInstanceParameters($location);
+        }
+        // If it's a JSON request then add the forward to the response object
+        if ($this->getRequest()->isJSON()) {
+            $this->getApplication()->getController()->getResponse()->forward = ($location != null) ? $location : "";
+        } else {
             $this->getController()->forward($location);
         }
     }
@@ -190,7 +209,7 @@ class SketchFormView extends SketchObject {
                 $parameters = $command->getParameters();
                 $cp = null; for ($i = 0; $i < count($parameters); $i++) $cp .= ', $parameters['.$i.']';
                 $result = eval('return $this->instance->'.$command->getCommand().'($this'.$cp.');');
-                // Check result$
+                // Check result
                 if ($result === true || is_string($result)) {
                     $location = (is_array($target)) ? $target[$result] : (($result) ? trim($target) : null);
                     if ($location != null || $target == null) {
@@ -231,8 +250,9 @@ class SketchFormView extends SketchObject {
      * @param string $mixed
      * @return string
      */
-    private function encodeCommand($mixed) {
+    function encodeCommand($mixed) {
         if ($mixed != null) {
+            $mixed = ($mixed instanceof SketchFormCommand) ? $mixed : new SketchFormCommand($mixed);
             switch (get_class($mixed)) {
                 case 'SketchFormCommandPropagate': $alias = 'sfcp'; break;
                 case 'SketchFormCommand': $alias = 'sfc'; break;
@@ -288,7 +308,11 @@ class SketchFormView extends SketchObject {
     }
 
     function getAction() {
-        return $this->getRequest()->getURI();
+        return $this->action;
+    }
+
+    function setAction($action) {
+        $this->action = $this->resolveInstanceParameters($action);
     }
 
     function getFromInstance() {
@@ -376,9 +400,9 @@ class SketchFormView extends SketchObject {
     function openForm($parameters = null) {
         $this->javascript = true;
         $form_name = $this->getFormName();
-        $action = htmlentities($this->getAction());
+        $action = $this->getAction();
         $parameters = (($parameters != null && strpos(" $parameters", 'class="')) ? $parameters : implode(' ', array($parameters, 'class="open-form"')));
-        return "<script type=\"text/javascript\"><!--\n(function($) { var stack = new Array(); ${form_name}Command = function(command, location) { $(\"input[name='${form_name}[command]']\").val(command); $(\"input[name='${form_name}[location]']\").val(location); $(\"form[name='${form_name}']\").submit(); return false; }; $(\"form[name='${form_name}']\").ready(function() { $(\"form[name='${form_name}']\").submit(function() { for (var i = 0; i < stack.length; i++) { eval(stack[i]); } }); }); })(jQuery);\n// --></script><form name=\"${form_name}\" action=\"${action}\" method=\"post\" enctype=\"multipart/form-data\" ${parameters}><input type=\"hidden\" id=\"${form_name}[command]\" name=\"${form_name}[command]\" /><input type=\"hidden\" id=\"${form_name}[location]\" name=\"${form_name}[location]\" />\n";
+        return "<script type=\"text/javascript\"><!--\n(function($) { var stack = new Array(); ${form_name}Stack = function(method) { stack[stack.length] = method; }; ${form_name}Command = function(command, location) { $(\"input[name='${form_name}[command]']\").val(command); $(\"input[name='${form_name}[location]']\").val(location); $(\"form[name='${form_name}']\").submit(); return false; }; $(\"form[name='${form_name}']\").ready(function() { $(\"form[name='${form_name}']\").submit(function() { for (var i = 0; i < stack.length; i++) { eval(stack[i]); } }); }); })(jQuery);\n// --></script><form name=\"${form_name}\" action=\"${action}\" method=\"post\" enctype=\"multipart/form-data\" ${parameters}><input type=\"hidden\" id=\"${form_name}[command]\" name=\"${form_name}[command]\" /><input type=\"hidden\" id=\"${form_name}[location]\" name=\"${form_name}[location]\" />\n";
     }
 
     function closeForm() {
@@ -387,14 +411,14 @@ class SketchFormView extends SketchObject {
 
     function setDefaultCommand($command, $location = null) {
         $form_name = $this->getFormName();
-        $command = $this->encodeCommand(($command instanceof SketchFormCommand) ? $command : new SketchFormCommand($command));
+        $command = $this->encodeCommand($command);
         $location = $this->encodeLocation($location);
         $this->defaultCommand = "${form_name}Command('${command}', '${location}')";
     }
 
     function command($command = null, $location = null) {
         $form_name = $this->getFormName();
-        $command = $this->encodeCommand(($command instanceof SketchFormCommand) ? $command : new SketchFormCommand($command));
+        $command = $this->encodeCommand($command);
         $location = $this->encodeLocation($location);
         return $form_name.'Command(\''.$command.'\', \''.$location.'\');';
     }
@@ -406,24 +430,27 @@ class SketchFormView extends SketchObject {
 
     function commandLink($command, $location = null, $label = null, $parameters = null) {
         $label = ($label != null) ? $label : $command;
-        $action = htmlentities($this->getAction());
+        $action = $this->getAction();
         return '<a href="'.$action.'" onclick="return '.$this->command($command, $location).'" '.trim(!strpos(" $parameters", 'class="') ? "$parameters class=\"command-link\"" : $parameters).'>'.$label.'</a>';
     }
 
     function commandLinkWithConfirmation($command, $location = null, $label = null, $confirmation_message = null, $parameters = null) {
         $label = ($label != null) ? $label : $command;
-        $action = htmlentities($this->getAction());
-        return '<a href="'.$action.'" onclick="if (confirm(\''.$confirmation_message.'\')) { return '.$this->command($command, $location).'; } else { return false; }" '.trim(!strpos(" $parameters", 'class="') ? "$parameters class=\"command-link\"" : $parameters).'>'.$label.'</a>';
+        return '<a href="'.$this->getAction().'" onclick="if (confirm(\''.$confirmation_message.'\')) { return '.$this->command($command, $location).'; } else { return false; }" '.trim(!strpos(" $parameters", 'class="') ? "$parameters class=\"command-link\"" : $parameters).'>'.$label.'</a>';
     }
 
     function commandLinkNewWindow($command, $location = null, $label = null, $parameters = null) {
         $form_name = $this->getFormName();
         $label = ($label != null) ? $label : $command;
-        $action = htmlentities($this->getAction());
-        return '<a href="'.$action.'" onclick="$(\'form[name=\\\''.$form_name.'\\\']\').attr(\'target\', \'_blank\'); '.$this->command($command, $location).'; $(\'form[name=\\\''.$form_name.'\\\']\').attr(\'target\', \'_self\'); return false;" '.trim(!strpos(" $parameters", 'class="') ? "$parameters class=\"command-link\"" : $parameters).'>'.$label.'</a>';
+        return '<a href="'.$this->getAction().'" onclick="jQuery(\'form[name=\\\''.$form_name.'\\\']\').attr(\'target\', \'_blank\'); '.$this->command($command, $location).'; jQuery(\'form[name=\\\''.$form_name.'\\\']\').attr(\'target\', \'_self\'); return false;" '.trim(!strpos(" $parameters", 'class="') ? "$parameters class=\"command-link\"" : $parameters).'>'.$label.'</a>';
     }
 
     function link($location = null, $label = null, $parameters = null) {
-        return $this->commandLink(null, $location, $label, $parameters);
+        $location = $this->resolveInstanceParameters($location);
+        return '<a href="'.$location.'" '.trim(!strpos(" $parameters", 'class="') ? "$parameters class=\"link\"" : $parameters).'>'.$label.'</a>';
+    }
+
+    function resolveLocation($location) {
+        return $this->resolveInstanceParameters($location);
     }
 }
