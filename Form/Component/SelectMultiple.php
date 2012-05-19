@@ -33,110 +33,69 @@ class SketchFormComponentSelectMultiple extends SketchFormComponent {
     function javascript() {
         $form_name = $this->getForm()->getFormName();
         ob_start(); ?>
-        <?=$form_name?>PrepareSubmitStack[<?=$form_name?>PrepareSubmitStack.length] = '<?=$form_name?>SelectMultipleSubmit()';
-
-        var <?=$form_name?>SelectMultipleArray = new Array();
-
-        function <?=$form_name?>SelectMultipleSubmit() {
-            for (var i = 0; i < <?=$form_name?>SelectMultipleArray.length; i++) {
-                select = document.getElementById(<?=$form_name?>SelectMultipleArray[i]);
-                for (var j = 0; j < select.options.length; j++) {
-                    select.options[j].selected = true;
-                }
-            }
-        }
-
-        function <?=$form_name?>SelectMultipleMove(from, to, sort) {
-            var from = document.getElementById(from);
-            var to = document.getElementById(to);
-            var o = new Array();
-            for (var i = 0; i < to.options.length; i++) {
-                o[o.length] = new Option(to.options[i].text, to.options[i].value);
-            }
-            var i = 0; do {
-                if (from.options[i].selected) {
-                    o[o.length] = new Option(from.options[i].text, from.options[i].value, from.options[i].defaultSelected, from.options[i].selected);
-                    from.options[from.selectedIndex] = null;
-                } else i++;
-            } while (i < from.options.length);
-            if (sort) o.sort(function (a,b) { if ((a.text + "") < (b.text + "")) return -1; if ((a.text + "") > (b.text + "")) return 1; return 0; });
-            for (var i = 0; i < o.length; i++) to.options[i] = new Option(o[i].text, o[i].value, o[i].defaultSelected, o[i].selected);
-        }
-
-        function <?=$form_name?>SelectMultipleSortUp(select) {
-            var select = document.getElementById(select);
-            var o = select.options;
-            var s = -1;
-            for (var i = 0; i < select.options.length; i++) {
-                j = i - 1; if (o[i].selected) {
-                    if (j > s) {
-                        var t1 = new Option(o[i].text, o[i].value, o[i].defaultSelected, o[i].selected);
-                        var t2 = new Option(o[j].text, o[j].value, o[j].defaultSelected, o[j].selected);
-                        o[i] = t2; o[j] = t1;
-                    } else s = i;
-                }
-            }
-        }
-
-        function <?=$form_name?>SelectMultipleSortDown(select) {
-            var select = document.getElementById(select);
-            var o = select.options;
-            var s = o.length;
-            for (var i = (o.length - 1); i > -1; i = i - 1) {
-                j = i + 1; if (o[i].selected) {
-                    if (j < s) {
-                        var t1 = new Option(o[i].text, o[i].value, o[i].defaultSelected, o[i].selected);
-                        var t2 = new Option(o[j].text, o[j].value, o[j].defaultSelected, o[j].selected);
-                        o[i] = t2; o[j] = t1;
-                    } else s = i;
-                }
-            }
-        }
+        <?=$form_name?>Stack("<?=$form_name?>SelectMultipleSubmit()");var <?=$form_name?>SelectMultipleArray=new Array();function <?=$form_name?>SelectMultipleSubmit(){for(var b=0;b<<?=$form_name?>SelectMultipleArray.length;b++){select=document.getElementById(<?=$form_name?>SelectMultipleArray[b]);for(var a=0;a<select.options.length;a++){select.options[a].selected=true}}}function <?=$form_name?>SelectMultipleMove(e,d,b){var e=document.getElementById(e);var d=document.getElementById(d);var c=new Array();if(e.options.length>0){for(var a=0;a<d.options.length;a++){c[c.length]=new Option(d.options[a].text,d.options[a].value)}var a=0;do{if(e.options[a].selected){c[c.length]=new Option(e.options[a].text,e.options[a].value,e.options[a].defaultSelected,e.options[a].selected);e.options[e.selectedIndex]=null}else{a++}}while(a<e.options.length);if(b){c.sort(function(g,f){if((g.text+"")<(f.text+"")){return -1}if((g.text+"")>(f.text+"")){return 1}return 0})}for(var a=0;a<c.length;a++){d.options[a]=new Option(c[a].text,c[a].value,c[a].defaultSelected,c[a].selected)}}}function <?=$form_name?>SelectMultipleSortUp(a){var a=document.getElementById(a);var f=a.options;var d=-1;for(var b=0;b<a.options.length;b++){j=b-1;if(f[b].selected){if(j>d){var e=new Option(f[b].text,f[b].value,f[b].defaultSelected,f[b].selected);var c=new Option(f[j].text,f[j].value,f[j].defaultSelected,f[j].selected);f[b]=c;f[j]=e}else{d=b}}}}function <?=$form_name?>SelectMultipleSortDown(a){var a=document.getElementById(a);var f=a.options;var d=f.length;for(var b=(f.length-1);b>-1;b=b-1){j=b+1;if(f[b].selected){if(j<d){var e=new Option(f[b].text,f[b].value,f[b].defaultSelected,f[b].selected);var c=new Option(f[j].text,f[j].value,f[j].defaultSelected,f[j].selected);f[b]=c;f[j]=e}else{d=b}}}};
         <?php return ob_get_clean();
     }
 
     function saveHTML() {
+        $form = $this->getForm();
         $arguments = $this->getArguments();
         $options = array_shift($arguments);
         $attribute = array_shift($arguments);
-        $parameters = array_shift($arguments);
-        $form_name = $this->getForm()->getFormName();
-        $action = $this->getForm()->getAction();
-        $field_name = $this->getForm()->getFieldName($attribute);
-        $ignore_field_name = str_replace('[attributes]', '[ignore]', $field_name);
-        $field_value = $this->getForm()->getFieldValue($attribute);
-        $parameters = (($parameters != null && strpos(" $parameters", 'class="')) ? $parameters : implode(' ', array($parameters, 'class="select-multiple"')));
-        $from = $to = array(); if (is_array($options)) foreach ($options as $key => $value) {
-            if (is_array($field_value) && in_array($key, $field_value)) {
-                $to[array_search($key, $field_value)] = '<option value="'.htmlspecialchars($key).'" selected="selected" class="select-option selected">'.htmlspecialchars($value).'</option>';
-            } else {
-                $from[] = '<option value="'.htmlspecialchars($key).'" class="select-option">'.htmlspecialchars($value).'</option>';
+        $parameters = $this->extend(array(
+            'show-sort-options' => false,
+            'size' => 5,
+            'to' => array('id' => null, 'class' => 'select-multiple-to', 'style' => 'float: left;'),
+            'controls' => array('id' => null, 'class' => 'select-multiple-controls', 'style' => 'float: left; margin-right: 4px;'),
+            'left' => array('id' => null, 'class' => 'select-multiple-left', 'style' => null),
+            'left-label' => $this->getTranslator()->_('Left'),
+            'up' => array('id' => null, 'class' => 'select-multiple-up', 'style' => null),
+            'up-label' => $this->getTranslator()->_('Up'),
+            'down' => array('id' => null, 'class' => 'select-multiple-down', 'style' => null),
+            'down-label' => $this->getTranslator()->_('Down'),
+            'right' => array('id' => null, 'class' => 'select-multiple-right', 'style' => null),
+            'right-label' => $this->getTranslator()->_('Right'),
+            'from' => array('id' => null, 'class' => 'select-multiple-from', 'style' => 'float: left;'),
+        ), array_shift($arguments));
+        $form_name = $form->getFormName();
+        $field_name = $form->getFieldName($attribute);
+        $field_value = $form->getFieldValue($attribute);
+        $from = $to = array();
+        if ($options instanceof SketchObjectIterator) {
+            foreach ($options as $object) {
+                $key = $object->getId();
+                $value = method_exists($object, '__toString') ? $object->__toString() : (method_exists($object, 'getDefaultDescription') ? $object->getDefaultDescription() : $object->getDescription());
+                if (is_array($field_value) && in_array($key, $field_value)) {
+                    $to[array_search($key, $field_value)] = '<option value="'.htmlspecialchars($key).'" selected="selected" class="select-option selected">'.htmlspecialchars($value).'</option>';
+                } else {
+                    $from[] = '<option value="'.htmlspecialchars($key).'" class="select-option">'.htmlspecialchars($value).'</option>';
+                }
             }
-        } ksort($to);
+        } elseif (is_array($options)) {
+            foreach ($options as $key => $value) {
+                if (is_array($field_value) && in_array($key, $field_value)) {
+                    $to[array_search($key, $field_value)] = '<option value="'.htmlspecialchars($key).'" selected="selected" class="select-option selected">'.htmlspecialchars($value).'</option>';
+                } else {
+                    $from[] = '<option value="'.htmlspecialchars($key).'" class="select-option">'.htmlspecialchars($value).'</option>';
+                }
+            }
+        }
+        ksort($to);
+        $ignore_field_name = str_replace('[attributes]', '[ignore]', $field_name);
         ob_start(); ?>
-        <script language="JavaScript">
-            // <!CDATA[[
-                <?=$form_name?>SelectMultipleArray[<?=$form_name?>SelectMultipleArray.length] = '<?=$field_name?>';
-            // ]]>
+        <script type="text/javascript">
+            <?=$form_name?>SelectMultipleArray[<?=$form_name?>SelectMultipleArray.length] = '<?=$field_name?>';
         </script>
-        <table border="0" cellspacing="0" cellpadding="0" <?=(($parameters != null && strpos(" $parameters", 'class="')) ? $parameters : implode(' ', array($parameters, 'class="select-multiple"')))?>>
-            <tr>
-                <td class="select-multiple-td select">
-                    <select id="<?=$ignore_field_name?>" name="<?=$ignore_field_name?>[]" multiple="multiple" size="5" class="select-multiple-select left"><?=implode($from)?></select>
-                </td>
-                <td class="select-multiple-td control">
-                    <input type="button" value="" onclick="<?=$form_name?>SelectMultipleMove('<?=$ignore_field_name?>', '<?=$field_name?>', false)" class="select-multiple-button right" /><br />
-                    <input type="button" value="" onclick="<?=$form_name?>SelectMultipleMove('<?=$field_name?>', '<?=$ignore_field_name?>', true)" class="select-multiple-button left" />
-                </td>
-                <td class="select-multiple-td select">
-                    <select id="<?=$field_name?>" name="<?=$field_name?>[]" multiple="multiple" size="5" class="select-multiple-select right"><?=implode($to)?></select>
-                </td>
-                <td class="select-multiple-td control">
-                    <input type="button" value="" onclick="<?=$form_name?>SelectMultipleSortUp('<?=$field_name?>')" class="select-multiple-button up" /><br />
-                    <input type="button" value="" onclick="<?=$form_name?>SelectMultipleSortDown('<?=$field_name?>')" class="select-multiple-button down" />
-                </td>
-            </tr>
-        </table>
+        <select id="<?=$field_name?>" name="<?=$field_name?>[]" multiple="multiple" size="<?=$parameters['size']?>"<?=$parameters['to']?>><?=implode($to)?></select>
+        <div<?=$parameters['controls']?>>
+            <a href="#" onclick="<?=$form_name?>SelectMultipleMove('<?=$ignore_field_name?>', '<?=$field_name?>', false); return false;"<?=$parameters['left']?>><?=$parameters['left-label']?></a>
+            <? if ($parameters['show-sort-options']): ?>
+                <a href="#" onclick="<?=$form_name?>SelectMultipleSortUp('<?=$field_name?>'); return false;"<?=$parameters['up']?>><?=$parameters['up-label']?></a>
+                <a href="#" onclick="<?=$form_name?>SelectMultipleSortDown('<?=$field_name?>'); return false;"<?=$parameters['down']?>><?=$parameters['down-label']?></a>
+            <? endif; ?>
+            <a href="#" onclick="<?=$form_name?>SelectMultipleMove('<?=$field_name?>', '<?=$ignore_field_name?>', true); return false;"<?=$parameters['right']?>><?=$parameters['right-label']?></a>
+        </div>
+        <select id="<?=$ignore_field_name?>" name="<?=$ignore_field_name?>[]" multiple="multiple" size="<?=$parameters['size']?>"<?=$parameters['from']?>><?=implode($from)?></select>
         <?php return ob_get_clean();
     }
 }
