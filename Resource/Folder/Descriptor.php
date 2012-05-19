@@ -279,6 +279,12 @@ class SketchResourceFolderDescriptor extends SketchResource {
 
     /**
      *
+     * @var string
+     */
+    private $caption;
+
+    /**
+     *
      * @param array $parameters
      */
     function __construct($parameters = null) {
@@ -291,6 +297,7 @@ class SketchResourceFolderDescriptor extends SketchResource {
         $this->setFileSize($parameters['file_size']);
         $this->setImageWidth($parameters['image_width']);
         $this->setImageHeight($parameters['image_height']);
+        $this->setCaption($parameters['caption']);
     }
 
     /**
@@ -403,8 +410,10 @@ class SketchResourceFolderDescriptor extends SketchResource {
      * @param string $type
      */
     function setFileType($type) {
+        // If the mimetype is application/octet-stream try and make sure that
+        // the mimetype is correct using one of the available methods
         if ($type == 'application/octet-stream') {
-            if ($extension = $this->getFileExtension()) {
+            if ($extension = strtolower($this->getFileExtension())) {
                if (array_key_exists($extension, self::$mimeTypes)) {
                    $type = self::$mimeTypes[$extension];
                }
@@ -467,5 +476,21 @@ class SketchResourceFolderDescriptor extends SketchResource {
      */
     function setImageHeight($image_height) {
         $this->imageHeight = intval($image_height);
+    }
+
+    /**
+     *
+     * @return string
+     */
+    function getCaption() {
+        return $this->caption;
+    }
+
+    /**
+     *
+     * @param string $caption
+     */
+    function setCaption($caption) {
+        $this->caption = $caption;
     }
 }
