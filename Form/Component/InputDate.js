@@ -1,15 +1,16 @@
 function formNameUpdateDays(input) {
-    var form = document.forms['formName'];
-    var day = form[input + '[day]'];
-    var month = form[input + '[year_month]'].value.substr(4, 2) - 1;
-    var year = form[input + '[year_month]'].value.substr(0, 4);
+    var form, day, month, year, td, from, value, date, selectedValue;
+    form = document.forms['formName'];
+    day = form[input + '[day]'];
+    month = form[input + '[year_month]'].value.substr(4, 2) - 1;
+    year = form[input + '[year_month]'].value.substr(0, 4);
     if (year != 0 && month >= 0) {
         // 28 to 31 days
-        var td = new Date();
-        var from = 1;
-        var value = 0;
+        td = new Date();
+        from = 1;
+        value = 0;
         if (value == 0) {
-            var date; value = 31; do {
+            date; value = 31; do {
                 date = new Date(year, month, value--);
             } while (month < date.getMonth());
         }
@@ -18,7 +19,7 @@ function formNameUpdateDays(input) {
             from = (from > (td.getDate())) ? from : td.getDate();
         }
         // Update the selector
-        var selectedValue = day.value;
+        selectedValue = day.value;
         while (day.options.length) day.options[0] = null;
         for (i = from; i < value + 2; i++) {
             option = new Option(((i > 9) ? i : '0' + i), i, false, false);
@@ -32,18 +33,19 @@ function formNameUpdateDays(input) {
 }
 
 function formNameUpdateDate(input, date) {
-    var form = document.forms['formName'];
-    var month = date.getMonth() > 8 ? String(date.getMonth() + 1) : '0' + String(date.getMonth() + 1);
-    var selectedValue = String(date.getFullYear()) + month;
-    var year_month = form[input + '[year_month]'];
+    var form, month, selectedValue, year_month, day, i;
+    form = document.forms['formName'];
+    month = date.getMonth() > 8 ? String(date.getMonth() + 1) : '0' + String(date.getMonth() + 1);
+    selectedValue = String(date.getFullYear()) + month;
+    year_month = form[input + '[year_month]'];
     for (i = 0; i < year_month.length; i++) {
         if (year_month.options[i].value == selectedValue) {
             year_month.options[i].selected = true;
             break;
         }
     } formNameUpdateDays(input);
-    var day = form[input + '[day]'];
-    for (var i = 0; i < day.length; i++) {
+    day = form[input + '[day]'];
+    for (i = 0; i < day.length; i++) {
         if (day.options[i].value == date.getDate()) {
             day.options[i].selected = true;
             break;
@@ -52,24 +54,26 @@ function formNameUpdateDate(input, date) {
 }
 
 function formNameUpdateNights(from_input, to_input, nights_input, from_calendar_input, to_calendar_input) {
-    var form = document.forms['formName'];
-    var from = new Date(form[from_input + '[year_month]'].value.substr(0, 4), form[from_input + '[year_month]'].value.substr(4, 2) - 1, form[from_input + '[day]'].value);
-    var to = new Date(form[to_input + '[year_month]'].value.substr(0, 4), form[to_input + '[year_month]'].value.substr(4, 2) - 1, form[to_input + '[day]'].value);
-    var nights = Math.round((to - from) / 86400000);
+    var form, from, to, nights;
+    form = document.forms['formName'];
+    from = new Date(form[from_input + '[year_month]'].value.substr(0, 4), form[from_input + '[year_month]'].value.substr(4, 2) - 1, form[from_input + '[day]'].value);
+    to = new Date(form[to_input + '[year_month]'].value.substr(0, 4), form[to_input + '[year_month]'].value.substr(4, 2) - 1, form[to_input + '[day]'].value);
+    nights = Math.round((to - from) / 86400000);
     form[nights_input].value = nights;
     formNameOnNightsChange(from_input, to_input, nights_input, from_calendar_input, to_calendar_input);
 }
 
 function formNameOnDayChange(input, from_input, to_input, nights_input, calendar_input, from_calendar_input, to_calendar_input) {
+    var form, day, year_month, date;
     if (input == from_input) {
         formNameOnNightsChange(from_input, to_input, nights_input, from_calendar_input, to_calendar_input);
     } else if (nights_input != null) {
         formNameUpdateNights(from_input, to_input, nights_input, from_calendar_input, to_calendar_input);
     } else {
-        var form = document.forms['formName'];
-        var day = Number(form[input + '[day]'].value);
-        var year_month = form[input + '[year_month]'];
-        var date = new Date(year_month.value.substr(0, 4), year_month.value.substr(4, 2) - 1, day);
+        form = document.forms['formName'];
+        day = Number(form[input + '[day]'].value);
+        year_month = form[input + '[year_month]'];
+        date = new Date(year_month.value.substr(0, 4), year_month.value.substr(4, 2) - 1, day);
         $('#' + calendar_input).val(date.getFullYear() + '-' + (date.getMonth() + 1) + '-' + date.getDate());
     }
 }
@@ -80,14 +84,15 @@ function formNameOnMonthChange(input, from_input, to_input, nights_input, calend
 }
 
 function formNameOnNightsChange(from_input, to_input, nights_input, from_calendar_input, to_calendar_input) {
-    var form = document.forms['formName'];
+    var form, from_day, to_day, year_month, from_date, to_date;
+    form = document.forms['formName'];
     if (form[nights_input].value < 1) form[nights_input].value = 1;
     if (form[nights_input].value > 90) form[nights_input].value = 90;
-    var from_day = Number(form[from_input + '[day]'].value);
-    var to_day = from_day + Number(form[nights_input].value);
-    var year_month = form[from_input + '[year_month]'];
-    var from_date = new Date(year_month.value.substr(0, 4), year_month.value.substr(4, 2) - 1, from_day);
-    var to_date = new Date(year_month.value.substr(0, 4), year_month.value.substr(4, 2) - 1, to_day);
+    from_day = Number(form[from_input + '[day]'].value);
+    to_day = from_day + Number(form[nights_input].value);
+    year_month = form[from_input + '[year_month]'];
+    from_date = new Date(year_month.value.substr(0, 4), year_month.value.substr(4, 2) - 1, from_day);
+    to_date = new Date(year_month.value.substr(0, 4), year_month.value.substr(4, 2) - 1, to_day);
     formNameUpdateDate(to_input, to_date);
     $('#' + from_calendar_input).val(from_date.getFullYear() + '-' + (from_date.getMonth() + 1) + '-' + from_date.getDate());
     $('#' + to_calendar_input).val(to_date.getFullYear() + '-' + (to_date.getMonth() + 1) + '-' + to_date.getDate());
