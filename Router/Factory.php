@@ -35,7 +35,7 @@ class SketchRouterFactory extends SketchObject {
     /**
      *
      * @param SketchRequest $request
-     * @return SkechRouter
+     * @return SketchRouter
      */
     static function getRouter(SketchRequest $request) {
         if ($request->isRedirect()) {
