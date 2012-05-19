@@ -59,6 +59,9 @@ class SketchLoggerSimple extends SketchLogger {
      */
     function log($message, $level = 5) {
         if ($level >= self::$level) {
+            if (!is_string($message)) {
+                $message = print_r($message, true);
+            }
             $md5 = md5($message);
             if (array_key_exists($md5, self::$md5)) {
                 self::$messages[] = $message.' (x'.self::$md5[$md5]++.')';
