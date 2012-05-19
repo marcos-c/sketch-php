@@ -46,6 +46,17 @@ class SketchLocaleISO extends SketchObject {
      *
      * @return array
      */
+    static function getMonthNames() {
+        $application = SketchApplication::getInstance();
+        $locale = $application->getLocale();
+        $translator = ($locale instanceof SketchLocale) ? $locale->getTranslator() : new SketchLocaleTranslator(new DummyLocaleTranslatorDriver());
+        return array(1 => $translator->_('January'), $translator->_('February'), $translator->_('March'), $translator->_('April'), $translator->_('May'), $translator->_('June'), $translator->_('July'), $translator->_('August'), $translator->_('September'), $translator->_('October'), $translator->_('November'), $translator->_('December'));
+    }
+
+    /**
+     *
+     * @return array
+     */
     static function getCountries() {
         $application = SketchApplication::getInstance();
         $locale = $application->getLocale();
@@ -300,7 +311,7 @@ class SketchLocaleISO extends SketchObject {
                 'zm' => $translator->_('Zambia'),
                 'zw' => $translator->_('Zimbabwe')
             );
-            asort(self::$localizedCountries);
+            asort(self::$localizedCountries[$locale_string]);
         }
         return self::$localizedCountries[$locale_string];
     }
