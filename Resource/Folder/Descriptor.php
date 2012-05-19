@@ -285,6 +285,12 @@ class SketchResourceFolderDescriptor extends SketchResource {
 
     /**
      *
+     * @var string
+     */
+    private $tags;
+
+    /**
+     *
      * @param array $parameters
      */
     function __construct($parameters = null) {
@@ -298,6 +304,7 @@ class SketchResourceFolderDescriptor extends SketchResource {
         $this->setImageWidth($parameters['image_width']);
         $this->setImageHeight($parameters['image_height']);
         $this->setCaption($parameters['caption']);
+        $this->setTags($parameters['tags']);
     }
 
     /**
@@ -492,5 +499,21 @@ class SketchResourceFolderDescriptor extends SketchResource {
      */
     function setCaption($caption) {
         $this->caption = $caption;
+    }
+
+    /**
+     *
+     * @return string
+     */
+    function getTags() {
+        return $this->tags;
+    }
+
+    /**
+     *
+     * @param string $tags
+     */
+    function setTags($tags) {
+        $this->tags = $tags;
     }
 }

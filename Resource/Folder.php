@@ -284,7 +284,8 @@ class SketchResourceFolder extends SketchResource {
         $table_name = $this->getName();
         $reference = $connection->escapeString($descriptor->getReference());
         $caption = $connection->escapeString($descriptor->getCaption());
-        return $connection->executeUpdate("UPDATE $table_name SET caption = '$caption' WHERE reference = '$reference'");
+        $tags = $connection->escapeString($descriptor->getTags());
+        return $connection->executeUpdate("UPDATE $table_name SET caption = '$caption', tags = '$tags' WHERE reference = '$reference'");
     }
 
     /**
