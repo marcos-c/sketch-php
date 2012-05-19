@@ -165,6 +165,14 @@ class SketchResourceFolder extends SketchResource {
 
     /**
      *
+     * @return array
+     */
+    function getDescriptors() {
+        return $this->descriptors;
+    }
+
+    /**
+     *
      * @param string $reference
      * @param string $extra
      * @return string
@@ -183,6 +191,25 @@ class SketchResourceFolder extends SketchResource {
         } else {
             return false;
         }
+    }
+
+    function exportDescriptor($reference) {
+        ob_end_clean();
+        $descriptor = $this->getDescriptor($reference);
+        $file = $this->getDocumentRoot().$descriptor->getFileName();
+        if (ini_get('zlib.output_compression')) ini_set('zlib.output_compression', 0);
+        header('Pragma: public');
+        header('Expires: 0');
+        header('Cache-Control: must-revalidate, post-check=0, pre-check=0');
+        header('Last-Modified: '.gmdate ('D, d M Y H:i:s', filemtime($file)).' GMT');
+        header('Cache-Control: private', false);
+        header('Content-Type: '.$descriptor->getFileType());
+        header('Content-Disposition: attachment; filename="'.$descriptor->getSourceFileName().'"');
+        header('Content-Transfer-Encoding: binary');
+        header('Content-Length: '.filesize($file));
+        header('Connection: close');
+        readfile($file);
+        exit();
     }
 
     /**
@@ -205,7 +232,7 @@ class SketchResourceFolder extends SketchResource {
             }
             if ($test) {
                 $connection = $this->getConnection();
-                $table = $this->getName();
+                $table_name = $this->getName();
                 $parent_id = $this->getParentId();
                 $reference = $descriptor->getReference();
                 $file_name = $descriptor->getFileName();
@@ -215,14 +242,21 @@ class SketchResourceFolder extends SketchResource {
                 $image_width = $descriptor->getImageWidth();
                 $image_height = $descriptor->getImageHeight();
                 if (array_key_exists($descriptor->getReference(), $this->descriptors)) {
-                    $test = $connection->executeUpdate("UPDATE $table SET file_name = '$file_name', source_file_name = '$source_file_name', file_type = '$file_type', file_size = $file_size, image_width = $image_width, image_height = $image_height WHERE parent_id = $parent_id AND reference = '$reference'");
+                    $test = $connection->executeUpdate("UPDATE $table_name SET file_name = '$file_name', source_file_name = '$source_file_name', file_type = '$file_type', file_size = $file_size, image_width = $image_width, image_height = $image_height WHERE parent_id = $parent_id AND reference = '$reference'");
                     if ($test) {
                         $application->addNotice(new SketchApplicationNotice(sprintf($this->getTranslator()->_("Descriptor <b>%s</b> (%s) has been updated"), $reference, $file_type)));
                     }
                 } else {
-                    $test = $connection->executeUpdate("INSERT INTO $table (parent_id, reference, file_name, source_file_name, file_type, file_size, image_width, image_height) VALUES ($parent_id, '$reference', '$file_name', '$source_file_name', '$file_type', $file_size, $image_width, $image_height)");
+                    if ($connection->supports('nextval')) {
+                        $descriptor->setId($connection->queryFirst("SELECT nextval('${table_name}_id_seq')"));
+                        $test = $connection->executeUpdate(sprintf("INSERT INTO ${table_name} (id, parent_id, reference, file_name, source_file_name, file_type, file_size, image_width, image_height) VALUES (%d, $parent_id, '$reference', '$file_name', '$source_file_name', '$file_type', $file_size, $image_width, $image_height)", $descriptor->getId()));
+                    } else {
+                        $test = $connection->executeUpdate("INSERT INTO $table_name (parent_id, reference, file_name, source_file_name, file_type, file_size, image_width, image_height) VALUES ($parent_id, '$reference', '$file_name', '$source_file_name', '$file_type', $file_size, $image_width, $image_height)");
+                        if ($test) {
+                            $descriptor->setId($connection->queryFirst("SELECT LAST_INSERT_ID()"));
+                        }
+                    }
                     if ($test) {
-                        $descriptor->setId($connection->queryFirst("SELECT LAST_INSERT_ID()"));
                         $application->addNotice(new SketchApplicationNotice(sprintf($this->getTranslator()->_("Descriptor <b>%s</b> (%s) was added to folder"), $reference, $file_type)));
                     }
                 }
