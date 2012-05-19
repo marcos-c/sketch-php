@@ -47,7 +47,7 @@ abstract class SketchObjectSearchableList extends SketchObjectList {
      * @return string
      */
     function getSearchText() {
-        if ($this->getUseSessionObject()) {
+        if ($this->searchText == null && $this->getUseSessionObject()) {
             $this->searchText = $this->getSessionObjectAttribute('search_text', $this->searchText);
         }
         return $this->searchText;

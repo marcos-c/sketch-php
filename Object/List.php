@@ -65,7 +65,7 @@ abstract class SketchObjectList extends SketchObjectView {
      * @return string
      */
     final function getOrderBy() {
-        if ($this->getUseSessionObject()) {
+        if ($this->orderBy == null && $this->getUseSessionObject()) {
             $this->orderBy = $this->getSessionObjectAttribute('order_by', $this->orderBy);
         }
         return $this->orderBy;
@@ -114,7 +114,7 @@ abstract class SketchObjectList extends SketchObjectView {
      * @return integer
      */
     final function getLimit($default = false) {
-        if ($this->getUseSessionObject()) {
+        if ($this->limit == null && $this->getUseSessionObject()) {
             $this->limit = $this->getSessionObjectAttribute('limit', $this->limit);
         }
         return ($this->limit > 0) ? $this->limit : $default;
@@ -165,7 +165,7 @@ abstract class SketchObjectList extends SketchObjectView {
      * @return integer
      */
     final function getOffset($default = false) {
-        if ($this->getUseSessionObject()) {
+        if ($this->offset == null && $this->getUseSessionObject()) {
             $this->offset = $this->getSessionObjectAttribute('offset', $this->offset);
         }
         if ($this->offset >= $this->getSize()) {
