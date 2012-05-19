@@ -74,6 +74,8 @@ class SketchRouterRewrite extends SketchRouter {
                 return $request_uri;
             }
         }
-        throw new Exception(sprintf('No route found for %s.', $redirect_url));
+        header($_SERVER["SERVER_PROTOCOL"]." 404 Not Found");
+        exit($_SERVER["SERVER_PROTOCOL"]." 404 Not Found");
+        // throw new Exception(sprintf('No route found for %s.', $redirect_url));
     }
 }

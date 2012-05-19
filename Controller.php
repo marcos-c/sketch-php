@@ -97,7 +97,7 @@ class SketchController extends SketchObject {
      *
      * @param string $location
      */
-    function forward($location = null) {
+    function forward($location = null, $https = false) {
         if ($this->getRequest()->isJSON()) {
             $response = new SketchResponseJSON();
             $response->forwardLocation = $location;
@@ -113,16 +113,29 @@ class SketchController extends SketchObject {
                 } else {
                     $server_name = $request->getServerName();
                     $server_port = $this->getRequest()->getServerPort();
-                    $server_port = ($server_port != 80) ? ":$server_port" : "";
-                    if ($location != null) {
-                        // If relative path
-                        if (substr($location, 0, 1) != DIRECTORY_SEPARATOR) {
-                            $base = rtrim(dirname($this->getRequest()->getResolvedURI()), DIRECTORY_SEPARATOR);
-                            $location = $base.DIRECTORY_SEPARATOR.$location;
+                    if ($server_port == 443 || $https) {
+                        if ($location != null) {
+                            // If relative path
+                            if (substr($location, 0, 1) != DIRECTORY_SEPARATOR) {
+                                $base = rtrim(dirname($this->getRequest()->getResolvedURI()), DIRECTORY_SEPARATOR);
+                                $location = $base.DIRECTORY_SEPARATOR.$location;
+                            }
+                            header("Location: https://$server_name".$location, true, 303);
+                        } else {
+                            header("Location: https://$server_name".$request->getURI(), true, 303);
                         }
-                        header("Location: http://$server_name$server_port".$location, true, 303);
                     } else {
-                        header("Location: http://$server_name$server_port".$request->getURI(), true, 303);
+                        $server_port = ($server_port != 80) ? ":$server_port" : "";
+                        if ($location != null) {
+                            // If relative path
+                            if (substr($location, 0, 1) != DIRECTORY_SEPARATOR) {
+                                $base = rtrim(dirname($this->getRequest()->getResolvedURI()), DIRECTORY_SEPARATOR);
+                                $location = $base.DIRECTORY_SEPARATOR.$location;
+                            }
+                            header("Location: http://$server_name$server_port".$location, true, 303);
+                        } else {
+                            header("Location: http://$server_name$server_port".$request->getURI(), true, 303);
+                        }
                     }
                 }
                 exit();
