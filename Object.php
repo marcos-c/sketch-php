@@ -150,4 +150,27 @@ abstract class SketchObject {
         }
         return $o;
     }
+
+    /**
+     *
+     * @return array
+     */
+    function expand() {
+        $o = array();
+        for ($i = 0; $i < func_num_args(); $i++) {
+            $t = func_get_arg($i);
+            if (is_array($t)) {
+                foreach ($t as $k1 => $v1) {
+                    if (is_array($v1)) {
+                        foreach ($v1 as $k2 => $v2) {
+                            $o[$k1][$k2] = $v2;
+                        }
+                    } else {
+                        $o[$k1] = $v1;
+                    }
+                }
+            }
+        }
+        return $o;
+    }
 }
