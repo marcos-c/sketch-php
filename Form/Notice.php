@@ -3,7 +3,7 @@
  * This file is part of the Sketch Framework
  * (http://code.google.com/p/sketch-framework/)
  *
- * Copyright (C) 2010 Marcos Albaladejo Cooper
+ * Copyright (C) 2011 Marcos Albaladejo Cooper
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -26,20 +26,16 @@ require_once 'Sketch/Application/Notice.php';
 
 /**
  * SketchFormNotice
- *
- * @package Sketch
  */
 class SketchFormNotice extends SketchApplicationNotice {
-    /**
-     *
-     * @var string
-     */
+    /** @var null */
     private $fieldName = null;
 
     /**
+     * Constructor
      *
-     * @param string $field_name
-     * @param string $message
+     * @param $field_name
+     * @param $message
      */
     function __construct($field_name, $message) {
         $this->setFieldName($field_name);
@@ -48,16 +44,19 @@ class SketchFormNotice extends SketchApplicationNotice {
     }
 
     /**
+     * Get field name
      *
-     * @return string
+     * @return null
      */
     function getFieldName() {
         return $this->fieldName;
     }
 
     /**
+     * Set field name
      *
-     * @param string $field_name
+     * @param $field_name
+     * @return void
      */
     function setFieldName($field_name) {
         $this->fieldName = $field_name;

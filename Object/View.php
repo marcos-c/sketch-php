@@ -3,7 +3,7 @@
  * This file is part of the Sketch Framework
  * (http://code.google.com/p/sketch-framework/)
  *
- * Copyright (C) 2010 Marcos Albaladejo Cooper
+ * Copyright (C) 2011 Marcos Albaladejo Cooper
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -26,48 +26,41 @@ require_once 'Sketch/Object.php';
 
 /**
  * SketchObjectView
- *
- * @package Sketch
  */
 abstract class SketchObjectView extends SketchObject {
-    /**
-     *
-     * @var boolean
-     */
+    /** @var bool */
     private $useSessionObject = false;
 
-    /**
-     *
-     * @var string
-     */
+    /** @var string */
     private $viewId;
 
-    /**
-     *
-     * @var string
-     */
+    /** @var string */
     private $id;
 
     /**
+     * Get use session object
      *
-     * @return boolean
+     * @return bool
      */
     function getUseSessionObject() {
         return $this->useSessionObject;
     }
 
     /**
+     * Set use session object
      *
-     * @param boolean $use_session_object
+     * @param $use_session_object
+     * @return void
      */
     function setUseSessionObject($use_session_object) {
         $this->useSessionObject = $use_session_object;
     }
 
     /**
+     * Get session object attribute
      *
-     * @param string $key
-     * @param string $default
+     * @param $key
+     * @param $default
      * @return string
      */
     protected final function getSessionObjectAttribute($key, $default) {
@@ -82,9 +75,11 @@ abstract class SketchObjectView extends SketchObject {
     }
 
     /**
+     * Set session object attribute
      *
-     * @param <type> $key
-     * @param <type> $value
+     * @param $key
+     * @param $value
+     * @return void
      */
     protected final function setSessionObjectAttribute($key, $value) {
         $session = $this->getSession();
@@ -94,40 +89,49 @@ abstract class SketchObjectView extends SketchObject {
     }
 
     /**
+     * Get view id
      *
-     * @return string
+     * @param bool $default
+     * @return mixed|string
      */
     final function getViewId($default = false) {
         return ($this->viewId != null) ? $this->viewId : $this->getId($default);
     }
 
     /**
+     * Set view id
      *
-     * @param mixed $view_id
+     * @param $view_id
+     * @return void
      */
     final function setViewId($view_id) {
         $this->viewId = $view_id;
     }
 
     /**
+     * Get view name
      *
-     * @return mixed
+     * @return string
      */
     final function getViewName() {
         return md5(get_class($this).'|'.$this -> getViewId());
     }
 
     /**
+     * Get id
      *
-     * @return mixed
+     * @param bool $default
+     * @return bool|string
      */
     final function getId($default = false) {
         return ($this->id != null) ? $this->id : $default;
     }
 
     /**
+     * Set id
      *
-     * @param mixed $id
+     * @param $id
+     * @return void
      */
     final function setId($id) {
         $this->id = $id;

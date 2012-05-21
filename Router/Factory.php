@@ -31,7 +31,7 @@ require_once 'Sketch/Router/Rewrite.php';
  */
 class SketchRouterFactory extends SketchObject {
     /**
-     * Return the current router
+     * Get router
      *
      * @static
      * @param SketchRequest $request

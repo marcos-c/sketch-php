@@ -3,7 +3,7 @@
  * This file is part of the Sketch Framework
  * (http://code.google.com/p/sketch-framework/)
  *
- * Copyright (C) 2010 Marcos Albaladejo Cooper
+ * Copyright (C) 2011 Marcos Albaladejo Cooper
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -26,18 +26,20 @@ require_once 'Sketch/Locale/Translator/Driver.php';
 
 /**
  * DummyLocaleTranslatorDriver
- *
- * @package Sketch
  */
 class DummyLocaleTranslatorDriver extends SketchLocaleTranslatorDriver {
+    /**
+     * Constructor
+     */
     function  __construct() {
         $this->setLocaleString('en');
     }
 
     /**
+     * Translate
      *
-     * @param string $text
-     * @return string
+     * @param $text
+     * @return
      */
     function translate($text) {
         return $text;

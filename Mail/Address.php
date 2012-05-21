@@ -3,7 +3,7 @@
  * This file is part of the Sketch Framework
  * (http://code.google.com/p/sketch-framework/)
  *
- * Copyright (C) 2010 Marcos Albaladejo Cooper
+ * Copyright (C) 2011 Marcos Albaladejo Cooper
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -27,26 +27,20 @@ require_once 'Sketch/Mail/Address/Exception.php';
 
  /**
  * SketchMailAddress
- *
- * @package Sketch
  */
 class SketchMailAddress extends SketchObject {
-    /**
-     *
-     * @var string
-     */
+    /** @var null|string */
     var $emailAddress = null;
 
-    /**
-     *
-     * @var string
-     */
+    /** @var null|string */
     var $contactName = null;
 
     /**
+     * Constructor
      *
-     * @param string $email_address
-     * @param string $contact_name
+     * @throws SketchMailAddressException
+     * @param $email_address
+     * @param null $contact_name
      */
     function  __construct($email_address, $contact_name = null) {
         $this->setEmailAddress($email_address);
@@ -56,40 +50,47 @@ class SketchMailAddress extends SketchObject {
     }
 
     /**
+     * Get email address
      *
-     * @return string
+     * @return null|string
      */
     function getEmailAddress() {
         return $this->emailAddress;
     }
 
     /**
+     * Set email address
      *
-     * @param string $email_address
+     * @param $email_address
+     * @return void
      */
     function setEmailAddress($email_address) {
         $this->emailAddress = trim($email_address);
     }
 
     /**
+     * Get contact name
      *
-     * @return string
+     * @return null|string
      */
     function getContactName() {
         return $this->contactName;
     }
 
     /**
+     * Set contact name
      *
-     * @param string $contact_name
+     * @param $contact_name
+     * @return void
      */
     function setContactName($contact_name) {
         $this->contactName = trim($contact_name);
     }
 
     /**
+     * To string
      *
-     * @return string
+     * @return null|string
      */
     function toString() {
         if ($this->isValid()) {
@@ -102,8 +103,9 @@ class SketchMailAddress extends SketchObject {
     }
 
     /**
+     * Is valid
      *
-     * @return boolean
+     * @return int
      */
     function isValid() {
         return preg_match('/^([*+!.&#$¦\'\\%\/0-9a-z^_`{}=?~:-]+)@(([0-9a-z-]+\.)+[0-9a-z]{2,4})$/i', $this->emailAddress);

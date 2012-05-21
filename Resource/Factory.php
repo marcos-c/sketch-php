@@ -3,7 +3,7 @@
  * This file is part of the Sketch Framework
  * (http://code.google.com/p/sketch-framework/)
  *
- * Copyright (C) 2010 Marcos Albaladejo Cooper
+ * Copyright (C) 2011 Marcos Albaladejo Cooper
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -30,18 +30,16 @@ require_once 'Sketch/Resource/XML.php';
 
 /**
  * SketchResourceFactory
- *
- * @package Sketch
  */
 class SketchResourceFactory {
-    /**
-     *
-     * @var string
-     */
+    /** @var string */
     static private $defaultContext = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<context name=\"sketch\" layer=\"default\">\n\t<layer name=\"default\" />\n</context>";
 
     /**
+     * Get connection
      *
+     * @static
+     * @throws Exception
      * @param SketchResourceContext $context
      * @return SketchResourceConnection
      */
@@ -64,8 +62,11 @@ class SketchResourceFactory {
     }
 
     /**
+     * Get context
      *
-     * @param string $file
+     * @static
+     * @throws Exception
+     * @param $file
      * @return SketchResourceContext
      */
     static function getContext($file) {
@@ -85,13 +86,24 @@ class SketchResourceFactory {
         return new SketchResourceContext($document);
     }
 
+    /**
+     * Get folder
+     *
+     * @static
+     * @param $table
+     * @param $parent_id
+     * @return SketchResourceFolder
+     */
     static function getFolder($table, $parent_id) {
         return new SketchResourceFolder($table, $parent_id);
     }
 
     /**
+     * Get XML
      *
-     * @param string $file
+     * @static
+     * @throws Exception
+     * @param $file
      * @return SketchResourceXML
      */
     static function getXML($file) {

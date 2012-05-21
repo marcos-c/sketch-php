@@ -3,7 +3,7 @@
  * This file is part of the Sketch Framework
  * (http://code.google.com/p/sketch-framework/)
  *
- * Copyright (C) 2010 Marcos Albaladejo Cooper
+ * Copyright (C) 2011 Marcos Albaladejo Cooper
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -26,15 +26,26 @@ require_once 'Sketch/Form/View.php';
 
 /**
  * SketchFormList
- *
- * @package Sketch
  */
 class SketchFormList extends SketchFormView {
+    /**
+     * Requires pager
+     *
+     * @param $size
+     * @return bool
+     */
     function requiresPager($size) {
         $limit = $this->instance->getLimit();
         return ($limit != 0 && $size > $limit);
     }
 
+    /**
+     * Get pager
+     *
+     * @param $size
+     * @param null $parameters
+     * @return string
+     */
     function getPager($size, $parameters = null) {
         $form_name = $this->getFormName();
         $limit = $this->getInstance()->getLimit();
@@ -82,6 +93,11 @@ class SketchFormList extends SketchFormView {
         return '<ul'.$parameters['pager'].'>'.trim(implode(' ', array('first' => $first, 'previous' => $previous) + $o + array('size' => $size, 'next' => $next, 'last' => $last))).'</ul>';
     }
 
+    /**
+     * Get limited pager
+     *
+     * @return string
+     */
     function getLimitedPager() {
         $form_name = $this->getFormName();
         $size = $this->getInstance()->getSize();
@@ -113,6 +129,11 @@ class SketchFormList extends SketchFormView {
         } return trim(implode(' ', array('first' => $first, 'previous' => $previous) + $o + array('size' => $of_size, 'next' => $next, 'last' => $last, 'limited' => $limited)));
     }
 
+    /**
+     * Get ranged pager
+     *
+     * @return string
+     */
     function getRangedPager() {
         $form_name = $this->getFormName();
         $size = $this->instance->getSize();

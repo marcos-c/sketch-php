@@ -3,7 +3,7 @@
  * This file is part of the Sketch Framework
  * (http://code.google.com/p/sketch-framework/)
  *
- * Copyright (C) 2010 Marcos Albaladejo Cooper
+ * Copyright (C) 2011 Marcos Albaladejo Cooper
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -30,14 +30,14 @@ require_once 'Sketch/Object.php';
  * All JSON related methods are based in Services_JSON by Michal Migurski <mike-json@teczno.com>
  *
  * Unicode based in the following documentation: http://www.cl.cam.ac.uk/~mgk25/unicode.html#utf-8
- *
- * @package Sketch
  */
 class SketchUtils extends SketchObject {
     /**
+     * Readable
      *
-     * @param string $file
-     * @return boolean
+     * @static
+     * @param $file
+     * @return bool
      */
     static function Readable($file) {
         $includes = explode(PATH_SEPARATOR, get_include_path());
@@ -48,9 +48,11 @@ class SketchUtils extends SketchObject {
     }
 
     /**
+     * Writable
      *
-     * @param string $file
-     * @return boolean
+     * @static
+     * @param $file
+     * @return bool|string
      */
     static function Writable($file) {
         $includes = explode(PATH_SEPARATOR, get_include_path());
@@ -60,14 +62,24 @@ class SketchUtils extends SketchObject {
         } return false;
     }
 
+    /**
+     * Name value
+     *
+     * @static
+     * @param $name
+     * @param $value
+     * @return string
+     */
     private static function name_value($name, $value) {
         $encoded_value = self::encodeJSON($value);
         return self::encodeJSON(strval($name)).':'.$encoded_value;
     }
 
     /**
+     * Encode JSON string
      *
-     * @param string $var
+     * @static
+     * @param $var
      * @return string
      */
     static function encodeJSONString($var) {
@@ -140,7 +152,8 @@ class SketchUtils extends SketchObject {
     }
 
     /**
-     *
+     * Encode JSON array
+     * @static
      * @param array $var
      * @return string
      */
@@ -154,8 +167,10 @@ class SketchUtils extends SketchObject {
     }
 
     /**
+     * Encode JSON object
      *
-     * @param object $var
+     * @static
+     * @param $var
      * @return string
      */
     static function encodeJSONObject($var) {
@@ -165,9 +180,11 @@ class SketchUtils extends SketchObject {
     }
 
     /**
+     * Encode JSON
      *
-     * @param mixed $var
-     * @return string
+     * @static
+     * @param $var
+     * @return float|int|string
      */
     static function encodeJSON($var) {
         if (function_exists('json_encode')) {

@@ -3,7 +3,7 @@
  * This file is part of the Sketch Framework
  * (http://code.google.com/p/sketch-framework/)
  *
- * Copyright (C) 2010 Marcos Albaladejo Cooper
+ * Copyright (C) 2011 Marcos Albaladejo Cooper
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -31,44 +31,28 @@ define('FOLDER_MD5_SIZE', 20);
 
 /**
  * SketchResourceFolder
- *
- * @package Sketch
  */
 class SketchResourceFolder extends SketchResource {
-    /**
-     *
-     * @var string
-     */
+    /** @var string */
     private $name;
 
-    /**
-     *
-     * @var string
-     */
+    /** @var string */
     private $uri;
 
-    /**
-     *
-     * @var integer
-     */
+    /** @var int */
     private $parentId;
 
-    /**
-     *
-     * @var array
-     */
+    /** @var array */
     private $descriptors;
 
-    /**
-     *
-     * @var array
-     */
+    /** @var null */
     private $geometry;
 
     /**
+     * Constructor
      *
-     * @param string $name
-     * @param integer $parent_id
+     * @param $name
+     * @param $parent_id
      */
     function __construct($name, $parent_id) {
         $connection = $this->getConnection();
@@ -90,15 +74,17 @@ class SketchResourceFolder extends SketchResource {
     }
 
     /**
+     * Get resource name
      *
-     * @return string
      * @deprecated
+     * @return string
      */
     function getResourceName() {
         return $this->getName();
     }
 
     /**
+     * Get name
      *
      * @return string
      */
@@ -107,32 +93,36 @@ class SketchResourceFolder extends SketchResource {
     }
 
     /**
+     * Get resource path
      *
-     * @return string
      * @deprecated
+     * @return string
      */
     function getResourcePath() {
         return $this->getURI();
     }
 
     /**
+     * Get URI
      *
      * @return string
      */
     function getURI() {
         return $this->uri;
     }
-    
+
     /**
+     * Get document resource path
      *
-     * @return string
      * @deprecated
+     * @return string
      */
     function getDocumentResourcePath() {
         return $this->getDocumentRoot();
     }
 
     /**
+     * Get document root
      *
      * @return string
      */
@@ -147,23 +137,26 @@ class SketchResourceFolder extends SketchResource {
     }
 
     /**
+     * Get parent id
      *
-     * @return integer
+     * @return bool|int
      */
     function getParentId() {
         return ($this->parentId > 0) ? $this->parentId : false;
     }
 
     /**
+     * Get descriptor
      *
-     * @param string $reference
-     * @return SketchResourceFolderDescriptor
+     * @param $reference
+     * @return bool|SketchResourceFolderDescriptor
      */
     function getDescriptor($reference) {
         return (array_key_exists($reference, $this->descriptors) && $this->descriptors[$reference] instanceof SketchResourceFolderDescriptor) ? $this->descriptors[$reference] : false;
     }
 
     /**
+     * Get descriptors
      *
      * @return array
      */
@@ -172,10 +165,11 @@ class SketchResourceFolder extends SketchResource {
     }
 
     /**
+     * Get descriptor HTML
      *
-     * @param string $reference
-     * @param string $extra
-     * @return string
+     * @param $reference
+     * @param null $extra
+     * @return bool|string
      */
     function getDescriptorHTML($reference, $extra = null) {
         if ($descriptor = $this->getDescriptor($reference)) {
@@ -193,6 +187,12 @@ class SketchResourceFolder extends SketchResource {
         }
     }
 
+    /**
+     * Export descriptor
+     *
+     * @param $reference
+     * @return void
+     */
     function exportDescriptor($reference) {
         ob_end_clean();
         $descriptor = $this->getDescriptor($reference);
@@ -217,8 +217,10 @@ class SketchResourceFolder extends SketchResource {
     }
 
     /**
+     * Add descriptor
      *
-     * @param SketchResourceFolderDescriptor $descriptor
+     * @param $descriptor
+     * @return void
      */
     function addDescriptor($descriptor) {
         if (($descriptor instanceof SketchResourceFolderDescriptor) && is_readable($descriptor->getFileName())) {
@@ -275,9 +277,11 @@ class SketchResourceFolder extends SketchResource {
     }
 
     /**
+     * Remove descriptor
      *
-     * @param string $reference
-     * @return boolean
+     * @throws Exception
+     * @param $reference
+     * @return bool
      */
     function removeDescriptor($reference) {
         $connection = $this->getConnection();
@@ -296,6 +300,11 @@ class SketchResourceFolder extends SketchResource {
         }
     }
 
+    /**
+     * Clean
+     *
+     * @return void
+     */
     private function clean() {
         $connection = $this->getConnection();
         $path = $this->getDocumentRoot();
@@ -321,18 +330,21 @@ class SketchResourceFolder extends SketchResource {
     }
 
     /**
+     * Get output geometry
      *
-     * @return array|false
+     * @return bool|null
      */
     function getOutputGeometry() {
         return (is_array($this->geometry)) ? $this->geometry : false;
     }
 
     /**
+     * Set output geometry
      *
-     * @param integer $width
-     * @param integer $height
-     * @param integer $model
+     * @param $width
+     * @param $height
+     * @param null $model
+     * @return void
      */
     function setOutputGeometry($width, $height, $model = null) {
         $this->geometry['width'] = intval($width);
@@ -341,11 +353,12 @@ class SketchResourceFolder extends SketchResource {
     }
 
     /**
+     * Document save
      *
      * @param SketchResourceFolderDescriptor $descriptor
-     * @return boolean
+     * @return bool
      */
-    function documentSave($descriptor) {
+    function documentSave(SketchResourceFolderDescriptor $descriptor) {
         if (array_key_exists($descriptor->getReference(), $this->descriptors) && $descriptor->getFileExtension() == $this->descriptors[$descriptor->getReference()]->getFileExtension()) {
             $file_name = $this->descriptors[$descriptor->getReference()]->getFileName();
         } else {
@@ -358,20 +371,22 @@ class SketchResourceFolder extends SketchResource {
     }
 
     /**
+     * imlib save
      *
      * @param SketchResourceFolderDescriptor $descriptor
-     * @return boolean
+     * @return bool
      */
-    function imlibSave($descriptor) {
+    function imlibSave(SketchResourceFolderDescriptor$descriptor) {
         return false;
     }
 
     /**
+     * gd save
      *
      * @param SketchResourceFolderDescriptor $descriptor
-     * @return boolean
+     * @return bool
      */
-    function gdSave($descriptor) {
+    function gdSave(SketchResourceFolderDescriptor $descriptor) {
         if (array_key_exists($descriptor->getReference(), $this->descriptors) && $descriptor->getFileExtension() == $this->descriptors[$descriptor->getReference()]->getFileExtension()) {
             $file_name = $this->descriptors[$descriptor->getReference()]->getFileName();
         } else {

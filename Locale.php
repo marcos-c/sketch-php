@@ -3,7 +3,7 @@
  * This file is part of the Sketch Framework
  * (http://code.google.com/p/sketch-framework/)
  *
- * Copyright (C) 2010 Marcos Albaladejo Cooper
+ * Copyright (C) 2011 Marcos Albaladejo Cooper
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -29,29 +29,19 @@ require_once 'Sketch/Locale/ISO.php';
 
 /**
  * SketchLocale
- *
- * @package Sketch
  */
 class SketchLocale extends SketchObject {
-    /**
-     *
-     * @var SketchLocaleTranslator
-     */
+    /** @var array */
     private $translator;
 
-    /**
-     *
-     * @var string
-     */
+    /** @var string */
     private $language;
 
-    /**
-     *
-     * @var string
-     */
+    /** @var country */
     private $country;
 
     /**
+     * Get language
      *
      * @return string
      */
@@ -60,8 +50,11 @@ class SketchLocale extends SketchObject {
     }
 
     /**
+     * Set language
      *
-     * @param string $language
+     * @throws Exception
+     * @param $language
+     * @return void
      */
     function setLanguage($language) {
         $language = strtolower($language);
@@ -69,18 +62,22 @@ class SketchLocale extends SketchObject {
             $this->language = $language;
         } else throw new Exception('Unsupported language');
     }
-    
+
     /**
+     * Get country
      *
-     * @return string
+     * @return country
      */
     function getCountry() {
         return $this->country;
     }
 
     /**
+     * Set country
      *
-     * @param string $country
+     * @throws Exception
+     * @param $country
+     * @return void
      */
     function setCountry($country) {
         if ($country != null) {
@@ -92,9 +89,10 @@ class SketchLocale extends SketchObject {
     }
 
     /**
+     * Constructor
      *
-     * @param string $language
-     * @param string $country
+     * @param $language
+     * @param null $country
      */
     function __construct($language, $country = null) {
         $this->setLanguage($language);
@@ -102,9 +100,11 @@ class SketchLocale extends SketchObject {
     }
 
     /**
+     * From locale string
      *
-     * @param string $locale_string
-     * @return SketchLocale 
+     * @static
+     * @param $locale_string
+     * @return SketchLocale
      */
     static function fromString($locale_string) {
         $r = explode('_', $locale_string);
@@ -112,7 +112,9 @@ class SketchLocale extends SketchObject {
     }
 
     /**
+     * To string
      *
+     * @throws Exception
      * @return string
      */
     function toString() {
@@ -128,8 +130,11 @@ class SketchLocale extends SketchObject {
     }
 
     /**
+     * Get translator
      *
-     * @return SketchLocaleTranslator 
+     * @throws Exception
+     * @param string $reference
+     * @return SketchLocaleTranslator
      */
     function getTranslator($reference = 'default') {
         if ($this->translator == null) {
@@ -164,8 +169,9 @@ class SketchLocale extends SketchObject {
     }
 
     /**
+     * Get formatter
      *
-     * @return SketchLocaleFormatter 
+     * @return SketchLocaleFormatter
      */
     function getFormatter() {
         return new SketchLocaleFormatter($this->toString());

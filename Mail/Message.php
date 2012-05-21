@@ -3,7 +3,7 @@
  * This file is part of the Sketch Framework
  * (http://code.google.com/p/sketch-framework/)
  *
- * Copyright (C) 2010 Marcos Albaladejo Cooper
+ * Copyright (C) 2011 Marcos Albaladejo Cooper
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -31,61 +31,40 @@ require_once 'Sketch/Mail/Address.php';
 
  /**
  * SketchMailMessage
- *
- * @package Sketch
  */
 class SketchMailMessage extends SketchObject {
-    /**
-     *
-     * @var string
-     */
+    /** @var string */
     var $subject;
 
-    /**
-     *
-     * @var string
-     */
+    /** @var string */
     var $boundary;
 
-    /**
-     *
-     * @var string
-     */
+    /** @var string */
     var $plainContent;
 
-    /**
-     *
-     * @var string
-     */
+    /** @var string */
     var $htmlContent;
 
-    /**
-     *
-     * @var string
-     */
+    /** @var string */
     var $replyTo;
 
-    /**
-     *
-     * @var array
-     */
+    /** @var array */
     var $from = array();
 
-    /**
-     *
-     * @var array
-     */
+    /** @var array */
     var $recipient = array();
 
     /**
+     * Is valid
      *
-     * @return boolean
+     * @return bool
      */
     function isValid() {
         return ($this->getReplyToHeader() && $this->getFromHeader());
     }
 
     /**
+     * Enf of line
      *
      * @return string
      */
@@ -100,6 +79,7 @@ class SketchMailMessage extends SketchObject {
     }
 
     /**
+     * Get subject
      *
      * @return string
      */
@@ -108,14 +88,17 @@ class SketchMailMessage extends SketchObject {
     }
 
     /**
+     * Set subject
      *
-     * @param string $subject
+     * @param $subject
+     * @return void
      */
     function setSubject($subject) {
         $this->subject = trim($subject);
     }
 
     /**
+     * Get boundary key
      *
      * @return string
      */
@@ -126,6 +109,7 @@ class SketchMailMessage extends SketchObject {
     }
 
     /**
+     * Get content
      *
      * @return string
      */
@@ -145,24 +129,30 @@ class SketchMailMessage extends SketchObject {
     }
 
     /**
+     * Set plain content
      *
-     * @param string $plain_content
+     * @param $plain_content
+     * @return void
      */
     private function setPlainContent($plain_content) {
         $this->plainContent = $plain_content;
     }
 
     /**
+     * Set HTML content
      *
-     * @param string $html_content
+     * @param $html_content
+     * @return void
      */
     private function setHtmlContent($html_content) {
         $this->htmlContent = $html_content;
     }
 
     /**
+     * Set content
      *
-     * @param string $html_content
+     * @param $html_content
+     * @return void
      */
     function setContent($html_content) {
         $this->setHtmlContent($html_content);
@@ -175,6 +165,7 @@ class SketchMailMessage extends SketchObject {
     }
 
     /**
+     * Get headers
      *
      * @return string
      */
@@ -196,8 +187,9 @@ class SketchMailMessage extends SketchObject {
     }
 
     /**
+     * Get reply to header
      *
-     * @return string
+     * @return bool
      */
     function getReplyToHeader() {
         if ($this->replyTo->isValid()) {
@@ -209,16 +201,19 @@ class SketchMailMessage extends SketchObject {
     }
 
     /**
+     * Set reply to header
      *
-     * @param string $address
+     * @param $address
+     * @return void
      */
     function setReplyTo($address) {
         $this->replyTo = $address;
     }
 
     /**
+     * Get from header
      *
-     * @return string
+     * @return bool|string
      */
     function getFromHeader() {
         $from_header = array(); foreach ($this->from as $address) {
@@ -234,25 +229,30 @@ class SketchMailMessage extends SketchObject {
     }
 
     /**
+     * Set from
      *
      * @param SketchMailAddress $address
+     * @return void
      */
     function setFrom(SketchMailAddress $address) {
         $this->from = array($address);
     }
 
     /**
+     * Add from
      *
      * @param SketchMailAddress $address
+     * @return void
      */
     function addFrom(SketchMailAddress $address) {
         $this->from[] = $address;
     }
 
     /**
+     * Get recipient header
      *
-     * @param integer $type
-     * @return string
+     * @param $type
+     * @return bool|string
      */
     function getRecipientHeader($type) {
         if (is_array($this->recipient[$type])) {
@@ -271,9 +271,11 @@ class SketchMailMessage extends SketchObject {
     }
 
     /**
+     * Add recipient
      *
-     * @param integer $type
+     * @param $type
      * @param SketchMailAddress $address
+     * @return void
      */
     function addRecipient($type, SketchMailAddress $address) {
         if (!is_array($this->recipient[$type])) {
@@ -283,6 +285,12 @@ class SketchMailMessage extends SketchObject {
         }
     }
 
+    /**
+     * Clear recipients
+     *
+     * @param $type
+     * @return void
+     */
     function clearRecipients($type) {
         unset($this->recipient[$type]);
     }

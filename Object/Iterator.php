@@ -3,7 +3,7 @@
  * This file is part of the Sketch Framework
  * (http://code.google.com/p/sketch-framework/)
  *
- * Copyright (C) 2010 Marcos Albaladejo Cooper
+ * Copyright (C) 2011 Marcos Albaladejo Cooper
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -28,30 +28,56 @@ require_once 'Sketch/Object/ArrayIterator.php';
 
 /**
  * SketchObjectIterator
- *
- * @package Sketch
  */
 abstract class SketchObjectIterator extends SketchObject implements Iterator {
+    /** @var null|resource */
     protected $result = null;
 
+    /** @var int|null */
     protected $size = null;
 
+    /** @var int */
     private $key = 0;
 
+    /**
+     * Constructor
+     *
+     * @param null $result
+     * @param null $size
+     */
     final function __construct($result = null, $size = null) {
         $this->result = $result;
         $this->size = ($size != null) ? intval($size) : null;
     }
 
+    /**
+     * Size
+     *
+     * @return int|null|void
+     */
     final function size() {
         return ($this->size != null) ? $this->size : $this->rows();
     }
 
+    /**
+     * Rows
+     *
+     * @abstract
+     * @return void
+     */
     abstract function rows();
 
+    /**
+     * Fetch
+     *
+     * @abstract
+     * @param $key
+     * @return void
+     */
     abstract function fetch($key);
 
     /**
+     * Current
      *
      * @return mixed
      */
@@ -62,30 +88,43 @@ abstract class SketchObjectIterator extends SketchObject implements Iterator {
     }
 
     /**
+     * Key
      *
-     * @return scalar
+     * @return int
      */
     final function key() {
         return $this->key;
     }
 
+    /**
+     * Next
+     *
+     * @return void
+     */
     final function next() {
         $this->key++;
     }
 
+    /**
+     * Rewind
+     *
+     * @return void
+     */
     final function rewind() {
         $this->key = 0;
     }
 
     /**
+     * Valid
      *
-     * @return boolean
+     * @return bool
      */
     final function valid() {
         return ($this->current() !== false);
     }
 
     /**
+     * To array
      *
      * @return array
      */

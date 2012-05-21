@@ -22,49 +22,8 @@
  * @package Sketch
  */
 
-require_once 'Sketch/Object.php';
 
 /**
- * SketchRouter
+ * SketchResourceConnectionResultSet
  */
-abstract class SketchLogger extends SketchObject {
-    /** @var int */
-    static protected $level = 5;
-
-    /**
-     * Get level
-     *
-     * @return int
-     */
-    function getLevel() {
-        return self::$level;
-    }
-
-    /**
-     * Set level
-     *
-     * @param $level
-     * @return void
-     */
-    function setLevel($level) {
-        self::$level = $level;
-    }
-
-    /**
-     * Log
-     *
-     * @abstract
-     * @param $message
-     * @param int $level
-     * @return void
-     */
-    abstract function log($message, $level = 5);
-
-    /**
-     * Get messages
-     *
-     * @abstract
-     * @return void
-     */
-    abstract function getMessages();
-}
+abstract class SketchResourceConnectionResultSet extends SketchObjectIterator {}

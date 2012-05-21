@@ -3,7 +3,7 @@
  * This file is part of the Sketch Framework
  * (http://code.google.com/p/sketch-framework/)
  *
- * Copyright (C) 2010 Marcos Albaladejo Cooper
+ * Copyright (C) 2011 Marcos Albaladejo Cooper
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -30,6 +30,11 @@ require_once 'Sketch/Form/Component.php';
  * @package Components
  */
 class SketchFormComponentSelectCheckbox extends SketchFormComponent {
+    /**
+     * JavaScript
+     *
+     * @return string
+     */
     function javascript() {
         $form_name = $this->getForm()->getFormName();
         ob_start(); ?>
@@ -46,6 +51,11 @@ class SketchFormComponentSelectCheckbox extends SketchFormComponent {
         <?php return ob_get_clean();
     }
 
+    /**
+     * Save HTML
+     *
+     * @return string
+     */
     function saveHTML() {
         $arguments = $this->getArguments();
         $attribute = array_shift($arguments);

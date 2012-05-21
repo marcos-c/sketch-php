@@ -3,7 +3,7 @@
  * This file is part of the Sketch Framework
  * (http://code.google.com/p/sketch-framework/)
  *
- * Copyright (C) 2010 Marcos Albaladejo Cooper
+ * Copyright (C) 2011 Marcos Albaladejo Cooper
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -27,17 +27,13 @@ require_once 'Sketch/Response.php';
 
 /**
  * SketchResponseFilter
- *
- * @package Sketch
  */
 abstract class SketchResponseFilter extends SketchObject {
-    /**
-     *
-     * @var SketchResponse
-     */
+    /** @var SketchResponse */
     private $response;
 
     /**
+     * Constructor
      *
      * @param SketchResponse $response
      */
@@ -46,6 +42,7 @@ abstract class SketchResponseFilter extends SketchObject {
     }
 
     /**
+     * Get response
      *
      * @return SketchResponse
      */
@@ -54,12 +51,21 @@ abstract class SketchResponseFilter extends SketchObject {
     }
 
     /**
+     * Set response
      *
-     * @param SketchResponse $response
+     * @param $response
+     * @return void
      */
     final function setResponse($response) {
         $this->response = $response;
     }
 
+    /**
+     * Apply
+     *
+     * @abstract
+     * @param SketchResourceXML $context
+     * @return void
+     */
     abstract function apply(SketchResourceXML $context);
 }

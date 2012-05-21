@@ -3,7 +3,7 @@
  * This file is part of the Sketch Framework
  * (http://code.google.com/p/sketch-framework/)
  *
- * Copyright (C) 2010 Marcos Albaladejo Cooper
+ * Copyright (C) 2011 Marcos Albaladejo Cooper
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -26,16 +26,22 @@ require_once 'Sketch/Object.php';
 
 /**
  * SketchFormCommand
- *
- * @package Sketch
  */
 class SketchFormCommand extends SketchObject {
+    /** @var null|string */
     private $command = null;
 
+    /** @var array */
     private $parameters = array();
 
+    /** @var bool */
     private $targetForError = false;
 
+    /**
+     * Constructor
+     *
+     * @param null $command
+     */
     final function __construct($command = null) {
         $a = func_get_args();
         if (array_key_exists(0, $a)) {
@@ -49,18 +55,41 @@ class SketchFormCommand extends SketchObject {
         }
     }
 
+    /**
+     * Get command
+     *
+     * @return null|string
+     */
     function getCommand() {
         return $this->command;
     }
 
+    /**
+     * Set command
+     *
+     * @param $command
+     * @return void
+     */
     function setCommand($command) {
         $this->command = trim($command);
     }
 
+    /**
+     * Get parameters
+     *
+     * @return array
+     */
     function getParameters() {
         return $this->parameters;
     }
 
+    /**
+     * Set parameters
+     *
+     * @throws Exception
+     * @param $parameters
+     * @return void
+     */
     function setParameters($parameters) {
         if (is_array($parameters)) {
             for ($i = 0; $i < count($parameters); $i++) {
@@ -69,6 +98,11 @@ class SketchFormCommand extends SketchObject {
         }
     }
 
+    /**
+     * Get target for error
+     *
+     * @return bool
+     */
     function getTargetForError() {
         return $this->targetForError;
     }

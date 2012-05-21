@@ -3,7 +3,7 @@
  * This file is part of the Sketch Framework
  * (http://code.google.com/p/sketch-framework/)
  *
- * Copyright (C) 2010 Marcos Albaladejo Cooper
+ * Copyright (C) 2011 Marcos Albaladejo Cooper
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -26,30 +26,21 @@ require_once 'Sketch/Resource/XML.php';
 
 /**
  * SketchResourceXML
- *
- * @package Sketch
  */
 class SketchResourceContext extends SketchResourceXML {
-    /**
-     *
-     * @var string
-     */
+    /** @var string */
     private $name;
 
-    /**
-     *
-     * @var string
-     */
+    /** @var string */
     private $locale;
 
-    /**
-     *
-     * @var string
-     */
+    /** @var string */
     private $layerName;
 
     /**
+     * Constructor
      *
+     * @throws Exception
      * @param DOMDocument $document
      */
     function __construct(DOMDocument $document) {
@@ -90,6 +81,7 @@ class SketchResourceContext extends SketchResourceXML {
     }
 
     /**
+     * Get name
      *
      * @return string
      */
@@ -98,8 +90,10 @@ class SketchResourceContext extends SketchResourceXML {
     }
 
     /**
+     * Set name
      *
-     * @param string $name
+     * @param $name
+     * @return void
      */
     function setName($name) {
         $this->name = $name;
@@ -110,6 +104,7 @@ class SketchResourceContext extends SketchResourceXML {
     }
 
     /**
+     * Get locale
      *
      * @return string
      */
@@ -118,8 +113,10 @@ class SketchResourceContext extends SketchResourceXML {
     }
 
     /**
+     * Set locale
      *
-     * @param string $locale
+     * @param $locale
+     * @return void
      */
     function setLocale($locale) {
         $this->locale = $locale;
@@ -130,6 +127,7 @@ class SketchResourceContext extends SketchResourceXML {
     }
 
     /**
+     * Get layer name
      *
      * @return string
      */
@@ -138,19 +136,24 @@ class SketchResourceContext extends SketchResourceXML {
     }
 
     /**
+     * Set layer name
      *
-     * @param string $layer_name
+     * @param $layer_name
+     * @return void
      */
     function setLayerName($layer_name) {
         $this->layerName = $layer_name;
     }
 
     /**
+     * Add driver
      *
-     * @param string $type
-     * @param string $class
-     * @param string $source
-     * @param array $parameters
+     * @param $reference
+     * @param $type
+     * @param $class
+     * @param $source
+     * @param array|null $parameters
+     * @return void
      */
     function addDriver($reference, $type, $class, $source, array $parameters = null) {
         $context = $this->document->getElementsByTagName('context')->item(0);
@@ -174,11 +177,13 @@ class SketchResourceContext extends SketchResourceXML {
     }
 
     /**
+     * Add extension
      *
-     * @param string $type
-     * @param string $class
-     * @param string $source
-     * @param array $parameters
+     * @param $type
+     * @param $class
+     * @param $source
+     * @param array|null $parameters
+     * @return void
      */
     function addExtension($type, $class, $source, $excludes = null, array $parameters = null) {
         $context = $this->document->getElementsByTagName('context')->item(0);
@@ -198,6 +203,7 @@ class SketchResourceContext extends SketchResourceXML {
     }
 
     /**
+     * To string
      *
      * @return string
      */
@@ -207,9 +213,11 @@ class SketchResourceContext extends SketchResourceXML {
     }
 
     /**
+     * Get parameters for
      *
-     * @param string $for
-     * @param string $name
+     * @param $for
+     * @param $name
+     * @return array
      */
     function getParametersFor($for, $name) {
         $parameters = array();

@@ -3,7 +3,7 @@
  * This file is part of the Sketch Framework
  * (http://code.google.com/p/sketch-framework/)
  *
- * Copyright (C) 2010 Marcos Albaladejo Cooper
+ * Copyright (C) 2011 Marcos Albaladejo Cooper
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -26,21 +26,22 @@ require_once 'Sketch/Resource.php';
 
 /**
  * SketchResourceConnection
- *
- * @package Sketch
  */
 class SketchResourceConnection extends SketchResource {
-    /**
-     *
-     * @var SketchConnectionDriver
-     */
+    /** @var SketchConnectionDriver */
     private $driver;
 
+    /**
+     * Constructor
+     *
+     * @param SketchConnectionDriver $driver
+     */
     function  __construct(SketchConnectionDriver $driver) {
         $this->setDriver($driver);
     }
 
     /**
+     * Get driver
      *
      * @return SketchConnectionDriver
      */
@@ -49,16 +50,19 @@ class SketchResourceConnection extends SketchResource {
     }
 
     /**
+     * Set driver
      *
      * @param SketchConnectionDriver $driver
+     * @return void
      */
     function setDriver(SketchConnectionDriver $driver) {
         $this->driver = $driver;
     }
 
     /**
+     * Get table prefix
      *
-     * @param string $default
+     * @param null $default
      * @return string
      */
     function getTablePrefix($default = null) {
@@ -66,35 +70,40 @@ class SketchResourceConnection extends SketchResource {
     }
 
     /**
+     * Get tables
      *
-     * @param mixed $do_not_show
-     * @return array
+     * @param $do_not_show
+     * @return void
      */
     function getTables($do_not_show) {
         return $this->driver->getTables($do_not_show);
     }
 
     /**
+     * Get table definition
      *
-     * @param string $table_name
-     * @return array
+     * @param $table_name
+     * @return void
      */
     function getTableDefinition($table_name) {
         return $this->driver->getTableDefinition($table_name);
     }
 
     /**
+     * Escape string
      *
-     * @param string $string
-     * @return string
+     * @param $string
+     * @return void
      */
     function escapeString($string) {
         return $this->driver->escapeString($string);
     }
 
     /**
+     * To ASCII
      *
-     * @param string $string
+     * @param $string
+     * @param $encoding
      * @return string
      */
     function toASCII($string, $encoding) {
@@ -103,58 +112,66 @@ class SketchResourceConnection extends SketchResource {
     }
 
     /**
+     * Execute query
      *
-     * @param string $expression
+     * @param $expression
+     * @return SketchResourceConnectionResultSet
      */
     function executeQuery($expression) {
         return $this->driver->executeQuery($expression);
     }
 
     /**
+     * Execute update
      *
-     * @param string $expression
-     * @return boolean
+     * @param $expression
+     * @return bool
      */
     function executeUpdate($expression) {
         return $this->driver->executeUpdate($expression);
     }
 
     /**
+     * Begin transaction
      *
-     * @return boolean
+     * @return bool
      */
     function beginTransaction() {
         return $this->driver->beginTransaction();
     }
 
     /**
+     * Commit transaction
      *
-     * @return boolean
+     * @return bool
      */
     function commitTransaction() {
         return $this->driver->commitTransaction();
     }
 
     /**
+     * Rollback transaction
      *
-     * @return boolean
+     * @return bool
      */
     function rollbackTransaction() {
         return $this->driver->rollbackTransaction();
     }
 
     /**
+     * Shorter alias for executeQuery
      *
-     * @param string $expression
-     * @return SketchObjectIterator
+     * @param $expression
+     * @return void
      */
     function query($expression) {
         return $this->driver->query($expression);
     }
 
     /**
+     * Query row
      *
-     * @param string $expression
+     * @param $expression
      * @return array
      */
     function queryRow($expression) {
@@ -162,17 +179,19 @@ class SketchResourceConnection extends SketchResource {
     }
 
     /**
+     * Query first
      *
-     * @param string $expression
-     * @return string
+     * @param $expression
+     * @return bool|mixed
      */
     function queryFirst($expression) {
         return $this->driver->queryFirst($expression);
     }
 
     /**
+     * Query array
      *
-     * @param string $expression
+     * @param $expression
      * @return array
      */
     function queryArray($expression) {
@@ -180,9 +199,10 @@ class SketchResourceConnection extends SketchResource {
     }
 
     /**
+     * Supports
      *
-     * @param string $attribute
-     * @return boolean
+     * @param null $attribute
+     * @return bool
      */
     function supports($attribute = null) {
         return $this->getDriver()->supports($attribute);

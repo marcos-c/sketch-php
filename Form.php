@@ -3,7 +3,7 @@
  * This file is part of the Sketch Framework
  * (http://code.google.com/p/sketch-framework/)
  *
- * Copyright (C) 2010 Marcos Albaladejo Cooper
+ * Copyright (C) 2011 Marcos Albaladejo Cooper
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -33,20 +33,17 @@ require_once 'Sketch/Form/Component.php';
 
 /**
  * SketchForm
- *
- * @package Sketch
  */
 class SketchForm extends SketchObject {
-    /**
-     *
-     * @var array
-     */
+    /** @var array */
     static private $components = array();
 
     /**
+     * Get components
      *
-     * @param string $form_name
-     * @return array
+     * @static
+     * @param $form_name
+     * @return bool
      */
     static function getComponents($form_name) {
         if (array_key_exists($form_name, self::$components)) {
@@ -55,27 +52,35 @@ class SketchForm extends SketchObject {
     }
 
     /**
+     * Set components
      *
-     * @param string $form_name
+     * @static
+     * @param $form_name
      * @param array $components
+     * @return void
      */
     static function setComponents($form_name, array $components) {
         self::$components[$form_name] = $components;
     }
 
     /**
+     * Add component
      *
-     * @param string $form_name
+     * @static
+     * @param $form_name
      * @param SketchFormComponent $component
+     * @return void
      */
     static function addComponent($form_name, SketchFormComponent $component) {
         self::$components[$form_name][] = $component;
     }
 
     /**
+     * Command
      *
-     * @param string $command
-     * @return SketchFormCommand
+     * @static
+     * @param null $command
+     * @return
      */
     static function Command($command = null) {
         $a = func_get_args();
@@ -88,9 +93,11 @@ class SketchForm extends SketchObject {
     }
 
     /**
+     * Propagate
      *
-     * @param string $command
-     * @return SketchFormCommandPropagate
+     * @static
+     * @param null $command
+     * @return
      */
     static function Propagate($command = null) {
         $a = func_get_args();
@@ -103,10 +110,13 @@ class SketchForm extends SketchObject {
     }
 
     /**
+     * Factory
      *
-     * @param SketchObject $data_object
-     * @param string $view_name
-     * @return mixed
+     * @static
+     * @throws Exception
+     * @param SketchObjectView $data_object
+     * @param null $view_id
+     * @return SketchFormList|SketchFormView
      */
     static function Factory(SketchObjectView $data_object, $view_id = null) {
         $application = SketchApplication::getInstance();

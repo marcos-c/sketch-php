@@ -3,7 +3,7 @@
  * This file is part of the Sketch Framework
  * (http://code.google.com/p/sketch-framework/)
  *
- * Copyright (C) 2010 Marcos Albaladejo Cooper
+ * Copyright (C) 2011 Marcos Albaladejo Cooper
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -26,32 +26,22 @@ require_once 'Sketch/Response.php';
 
 /**
  * SketchResponseJSON
- *
- * @package Sketch
  */
 class SketchResponseJSON extends SketchResponse {
-    /**
-     *
-     * @var string
-     */
+    /** @var string */
     public $html;
 
-    /**
-     *
-     * @var string
-     */
+    /** @var string */
     public $forward = "";
 
-    /**
-     *
-     * @var string
-     */
+    /** @var string */
     public $forwardLocation = "";
 
     /**
+     * JSON HTML based sketch response
      *
      * @static
-     * @return SketchResponse
+     * @return SketchResponseJSON
      */
     static function HTML() {
         $response = new SketchResponseJSON();
@@ -60,17 +50,20 @@ class SketchResponseJSON extends SketchResponse {
     }
 
     /**
+     * JSON XHTML based sketch response
      *
      * @static
-     * @return SketchResponse
+     * @return SketchResponseJSON
      */
     static function XHTML() {
         return new SketchResponseJSON();
     }
 
     /**
+     * Set document
      *
      * @param DOMDocument $document
+     * @return void
      */
     function setDocument(DOMDocument $document) {
         $this->document = $document;
@@ -79,7 +72,6 @@ class SketchResponseJSON extends SketchResponse {
             $context->registerNamespace('j', 'http://kunyomi.com/sketch/json');
             $q = $context->query('//j:response');
             if ($q instanceof DOMNodeList) foreach ($q as $json_response) {
-                /* @var $json_respone DOMElement */
                 $document = new DOMDocument();
                 $document->preserveWhiteSpace = false;
                 $document->resolveExternals = false;
@@ -96,7 +88,6 @@ class SketchResponseJSON extends SketchResponse {
             $context = new DOMXPath($this->document);
             $q = $context->query('//response');
             if ($q instanceof DOMNodeList) foreach ($q as $json_response) {
-                /* @var $json_respone DOMElement */
                 $document = new DOMDocument();
                 $document->preserveWhiteSpace = false;
                 $document->resolveExternals = false;

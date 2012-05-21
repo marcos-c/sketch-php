@@ -3,7 +3,7 @@
  * This file is part of the Sketch Framework
  * (http://code.google.com/p/sketch-framework/)
  *
- * Copyright (C) 2010 Marcos Albaladejo Cooper
+ * Copyright (C) 2011 Marcos Albaladejo Cooper
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -29,17 +29,13 @@ require_once 'Sketch/Response/Filter.php';
 
 /**
  * SketchController
- *
- * @package Sketch
  */
 class SketchController extends SketchObject {
-    /**
-     *
-     * @var SketchRouter
-     */
+    /** @var SketchRouter */
     private $router;
 
     /**
+     * Get response
      *
      * @return SketchResponse
      */
@@ -48,8 +44,10 @@ class SketchController extends SketchObject {
     }
 
     /**
+     * Set response
      *
      * @param SketchResponse $response
+     * @return void
      */
     function setResponse(SketchResponse $response) {
         $this->response = $response;
@@ -57,8 +55,11 @@ class SketchController extends SketchObject {
     }
 
     /**
+     * Set response filters
      *
+     * @throws Exception
      * @param SketchResourceContext $context
+     * @return void
      */
     function setResponseFilters(SketchResourceContext $context) {
         $extensions = $context->query("//extension[@type='SketchResponseFilter']");
@@ -78,6 +79,7 @@ class SketchController extends SketchObject {
     }
 
     /**
+     * Get router
      *
      * @return SketchRouter
      */
@@ -86,16 +88,21 @@ class SketchController extends SketchObject {
     }
 
     /**
+     * Set router
      *
      * @param SketchRouter $router
+     * @return void
      */
     function setRouter(SketchRouter $router) {
         $this->router = $router;
     }
 
     /**
+     * Forward
      *
-     * @param string $location
+     * @throws Exception
+     * @param null $location
+     * @return void
      */
     function forward($location = null) {
         if ($this->getRequest()->isJSON()) {

@@ -3,7 +3,7 @@
  * This file is part of the Sketch Framework
  * (http://code.google.com/p/sketch-framework/)
  *
- * Copyright (C) 2010 Marcos Albaladejo Cooper
+ * Copyright (C) 2011 Marcos Albaladejo Cooper
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -27,18 +27,32 @@ require_once 'Sketch/Resource/Connection/Driver.php';
 
 /**
  * PostgreSQLResultSet.
- *
- * @package Drivers
  */
-class PostgreSQLResultSet extends SketchObjectIterator {
+class PostgreSQLResultSet extends SketchResourceConnectionResultSet {
+    /**
+     * Rows
+     *
+     * @return int
+     */
     function rows() {
         return pg_num_rows($this->result);
     }
 
+    /**
+     * Fetch
+     *
+     * @param $key
+     * @return array
+     */
     function fetch($key) {
         return pg_fetch_assoc($this->result, $key);
     }
 
+    /**
+     * Free
+     *
+     * @return void
+     */
     protected function free() {
         // Ignore thrown exceptions
         try {
@@ -49,12 +63,22 @@ class PostgreSQLResultSet extends SketchObjectIterator {
 
 /**
  * PostgreSQLConnectionDriver
- *
- * @package Sketch
  */
 class PostgreSQLConnectionDriver extends SketchConnectionDriver {
+    /** @var resource */
     private $connection;
 
+    /**
+     * Constructor
+     *
+     * @throws SketchResourceConnectionException
+     * @param $host
+     * @param $database
+     * @param $user
+     * @param $password
+     * @param $encoding
+     * @return void
+     */
     protected function connect($host, $database, $user, $password, $encoding) {
         if (function_exists('pg_connect')) {
             $connection = pg_connect("dbname='$database' user='$user' password='$password'");
@@ -71,17 +95,29 @@ class PostgreSQLConnectionDriver extends SketchConnectionDriver {
         }
     }
 
+    /**
+     * Close
+     *
+     * @return void
+     */
     protected function close() {
         pg_close($this->connection);
     }
 
+    /**
+     * Get tables
+     *
+     * @param null $do_not_show
+     * @return array
+     */
     function getTables($do_not_show = null) {
         return array();
     }
 
     /**
+     * Get table definition
      *
-     * @param string $expression
+     * @param $table_name
      * @return array
      */
     function getTableDefinition($table_name) {
@@ -121,8 +157,9 @@ class PostgreSQLConnectionDriver extends SketchConnectionDriver {
     }
 
     /**
+     * Escape string
      *
-     * @param string $string
+     * @param $string
      * @return string
      */
     function escapeString($string) {
@@ -135,7 +172,8 @@ class PostgreSQLConnectionDriver extends SketchConnectionDriver {
      *
      * This version uses pg_result_error_field to get better error states so requires PHP v5.1 or later.
      *
-     * @param string $expression
+     * @throws SketchResourceConnectionException
+     * @param $expression
      * @return PostgreSQLResultSet
      */
     function executeQuery($expression) {
@@ -148,7 +186,8 @@ class PostgreSQLConnectionDriver extends SketchConnectionDriver {
         $result = pg_get_result($this->connection);
         $error = pg_result_error_field($result, PGSQL_DIAG_SQLSTATE);
         if ($error) {
-            pg_connection_reset($this->connection); // Reseting the connection fixes transaction problems
+            // Reseting the connection fixes transaction problems
+            pg_connection_reset($this->connection);
             throw new SketchResourceConnectionException(pg_result_error_field($result, PGSQL_DIAG_MESSAGE_PRIMARY).' '.$expression, $error);
         }
         return new PostgreSQLResultSet($result);
@@ -158,9 +197,10 @@ class PostgreSQLConnectionDriver extends SketchConnectionDriver {
      * Execute update expression and return true on success
      *
      * This version uses pg_result_error_field to get better error states so requires PHP v5.1 or later.
-     * 
-     * @param string $expression
-     * @return boolean
+     *
+     * @throws SketchResourceConnectionException
+     * @param $expression
+     * @return bool
      */
     function executeUpdate($expression) {
         if ($this->getContext()->getLayerName() == 'development') {
@@ -172,40 +212,45 @@ class PostgreSQLConnectionDriver extends SketchConnectionDriver {
         $result = pg_get_result($this->connection);
         $error = pg_result_error_field($result, PGSQL_DIAG_SQLSTATE);
         if ($error) {
-            pg_connection_reset($this->connection); // Reseting the connection fixes transaction problems
+            // Reseting the connection fixes transaction problems
+            pg_connection_reset($this->connection);
             throw new SketchResourceConnectionException(pg_result_error_field($result, PGSQL_DIAG_MESSAGE_PRIMARY).' '.$expression, $error);
         }
         return true;
     }
 
     /**
+     * Begin transaction
      *
-     * @return boolean
+     * @return bool
      */
     function beginTransaction() {
         return $this->executeUpdate("BEGIN");
     }
 
     /**
+     * Commit transaction
      *
-     * @return boolean
+     * @return bool
      */
     function commitTransaction() {
         return $this->executeUpdate("COMMIT");
     }
 
     /**
+     * Rollback transaction
      *
-     * @return boolean
+     * @return bool
      */
     function rollbackTransaction() {
         return $this->executeUpdate("ROLLBACK");
     }
 
     /**
+     * Supports
      *
-     * @param string $attribute
-     * @return boolean
+     * @param $attribute
+     * @return bool
      */
     function supports($attribute) {
         switch ($attribute) {

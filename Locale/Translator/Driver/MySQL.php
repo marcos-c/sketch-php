@@ -3,7 +3,7 @@
  * This file is part of the Sketch Framework
  * (http://code.google.com/p/sketch-framework/)
  *
- * Copyright (C) 2010 Marcos Albaladejo Cooper
+ * Copyright (C) 2011 Marcos Albaladejo Cooper
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -26,22 +26,19 @@ require_once 'Sketch/Locale/Translator/Driver.php';
 
 /**
  * MySQLLocaleTranslatorDriver
- *
- * @package Sketch
  */
 class MySQLLocaleTranslatorDriver extends SketchLocaleTranslatorDriver {
-    /**
-     *
-     * @var array
-     */
+    /** @var array */
     private $data = array();
 
-    /**
-     *
-     * @var string
-     */
+    /** @var string */
     private $domain = 'default';
 
+    /**
+     * Read data
+     *
+     * @return void
+     */
     private function readData() {
         $connection = $this->getConnection();
         if ($connection instanceof SketchResourceConnection) {
@@ -58,8 +55,9 @@ class MySQLLocaleTranslatorDriver extends SketchLocaleTranslatorDriver {
     }
 
     /**
+     * Constructor
      *
-     * @param string $locale_string
+     * @param $locale_string
      * @param SketchResourceXML $resource
      */
     function  __construct($locale_string, SketchResourceXML $resource) {
@@ -68,9 +66,10 @@ class MySQLLocaleTranslatorDriver extends SketchLocaleTranslatorDriver {
     }
     
     /**
+     * Translate
      *
-     * @param string $text
-     * @return string
+     * @param $text
+     * @return
      */
     function translate($text) {
         $md5 = md5($text);

@@ -3,7 +3,7 @@
  * This file is part of the Sketch Framework
  * (http://code.google.com/p/sketch-framework/)
  *
- * Copyright (C) 2010 Marcos Albaladejo Cooper
+ * Copyright (C) 2011 Marcos Albaladejo Cooper
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -28,26 +28,19 @@ define('A_NOTICE', 4);
 
 /**
  * ApplicationNotice.
- *
- * @package System
  */
 class SketchApplicationNotice {
-    /**
-     *
-     * @var string
-     */
+    /** @var string */
     private $message;
 
-    /**
-     *
-     * @var integer
-     */
+    /** @var int */
     private $noticeType;
 
     /**
+     * Constructor
      *
-     * @param string $message
-     * @param integer $type
+     * @param $message
+     * @param int $type
      */
     function  __construct($message, $type = A_NOTICE) {
         $this->setMessage($message);
@@ -55,6 +48,7 @@ class SketchApplicationNotice {
     }
 
     /**
+     * Returns string representation of object
      *
      * @return string
      */
@@ -63,6 +57,7 @@ class SketchApplicationNotice {
     }
 
     /**
+     * Get message
      *
      * @return string
      */
@@ -71,24 +66,33 @@ class SketchApplicationNotice {
     }
 
     /**
+     * Set message
      *
-     * @param string $message
+     * @param $message
+     * @return void
      */
     function setMessage($message) {
         $this->message = $message;
     }
 
     /**
+     * Get notice type
      *
-     * @return string
+     * A_ERROR, A_WARNING, A_NOTICE.
+     *
+     * @return int
      */
     function getNoticeType() {
         return $this->noticeType;
     }
 
     /**
+     * Set notice type
      *
-     * @param string $type
+     * A_ERROR, A_WARNING, A_NOTICE.
+     *
+     * @param $type
+     * @return void
      */
     function setNoticeType($type) {
         $this -> noticeType = $type;

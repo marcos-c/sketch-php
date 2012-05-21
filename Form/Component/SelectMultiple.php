@@ -3,7 +3,7 @@
  * This file is part of the Sketch Framework
  * (http://code.google.com/p/sketch-framework/)
  *
- * Copyright (C) 2010 Marcos Albaladejo Cooper
+ * Copyright (C) 2011 Marcos Albaladejo Cooper
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -26,17 +26,78 @@ require_once 'Sketch/Form/Component.php';
 
 /**
  * SketchFormComponentSelectMultiple
- *
- * @package Components
  */
 class SketchFormComponentSelectMultiple extends SketchFormComponent {
+    /**
+     * JavaScript
+     *
+     * @return string
+     */
     function javascript() {
         $form_name = $this->getForm()->getFormName();
         ob_start(); ?>
-        <?=$form_name?>Stack("<?=$form_name?>SelectMultipleSubmit()");var <?=$form_name?>SelectMultipleArray=new Array();function <?=$form_name?>SelectMultipleSubmit(){var b,a;for(b=0;b<<?=$form_name?>SelectMultipleArray.length;b++){select=document.getElementById(<?=$form_name?>SelectMultipleArray[b]);for(a=0;a<select.options.length;a++){select.options[a].selected=true}}}function <?=$form_name?>SelectMultipleMove(h,g,c,f){var a=document.getElementById(h),e=document.getElementById(g),d=new Array(),b;if(a.options.length>0){for(b=0;b<e.options.length;b++){d[d.length]=new Option(e.options[b].text,e.options[b].value)}b=0;do{if(a.options[b].selected){d[d.length]=new Option(a.options[b].text,a.options[b].value,a.options[b].defaultSelected,a.options[b].selected);a.options[a.selectedIndex]=null}else{b++}}while(b<a.options.length);if(c){d.sort(function(k,i){if((k.text+"")<(i.text+"")){return -1}if((k.text+"")>(i.text+"")){return 1}return 0})}for(b=0;b<d.length;b++){e.options[b]=new Option(d[b].text,d[b].value,d[b].defaultSelected,d[b].selected)}}if(arguments.length==4){f.call(a)}}function <?=$form_name?>SelectMultipleSortUp(b){var a=document.getElementById(b),h=a.options,f=-1,d,c,g,e;for(d=0;d<a.options.length;d++){c=d-1;if(h[d].selected){if(c>f){g=new Option(h[d].text,h[d].value,h[d].defaultSelected,h[d].selected);e=new Option(h[c].text,h[c].value,h[c].defaultSelected,h[c].selected);h[d]=e;h[c]=g}else{f=d}}}}function <?=$form_name?>SelectMultipleSortDown(b){var a=document.getElementById(b),g=a.options,e=g.length,c,f,d;for(c=(g.length-1);c>-1;c=c-1){j=c+1;if(g[c].selected){if(j<e){f=new Option(g[c].text,g[c].value,g[c].defaultSelected,g[c].selected);d=new Option(g[j].text,g[j].value,g[j].defaultSelected,g[j].selected);g[c]=d;g[j]=f}else{e=c}}}};
+        <?=$form_name?>Stack('<?=$form_name?>SelectMultipleSubmit()');
+        var <?=$form_name?>SelectMultipleArray = new Array();
+        function <?=$form_name?>SelectMultipleSubmit() {
+            var i, j;
+            for (i = 0; i < <?=$form_name?>SelectMultipleArray.length; i++) {
+                select = document.getElementById(<?=$form_name?>SelectMultipleArray[i]);
+                for (j = 0; j < select.options.length; j++) {
+                    select.options[j].selected = true;
+                }
+            }
+        }
+        function <?=$form_name?>SelectMultipleMove(from, to, sort, callback) {
+            var from_element = document.getElementById(from), to_element = document.getElementById(to), o = new Array(), i;
+            if (from_element.options.length > 0) {
+                for (i = 0; i < to_element.options.length; i++) {
+                    o[o.length] = new Option(to_element.options[i].text, to_element.options[i].value);
+                }
+                i = 0; do {
+                    if (from_element.options[i].selected) {
+                        o[o.length] = new Option(from_element.options[i].text, from_element.options[i].value, from_element.options[i].defaultSelected, from_element.options[i].selected);
+                        from_element.options[from_element.selectedIndex] = null;
+                    } else i++;
+                } while (i < from_element.options.length);
+                if (sort) o.sort(function (a,b) { if ((a.text + "") < (b.text + "")) return -1; if ((a.text + "") > (b.text + "")) return 1; return 0; });
+                for (i = 0; i < o.length; i++) to_element.options[i] = new Option(o[i].text, o[i].value, o[i].defaultSelected, o[i].selected);
+            }
+            if (arguments.length == 4) {
+                callback.call(from_element);
+            }
+        }
+        function <?=$form_name?>SelectMultipleSortUp(select) {
+            var select_element = document.getElementById(select), o = select_element.options, s = -1, i, j, t1, t2;
+            for (i = 0; i < select_element.options.length; i++) {
+                j = i - 1; if (o[i].selected) {
+                    if (j > s) {
+                        t1 = new Option(o[i].text, o[i].value, o[i].defaultSelected, o[i].selected);
+                        t2 = new Option(o[j].text, o[j].value, o[j].defaultSelected, o[j].selected);
+                        o[i] = t2; o[j] = t1;
+                    } else s = i;
+                }
+            }
+        }
+        function <?=$form_name?>SelectMultipleSortDown(select) {
+            var select_element = document.getElementById(select), o = select_element.options, s = o.length, i, t1, t2;
+            for (i = (o.length - 1); i > -1; i = i - 1) {
+                j = i + 1; if (o[i].selected) {
+                    if (j < s) {
+                        t1 = new Option(o[i].text, o[i].value, o[i].defaultSelected, o[i].selected);
+                        t2 = new Option(o[j].text, o[j].value, o[j].defaultSelected, o[j].selected);
+                        o[i] = t2; o[j] = t1;
+                    } else s = i;
+                }
+            }
+        }
         <?php return ob_get_clean();
     }
 
+    /**
+     * Save HTML
+     *
+     * @return string
+     */
     function saveHTML() {
         $form = $this->getForm();
         $arguments = $this->getArguments();

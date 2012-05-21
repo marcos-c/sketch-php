@@ -3,7 +3,7 @@
  * This file is part of the Sketch Framework
  * (http://code.google.com/p/sketch-framework/)
  *
- * Copyright (C) 2010 Marcos Albaladejo Cooper
+ * Copyright (C) 2011 Marcos Albaladejo Cooper
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -26,19 +26,33 @@ require_once 'Sketch/Object/Iterator.php';
 
 /**
  * SketchFormIterator
- *
- * @package Sketch
  */
 class SketchFormIterator extends SketchObjectIterator {
+    /**
+     * Rows
+     *
+     * @return null
+     */
     function rows() {
         return $this -> result -> rows();
     }
 
+    /**
+     * Fetch
+     *
+     * @param $key
+     * @return mixed
+     */
     function fetch($key) {
         $object = $this -> result -> fetch($key);
         return SketchForm::Factory($object);
     }
 
+    /**
+     * Free
+     *
+     * @return bool
+     */
     function free() {
         return $this -> result -> free();
     }

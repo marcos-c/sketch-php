@@ -3,7 +3,7 @@
  * This file is part of the Sketch Framework
  * (http://code.google.com/p/sketch-framework/)
  *
- * Copyright (C) 2010 Marcos Albaladejo Cooper
+ * Copyright (C) 2011 Marcos Albaladejo Cooper
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -26,20 +26,19 @@ require_once 'Sketch/Object.php';
 
 /**
  * SketchJobScheduler
- *
- * @package Sketch
  */
 class SketchJobScheduler extends SketchObject {
     static function execute() {
         $application = SketchApplication::getInstance();
         $connection = $application->getConnection();
+        $prefix = $connection->getTablePrefix('job');
         $now = SketchDateTime::Now();
         $date_time = $now->addInterval('-6 hours');
         $document_root = $application->getDocumentRoot();
         $uri = $application->getURI(WITH_PROTOCOL_AND_DOMAIN);
-        foreach ($connection -> query("SELECT * FROM job_scheduler WHERE last_execution_date_time IS NULL OR last_execution_date_time < '".$date_time->toString()."'") as $r) {
+        foreach ($connection -> query("SELECT * FROM ${prefix}_scheduler WHERE last_execution_date_time IS NULL OR last_execution_date_time < '".$date_time->toString()."'") as $r) {
             exec("php ${document_root}/wget.php ${uri}$r[exec] &");
-            $connection -> query("UPDATE job_scheduler SET last_execution_date_time = '".$now->toString()."' WHERE id = '$r[id]]'");
+            $connection -> query("UPDATE ${prefix}_scheduler SET last_execution_date_time = '".$now->toString()."' WHERE id = '$r[id]]'");
         }
     }
 }

@@ -3,7 +3,7 @@
  * This file is part of the Sketch Framework
  * (http://code.google.com/p/sketch-framework/)
  *
- * Copyright (C) 2010 Marcos Albaladejo Cooper
+ * Copyright (C) 2011 Marcos Albaladejo Cooper
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -27,19 +27,33 @@ require_once 'Sketch/Resource/Connection/Driver.php';
 
 /**
  * MYSQLResultSet.
- *
- * @package Drivers
  */
-class MySQLResultSet extends SketchObjectIterator {
+class MySQLResultSet extends SketchResourceConnectionResultSet {
+    /**
+     * Rows
+     *
+     * @return int
+     */
     function rows() {
         return mysql_num_rows($this->result);
     }
 
+    /**
+     * Fetch
+     *
+     * @param $key
+     * @return array
+     */
     function fetch($key) {
         mysql_data_seek($this->result, $key);
         return mysql_fetch_assoc($this->result);
     }
 
+    /**
+     * Free
+     *
+     * @return void
+     */
     protected function free() {
         // Ignore thrown exceptions
         try {
@@ -50,12 +64,22 @@ class MySQLResultSet extends SketchObjectIterator {
 
 /**
  * MySQLConnectionDriver
- *
- * @package Sketch
  */
 class MySQLConnectionDriver extends SketchConnectionDriver {
+    /** @var string */
     private $databaseName;
 
+    /**
+     * Constructor
+     *
+     * @throws SketchResourceConnectionException
+     * @param $host
+     * @param $database
+     * @param $user
+     * @param $password
+     * @param $encoding
+     * @return void
+     */
     protected function connect($host, $database, $user, $password, $encoding) {
         $connection = mysql_connect($host, $user, $password);
         if ($connection) {
@@ -71,10 +95,21 @@ class MySQLConnectionDriver extends SketchConnectionDriver {
         }
     }
 
+    /**
+     * Close
+     *
+     * @return void
+     */
     protected function close() {
         @mysql_close($this->connection);
     }
 
+    /**
+     * Get tables
+     *
+     * @param null $do_not_show
+     * @return array
+     */
     function getTables($do_not_show = null) {
         $do_not_show = (is_array($do_not_show)) ? array_merge(array('WB_cache'), $do_not_show) : array('WB_cache');
         $output = array();
@@ -87,8 +122,9 @@ class MySQLConnectionDriver extends SketchConnectionDriver {
     }
 
     /**
+     * Get table definition
      *
-     * @param string $table_name
+     * @param $table_name
      * @return array
      */
     function getTableDefinition($table_name) {
@@ -113,8 +149,9 @@ class MySQLConnectionDriver extends SketchConnectionDriver {
     }
 
     /**
+     * Escape string
      *
-     * @param string $string
+     * @param $string
      * @return string
      */
     function escapeString($string) {
@@ -122,10 +159,11 @@ class MySQLConnectionDriver extends SketchConnectionDriver {
     }
 
     /**
-     * Execute query expression and return result set
+     * Execute query
      *
-     * @param string $expression
-     * @return PostgreSQLResultSet
+     * @throws SketchResourceConnectionException
+     * @param $expression
+     * @return MySQLResultSet
      */
     function executeQuery($expression) {
         if ($this->getContext()->getLayerName() == 'development') {
@@ -140,10 +178,11 @@ class MySQLConnectionDriver extends SketchConnectionDriver {
     }
 
     /**
-     * Execute update expression and return true on success
+     * Execute update
      *
-     * @param string $expression
-     * @return boolean
+     * @throws SketchResourceConnectionException
+     * @param $expression
+     * @return bool
      */
     function executeUpdate($expression) {
         if ($this->getContext()->getLayerName() == 'development') {
@@ -158,33 +197,37 @@ class MySQLConnectionDriver extends SketchConnectionDriver {
     }
 
     /**
+     * Begin transaction
      *
-     * @return boolean
+     * @return bool
      */
     function beginTransaction() {
         return $this->executeUpdate("BEGIN");
     }
 
     /**
+     * Commit transaction
      *
-     * @return boolean
+     * @return bool
      */
     function commitTransaction() {
         return $this->executeUpdate("COMMIT");
     }
 
     /**
+     * Rollback transaction
      *
-     * @return boolean
+     * @return bool
      */
     function rollbackTransaction() {
         return $this->executeUpdate("ROLLBACK");
     }
 
     /**
+     * Supports
      *
-     * @param string $attribute
-     * @return boolean
+     * @param $attribute
+     * @return bool
      */
     function supports($attribute) {
         return false;

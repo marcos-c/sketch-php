@@ -3,7 +3,7 @@
  * This file is part of the Sketch Framework
  * (http://code.google.com/p/sketch-framework/)
  *
- * Copyright (C) 2010 Marcos Albaladejo Cooper
+ * Copyright (C) 2011 Marcos Albaladejo Cooper
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -27,10 +27,15 @@ require_once 'Sketch/Mail/Message.php';
 
  /**
  * SketchMailTransport
- *
- * @package Sketch
  */
 class SketchMailTransport extends SketchObject {
+    /**
+     * Send message
+     *
+     * @static
+     * @param SketchMailMessage $message
+     * @return bool
+     */
     static function sendMessage(SketchMailMessage $message) {
         if ($message->isValid()) {
             $subject = '=?UTF-8?B?'.base64_encode($message->getSubject()).'?=';

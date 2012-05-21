@@ -3,7 +3,7 @@
  * This file is part of the Sketch Framework
  * (http://code.google.com/p/sketch-framework/)
  *
- * Copyright (C) 2010 Marcos Albaladejo Cooper
+ * Copyright (C) 2011 Marcos Albaladejo Cooper
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -26,62 +26,66 @@ require_once 'Sketch/Object.php';
 
 /**
  * SketchFormComponent
- *
- * @package Sketch
  */
 abstract class SketchFormComponent extends SketchObject {
-    /**
-     *
-     * @var SketchFormView
-     */
+    /** @var null|SketchFormView */
     private $form = null;
 
-    /**
-     *
-     * @var array
-     */
+    /** @var null|arguments */
     private $arguments = null;
 
     /**
+     * Constructor
      *
      * @param SketchFormView $form
-     * @param array $arguments
+     * @param $arguments
      */
     final function __construct(SketchFormView $form, $arguments) {
         $this->setForm($form);
         $this->setArguments($arguments);
     }
 
-    
+    /**
+     * Save HTML
+     *
+     * @abstract
+     * @return void
+     */
     abstract function saveHTML();
 
     /**
+     * Get form
      *
-     * @return SketchFormView
+     * @return null|SketchFormView
      */
     final protected function getForm() {
         return $this->form;
     }
 
     /**
+     * Set form
      *
-     * @param SketchFormView $form 
+     * @param SketchFormView $form
+     * @return void
      */
     final protected function setForm(SketchFormView $form) {
         $this->form = $form;
     }
 
     /**
+     * Get arguments
      *
-     * @return array
+     * @return arguments|null
      */
     final protected function getArguments() {
         return $this->arguments;
     }
 
     /**
+     * Set arguments
      *
-     * @param array $arguments 
+     * @param array $arguments
+     * @return void
      */
     final protected function setArguments(array $arguments) {
         $this->arguments = $arguments;

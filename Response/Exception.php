@@ -3,7 +3,7 @@
  * This file is part of the Sketch Framework
  * (http://code.google.com/p/sketch-framework/)
  *
- * Copyright (C) 2010 Marcos Albaladejo Cooper
+ * Copyright (C) 2011 Marcos Albaladejo Cooper
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -24,23 +24,16 @@
 
 /**
  * SketchResponseExtension
- *
- * @package Sketch
  */
 class SketchResponseException extends Exception {
-    /**
-     *
-     * @var array
-     */
+    /** @var array */
     private $debugInfo = array();
 
-    /**
-     *
-     * @var array
-     */
+    /** @var array */
     private $stack = array();
 
     /**
+     * Get debug info
      *
      * @return array
      */
@@ -49,14 +42,17 @@ class SketchResponseException extends Exception {
     }
 
     /**
+     * Add debug info
      *
-     * @param mixed $debug_info
+     * @param $debug_info
+     * @return void
      */
     function addDebugInfo($debug_info) {
         $this->debugInfo[] = $debug_info;
     }
 
     /**
+     * Get stack
      *
      * @return array
      */
@@ -65,8 +61,10 @@ class SketchResponseException extends Exception {
     }
 
     /**
+     * Add to stack
      *
-     * @param Exception $exception 
+     * @param Exception $exception
+     * @return void
      */
     function addToStack(Exception $exception) {
         $this->stack[] = $exception;

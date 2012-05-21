@@ -3,7 +3,7 @@
  * This file is part of the Sketch Framework
  * (http://code.google.com/p/sketch-framework/)
  *
- * Copyright (C) 2010 Marcos Albaladejo Cooper
+ * Copyright (C) 2011 Marcos Albaladejo Cooper
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -26,25 +26,22 @@ require_once 'Sketch/Object.php';
 
 /**
  * SketchLocaleTranslator
- *
- * @package Sketch
  */
 class SketchLocaleTranslator extends SketchObject {
-    /**
-     *
-     * @var SketchLocaleTranslatorDriver
-     */
+    /** @var SketchLocaleTranslatorDriver */
     private $driver;
 
     /**
+     * Constructor
      *
-     * @param SketchLocaleTranslatorDriver $driver 
+     * @param SketchLocaleTranslatorDriver $driver
      */
     function  __construct(SketchLocaleTranslatorDriver $driver) {
         $this->setDriver($driver);
     }
 
     /**
+     * Get driver
      *
      * @return SketchLocaleTranslatorDriver
      */
@@ -53,16 +50,19 @@ class SketchLocaleTranslator extends SketchObject {
     }
 
     /**
+     * Set driver
      *
      * @param SketchLocaleTranslatorDriver $driver
+     * @return void
      */
     function setDriver(SketchLocaleTranslatorDriver $driver) {
         $this->driver = $driver;
     }
 
     /**
+     * Translate
      *
-     * @param string $text
+     * @param $text
      * @return string
      */
     function translate($text) {
@@ -70,8 +70,9 @@ class SketchLocaleTranslator extends SketchObject {
     }
 
     /**
+     * Shorter alias for translate
      *
-     * @param string $text
+     * @param $text
      * @return string
      */
     function _($text) {

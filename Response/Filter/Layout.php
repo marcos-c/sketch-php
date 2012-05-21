@@ -3,7 +3,7 @@
  * This file is part of the Sketch Framework
  * (http://code.google.com/p/sketch-framework/)
  *
- * Copyright (C) 2010 Marcos Albaladejo Cooper
+ * Copyright (C) 2011 Marcos Albaladejo Cooper
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -26,15 +26,15 @@ require_once 'Sketch/Response/Filter.php';
 
 /**
  * LayoutResponseFilter
- *
- * @package Sketch
  */
 class LayoutResponseFilter extends SketchResponseFilter {
     /**
+     * Append
      *
      * @param DOMDocument $layout
      * @param DOMElement $append
      * @param DOMElement $old
+     * @return void
      */
     private function append(DOMDocument $layout, DOMElement $append, DOMElement $old) {
         if ($append->hasChildNodes()) foreach ($append->childNodes as $node) {
@@ -43,10 +43,12 @@ class LayoutResponseFilter extends SketchResponseFilter {
     }
 
     /**
+     * Replace element
      *
      * @param DOMDocument $layout
      * @param DOMElement $replace
      * @param DOMElement $old
+     * @return void
      */
     private function replaceElement(DOMDocument $layout, DOMElement $replace, DOMElement $old) {
         $new = $layout->createElement($old->tagName);
@@ -64,10 +66,12 @@ class LayoutResponseFilter extends SketchResponseFilter {
     }
 
     /**
+     * Replace element with name space
      *
      * @param DOMDocument $layout
      * @param DOMElement $replace
      * @param DOMElement $old
+     * @return void
      */
     private function replaceElementNs(DOMDocument $layout, DOMElement $replace, DOMElement $old) {
         $new = $layout->createElementNs('http://www.w3.org/1999/xhtml', $old->tagName);
@@ -85,8 +89,10 @@ class LayoutResponseFilter extends SketchResponseFilter {
     }
 
     /**
+     * Apply
      *
      * @param SketchResourceXML $resource
+     * @return void
      */
     function apply(SketchResourceXML $resource) {
         $layout_path = null;

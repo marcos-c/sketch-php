@@ -3,7 +3,7 @@
  * This file is part of the Sketch Framework
  * (http://code.google.com/p/sketch-framework/)
  *
- * Copyright (C) 2010 Marcos Albaladejo Cooper
+ * Copyright (C) 2011 Marcos Albaladejo Cooper
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -26,17 +26,13 @@ require_once 'Sketch/Object.php';
 
 /**
  * SketchLocaleTranslatorDriver
- *
- * @package Sketch
  */
 abstract class SketchLocaleTranslatorDriver extends SketchObject {
-    /**
-     *
-     * @var string
-     */
+    /** @var string */
     private $localeString;
 
     /**
+     * Get locale string
      *
      * @return string
      */
@@ -45,16 +41,20 @@ abstract class SketchLocaleTranslatorDriver extends SketchObject {
     }
 
     /**
+     * Set locale string
      *
-     * @param string $locale_string
+     * @param $locale_string
+     * @return void
      */
     function setLocaleString($locale_string) {
         $this->localeString = $locale_string;
     }
 
     /**
+     * Translate
      *
-     * @param string $text
+     * @abstract
+     * @param $text
      * @return string
      */
     abstract function translate($text);

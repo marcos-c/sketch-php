@@ -3,7 +3,7 @@
  * This file is part of the Sketch Framework
  * (http://code.google.com/p/sketch-framework/)
  *
- * Copyright (C) 2010 Marcos Albaladejo Cooper
+ * Copyright (C) 2011 Marcos Albaladejo Cooper
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -23,23 +23,22 @@
  */
 
 require_once 'Sketch/Resource/Connection.php';
+require_once 'Sketch/Resource/Connection/ResultSet.php';
 require_once 'Sketch/Resource/Connection/Exception.php';
+
 
 /**
  * SketchResource
- *
- * @package Sketch
  */
 abstract class SketchConnectionDriver extends SketchResource {
-    /**
-     *
-     * @var string
-     */
+    /** @var string */
     private $tablePrefix;
 
     /**
+     * Constructor
      *
-     * @param SketchResource $resource 
+     * @throws SketchResourceConnectionException
+     * @param SketchResource $resource
      */
     final function __construct(SketchResource $resource) {
         try {
@@ -55,24 +54,38 @@ abstract class SketchConnectionDriver extends SketchResource {
         }
     }
 
+    /**
+     * Destructor
+     */
     final function __destruct() {
         $this->close();
     }
 
     /**
+     * Connect
      *
-     * @param string $host
-     * @param string $user
-     * @param string $password
-     * @param string $database
-     * @param stirng $encoding
+     * @abstract
+     * @param $host
+     * @param $user
+     * @param $password
+     * @param $database
+     * @param $encoding
+     * @return void
      */
     abstract protected function connect($host, $user, $password, $database, $encoding);
 
+    /**
+     * Close
+     *
+     * @abstract
+     * @return void
+     */
     abstract protected function close();
 
     /**
+     * Get table prefix
      *
+     * @param $default
      * @return string
      */
     function getTablePrefix($default) {
@@ -80,78 +93,98 @@ abstract class SketchConnectionDriver extends SketchResource {
     }
 
     /**
+     * Set table prefix
      *
-     * @param string $table_prefix
+     * @param $table_prefix
+     * @return void
      */
     function setTablePrefix($table_prefix) {
         $this->tablePrefix = $table_prefix;
     }
     
     /**
+     * Get tables
      *
-     * @param mixed $do_not_show
-     * @return array
+     * @abstract
+     * @param null $do_not_show
+     * @return void
      */
     abstract function getTables($do_not_show = null);
     
     /**
+     * Get table definition
      *
-     * @param string $table_name
-     * @return array
+     * @abstract
+     * @param $table_name
+     * @return void
      */
     abstract function getTableDefinition($table_name);
 
     /**
+     * Escape string
      *
-     * @param string $string
-     * @return string
+     * @abstract
+     * @param $string
+     * @return void
      */
     abstract function escapeString($string);
     
     /**
+     * Execute query
      *
-     * @param string $expression
-     * @return SketchObjectIterator
+     * @abstract
+     * @param $expression
+     * @return SketchResourceConnectionResultSet
      */
     abstract function executeQuery($expression);
 
     /**
+     * Execute update
      *
-     * @param string $expression
-     * @return boolean
+     * @abstract
+     * @param $expression
+     * @return bool
      */
     abstract function executeUpdate($expression);
 
     /**
+     * Begin transaction
      *
-     * @return boolean
+     * @abstract
+     * @return bool
      */
     abstract function beginTransaction();
 
     /**
+     * Commit transaction
      *
-     * @return boolean
+     * @abstract
+     * @return bool
      */
     abstract function commitTransaction();
 
     /**
+     * Rollback transaction
      *
-     * @return boolean
+     * @abstract
+     * @return bool
      */
     abstract function rollbackTransaction();
 
     /**
+     * Shorter alias for executeQuery
      *
-     * @param string $expression
-     * @return SketchObjectIterator
+     * @param $expression
+     * @return void
      */
     function query($expression) {
         return $this->executeQuery($expression);
     }
 
     /**
+     * Query row
      *
-     * @param string $expression
+     * @param $expression
      * @return array
      */
     function queryRow($expression) {
@@ -159,9 +192,10 @@ abstract class SketchConnectionDriver extends SketchResource {
     }
 
     /**
+     * Query first
      *
-     * @param string $expression
-     * @return mixed
+     * @param $expression
+     * @return bool|mixed
      */
     function queryFirst($expression) {
         $row = $this->queryRow($expression);
@@ -169,8 +203,9 @@ abstract class SketchConnectionDriver extends SketchResource {
     }
 
     /**
+     * Query array
      *
-     * @param string $expression
+     * @param $expression
      * @return array
      */
     function queryArray($expression) {
@@ -188,9 +223,11 @@ abstract class SketchConnectionDriver extends SketchResource {
     }
 
     /**
+     * Supports
      *
-     * @param string $attribute
-     * @return boolean
+     * @abstract
+     * @param $attribute
+     * @return bool
      */
     abstract function supports($attribute);
 }

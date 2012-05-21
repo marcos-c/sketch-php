@@ -3,7 +3,7 @@
  * This file is part of the Sketch Framework
  * (http://code.google.com/p/sketch-framework/)
  *
- * Copyright (C) 2010 Marcos Albaladejo Cooper
+ * Copyright (C) 2011 Marcos Albaladejo Cooper
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -26,10 +26,17 @@ require_once 'Sketch/Form/Component.php';
 
 /**
  * SketchFormComponentInputDate
- *
- * @package Components
  */
 class SketchFormComponentInputDate extends SketchFormComponent {
+    /**
+     * Get day selector
+     *
+     * @param $field_name
+     * @param $parameters
+     * @param $days
+     * @param $day
+     * @return string
+     */
     private function getDaySelector($field_name, $parameters, $days, $day) {
         $disabled = ($parameters['disabled'] !== false) ? ' disabled="disabled"' : '';
         ob_start(); ?>
@@ -41,6 +48,15 @@ class SketchFormComponentInputDate extends SketchFormComponent {
         <?php return ob_get_clean();
     }
 
+    /**
+     * Get month selector
+     *
+     * @param $field_name
+     * @param $parameters
+     * @param $months
+     * @param $month
+     * @return string
+     */
     private function getMonthSelector($field_name, $parameters, $months, $month) {
         $disabled = ($parameters['disabled'] !== false) ? ' disabled="disabled"' : '';
         ob_start(); ?>
@@ -52,6 +68,15 @@ class SketchFormComponentInputDate extends SketchFormComponent {
         <?php return ob_get_clean();
     }
 
+    /**
+     * Get year selector
+     *
+     * @param $field_name
+     * @param $parameters
+     * @param $years
+     * @param $year
+     * @return string
+     */
     private function getYearSelector($field_name, $parameters, $years, $year) {
         $disabled = ($parameters['disabled'] !== false) ? ' disabled="disabled"' : '';
         ob_start(); ?>
@@ -63,6 +88,15 @@ class SketchFormComponentInputDate extends SketchFormComponent {
         <?php return ob_get_clean();
     }
 
+    /**
+     * Get year and month selector
+     *
+     * @param $field_name
+     * @param $parameters
+     * @param $year_months
+     * @param $year_month
+     * @return string
+     */
     private function getYearMonthSelector($field_name, $parameters, $year_months, $year_month) {
         $disabled = ($parameters['disabled'] !== false) ? ' disabled="disabled"' : '';
         ob_start(); ?>
@@ -74,6 +108,25 @@ class SketchFormComponentInputDate extends SketchFormComponent {
         <?php return ob_get_clean();
     }
 
+    /**
+     * Get calendar and or javascript
+     *
+     * @param $calendar_field_id
+     * @param $field_name
+     * @param $parameters
+     * @param $year
+     * @param $month
+     * @param $day
+     * @param $from_year
+     * @param $from_month
+     * @param $from_day
+     * @param $to_year
+     * @param $to_month
+     * @param $to_day
+     * @param $months
+     * @param $year_month_days
+     * @return string
+     */
     private function getCalendarAndOrJavascript($calendar_field_id, $field_name, $parameters, $year, $month, $day, $from_year, $from_month, $from_day, $to_year, $to_month, $to_day, $months, $year_month_days) {
         ob_start(); ?>
             <? if ($parameters['calendar']): ?>
@@ -256,7 +309,9 @@ class SketchFormComponentInputDate extends SketchFormComponent {
     }
 
     /**
+     * Save HTML
      *
+     * @throws Exception
      * @return string
      */
     function saveHTML() {

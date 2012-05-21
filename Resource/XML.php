@@ -3,7 +3,7 @@
  * This file is part of the Sketch Framework
  * (http://code.google.com/p/sketch-framework/)
  *
- * Copyright (C) 2010 Marcos Albaladejo Cooper
+ * Copyright (C) 2011 Marcos Albaladejo Cooper
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -30,27 +30,24 @@ require_once 'Sketch/Resource.php';
 
 /**
  * SketchResourceXML
- *
- * @package Sketch
  */
 class SketchResourceXML extends SketchResource {
-    /**
-     *
-     * @var DOMDocument
-     */
+    /** @var \DOMDocument */
     protected $document;
 
     /**
+     * Constructor
      *
-     * @param DOMDocument $document 
+     * @param DOMDocument $document
      */
     function __construct(DOMDocument $document) {
         $this->document = $document;
     }
 
     /**
+     * Get attribute
      *
-     * @param string $attribute
+     * @param $attribute
      * @return string
      */
     function getAttribute($attribute) {
@@ -58,6 +55,7 @@ class SketchResourceXML extends SketchResource {
     }
 
     /**
+     * Get attributes
      *
      * @return array
      */
@@ -70,8 +68,9 @@ class SketchResourceXML extends SketchResource {
     }
 
     /**
+     * Get character data
      *
-     * @return string
+     * @return null|string
      */
     function getCharacterData() {
         $element = $this->document->documentElement;
@@ -85,8 +84,9 @@ class SketchResourceXML extends SketchResource {
     }
 
     /**
+     * Query
      *
-     * @param string $expression
+     * @param $expression
      * @return array
      */
     function query($expression) {
@@ -105,8 +105,9 @@ class SketchResourceXML extends SketchResource {
     }
 
     /**
+     * Query first
      *
-     * @param string $expression
+     * @param $expression
      * @return mixed
      */
     function queryFirst($expression) {
@@ -114,9 +115,11 @@ class SketchResourceXML extends SketchResource {
     }
 
     /**
+     * Query character data
      *
-     * @param string $query_string
-     * @return string
+     * @param $query_string
+     * @param null $default
+     * @return null
      */
     function queryCharacterData($query_string, $default = null) {
         $node = $this->queryFirst($query_string);

@@ -3,7 +3,7 @@
  * This file is part of the Sketch Framework
  * (http://code.google.com/p/sketch-framework/)
  *
- * Copyright (C) 2010 Marcos Albaladejo Cooper
+ * Copyright (C) 2011 Marcos Albaladejo Cooper
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -29,22 +29,20 @@ define('SESSION_LIFETIME', 0);
 
 /**
  * SketchSession
- *
- * @package Sketch
  */
 class SketchSession extends SketchObject {
-    /**
-     *
-     * @var array
-     */
+    /** @var array */
     private $attributes = array();
 
-    /**
-     *
-     * @var string
-     */
+    /** @var string */
     private $contextName;
 
+    /**
+     * Constructor
+     *
+     * @throws Exception
+     * @param string $session_name
+     */
     function __construct($session_name = 'sketch_session') {
         $context_name = strtr($this->getContext()->getAttribute('name'), '.', '_');
         if (defined('CONTEXT_PREFIX')) {
@@ -80,6 +78,7 @@ class SketchSession extends SketchObject {
     }
 
     /**
+     * Get id
      *
      * @return string
      */
@@ -88,6 +87,7 @@ class SketchSession extends SketchObject {
     }
 
     /**
+     * Get name
      *
      * @return string
      */
@@ -96,6 +96,7 @@ class SketchSession extends SketchObject {
     }
 
     /**
+     * Get context name
      *
      * @return string
      */
@@ -104,14 +105,17 @@ class SketchSession extends SketchObject {
     }
 
     /**
+     * Set context name
      *
-     * @param string $context_name
+     * @param $context_name
+     * @return void
      */
     function setContextName($context_name) {
         $this->contextName = $context_name;
     }
 
     /**
+     * Get attributes
      *
      * @return array
      */
@@ -122,9 +126,10 @@ class SketchSession extends SketchObject {
     }
 
     /**
+     * Get attribute
      *
-     * @param string $key
-     * @return string
+     * @param $key
+     * @return bool
      */
     function getAttribute($key) {
         if (is_array($this->attributes) && array_key_exists($this->contextName, $this->attributes) && array_key_exists($key, $this->attributes[$this->contextName])) {
@@ -133,9 +138,11 @@ class SketchSession extends SketchObject {
     }
 
     /**
+     * Set attribute
      *
-     * @param string $key
-     * @param string $value
+     * @param $key
+     * @param $value
+     * @return void
      */
     function setAttribute($key, $value) {
         if ($value != null) {
@@ -144,6 +151,7 @@ class SketchSession extends SketchObject {
     }
 
     /**
+     * Get ACL
      *
      * @return SketchSessionACL
      */
@@ -152,16 +160,20 @@ class SketchSession extends SketchObject {
     }
 
     /**
+     * Set ACL
      *
      * @param SketchSessionACL $acl
+     * @return void
      */
     function setACL(SketchSessionACL $acl) {
         $this -> setAttribute('__acl', $acl);
     }
 
     /**
+     * Set remember me
      *
-     * @param boolean $remember
+     * @param $remember
+     * @return void
      */
     function setRememberMe($remember) {
         if ($remember) {
@@ -171,9 +183,16 @@ class SketchSession extends SketchObject {
         }
     }
 
+    /**
+     * Invalidate
+     *
+     * @return void
+     */
     function invalidate() {
-        $this->attributes = array(); if (isset($_COOKIE[session_name()])) {
+        $this->attributes = array();
+        if (isset($_COOKIE[session_name()])) {
             setcookie(session_name(), null, time() - 3600, '/');
-        } session_destroy();
+        }
+        session_destroy();
     }
 }

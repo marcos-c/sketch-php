@@ -3,7 +3,7 @@
  * This file is part of the Sketch Framework
  * (http://code.google.com/p/sketch-framework/)
  *
- * Copyright (C) 2010 Marcos Albaladejo Cooper
+ * Copyright (C) 2011 Marcos Albaladejo Cooper
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -26,79 +26,47 @@ require_once 'Sketch/Object.php';
 
 /**
  * SketchRequest
- *
- * @package Sketch
  */
 class SketchRequest extends SketchObject {
-    /**
-     *
-     * @var boolean
-     */
+    /** @var bool */
     private $json;
 
-    /**
-     *
-     * @var string
-     */
+    /** @var null|string */
     private $onForwardReturn = null;
 
-    /**
-     *
-     * @var string
-     */
+    /** @var string */
     private $method;
 
-    /**
-     *
-     * @var boolean
-     */
+    /** @var bool */
     private $redirect;
 
-    /**
-     *
-     * @var string
-     */
+    /** @var string */
     private $serverProtocol;
 
-    /**
-     *
-     * @var string
-     */
+    /** @var string */
     private $serverName;
 
-    /**
-     *
-     * @var integer
-     */
+    /** @var int */
     private $serverPort;
 
-    /**
-     *
-     * @var string
-     */
+    /** @var string */
     private $documentRoot;
 
-    /**
-     *
-     * @var string
-     */
+    /** @var string */
     private $uri;
 
-    /**
-     *
-     * @var string
-     */
+    /** @var string */
     private $resolvedURI;
 
-    /**
-     *
-     * @var array
-     */
+    /** @var array */
     private $attributes = array();
 
     /**
+     * Encode
      *
-     * @param string $string
+     * @static
+     * @throws Exception
+     * @param $string
      * @return string
      */
     private static function encode($string) {
@@ -122,14 +90,19 @@ class SketchRequest extends SketchObject {
         throw new Exception('Wrong ENCODING. Sketch recomends UTF-8 but it can sort of work around ISO-8859-1, please provide a valid ENCODING');
     }
 
+    /**
+     * Constructor
+     */
     function __construct() {
         $this->json = strpos($_SERVER['HTTP_ACCEPT'], 'application/json') !== false;
         $this->method = $_SERVER['REQUEST_METHOD'];
         $this->redirect = isset($_SERVER['REDIRECT_URL']);
         $this->serverProtocol = ($_SERVER['SERVER_PORT'] == 443) ? 'https' : 'http';
         $this->serverName = $_SERVER['SERVER_NAME'];
-        // Can't rely on $_SERVER['DOCUMENT_ROOT'] because it doesn't return what you would
-        // expect on all situations (symbolic links, server configuration, etc.)
+        /**
+         * Can't rely on $_SERVER['DOCUMENT_ROOT'] because it doesn't return what you would expect on all situations
+         * (symbolic links, server configuration, etc.)
+         */
         $this->serverPort = $_SERVER['SERVER_PORT'];
         $this->documentRoot = str_replace($_SERVER['SCRIPT_NAME'], '', realpath(basename($_SERVER['SCRIPT_NAME'])));
         $this->uri = $_SERVER['REQUEST_URI'];
@@ -164,30 +137,35 @@ class SketchRequest extends SketchObject {
     }
 
     /**
+     * Is JSON
      *
-     * @return boolean
+     * @return bool
      */
     function isJSON() {
         return $this->json;
     }
 
     /**
+     * Get on forward return
      *
-     * @return string
+     * @return bool|null|string
      */
     function getOnForwardReturn() {
         return ($this->onForwardReturn != null) ? $this->onForwardReturn : false;
     }
 
     /**
+     * Set on forward return
      *
-     * @param string $on_forward_return
+     * @param $on_forward_return
+     * @return void
      */
     function setOnForwardReturn($on_forward_return) {
         $this->onForwardReturn = $on_forward_return;
     }
 
     /**
+     * Get method
      *
      * @return string
      */
@@ -196,14 +174,16 @@ class SketchRequest extends SketchObject {
     }
 
     /**
+     * Is redirect
      *
-     * @return boolean
+     * @return bool
      */
     function isRedirect() {
         return $this->redirect;
     }
 
     /**
+     * Get server protocol
      *
      * @return string
      */
@@ -212,6 +192,7 @@ class SketchRequest extends SketchObject {
     }
 
     /**
+     * Get server name
      *
      * @return string
      */
@@ -220,22 +201,25 @@ class SketchRequest extends SketchObject {
     }
 
     /**
+     * Get server port
      *
-     * @return integer
+     * @return int
      */
     function getServerPort() {
         return $this->serverPort;
     }
 
     /**
+     * Get document root
      *
-     * @return string
+     * @return mixed|string
      */
     function getDocumentRoot() {
         return $this->documentRoot;
     }
 
     /**
+     * Get URI
      *
      * @return string
      */
@@ -244,6 +228,7 @@ class SketchRequest extends SketchObject {
     }
 
     /**
+     * Get resolved URI
      *
      * @return string
      */
@@ -252,6 +237,7 @@ class SketchRequest extends SketchObject {
     }
 
     /**
+     * Get attributes
      *
      * @return array
      */
@@ -260,9 +246,10 @@ class SketchRequest extends SketchObject {
     }
 
     /**
+     * Get attribute
      *
-     * @param string $key
-     * @return string
+     * @param $key
+     * @return bool
      */
     function getAttribute($key) {
         if (array_key_exists($key, $this->attributes)) {
