@@ -82,8 +82,8 @@ class SketchFormComponentSelectOneRadio extends SketchFormComponent {
                 <? endforeach; ?>
             <? else: ?>
                 <? foreach ($options as $key => $value): ?>
-                    <input type="radio" name="<?=$field_name?>" value="<?=$key?>" <?=(($field_value == $key) ? 'checked="checked"' : '')?><?=$parameters['input']?> />
-                    <?=$value?>
+                    <span style="display:inline-block; margin-bottom: 4px;"><input type="radio" name="<?=$field_name?>" value="<?=$key?>" <?=(($field_value == $key) ? 'checked="checked"' : '')?><?=$parameters['input']?> />
+                    <?=$value?></span><br />
                 <? endforeach; ?>
             <? endif; ?>
         <? else: ?>

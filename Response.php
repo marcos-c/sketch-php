@@ -3,7 +3,7 @@
  * This file is part of the Sketch Framework
  * (http://code.google.com/p/sketch-framework/)
  *
- * Copyright (C) 2011 Marcos Albaladejo Cooper
+ * Copyright (C) 2010 Marcos Albaladejo Cooper
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -27,20 +27,30 @@ require_once 'Sketch/Response/Part.php';
 
 /**
  * SketchResponse
+ *
+ * @package Sketch
  */
 class SketchResponse extends SketchObject {
-    /** @var bool */
+    /**
+     *
+     * @var boolean
+     */
     private $isXHTML = false;
 
-    /** @var bool */
-    private $forceEncoding = true;
+    /**
+     *
+     * @var boolean
+     */
+    private $forceEncoding = false;
 
-    /** @var DOMDocument */
+    /**
+     *
+     * @var DOMDocument
+     */
     protected $document;
 
     /**
-     * HTML
-     *
+     * 
      * @static
      * @return SketchResponse
      */
@@ -51,8 +61,7 @@ class SketchResponse extends SketchObject {
     }
 
     /**
-     * XHTML
-     *
+     * 
      * @static
      * @return SketchResponse
      */
@@ -61,7 +70,6 @@ class SketchResponse extends SketchObject {
     }
 
     /**
-     * To string
      *
      * @return string
      */
@@ -74,54 +82,46 @@ class SketchResponse extends SketchObject {
     }
 
     /**
-     * Get is XHTML
      *
-     * @return bool
+     * @return boolean
      */
     function getIsXHTML() {
         return $this->isXHTML;
     }
 
     /**
-     * Is XHTML
      *
-     * @return bool
+     * @return boolean
      */
     function isXHTML() {
         return $this->getIsXHTML();
     }
 
     /**
-     * Get force encoding
      *
-     * @return bool
+     * @return boolean
      */
     function getForceEncoding() {
         return $this->forceEncoding;
     }
 
     /**
-     * Set force encoding
      *
-     * @param $force_encoding
-     * @return void
+     * @param boolean $force_encoding
      */
     function setForceEncoding($force_encoding) {
         $this->forceEncoding = $force_encoding;
     }
 
     /**
-     * Set is XHTML
      *
-     * @param $is_xhtml
-     * @return void
+     * @param boolean $is_xhtml
      */
     function setIsXHTML($is_xhtml) {
         $this->isXHTML = $is_xhtml;
     }
 
     /**
-     * Get DOMDocument
      *
      * @return DOMDocument
      */
@@ -130,10 +130,8 @@ class SketchResponse extends SketchObject {
     }
 
     /**
-     * Set DOMDocument
      *
      * @param DOMDocument $document
-     * @return void
      */
     function setDocument(DOMDocument $document) {
         $this->document = $document;

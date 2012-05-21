@@ -56,7 +56,7 @@ class SketchFormComponentInputFileWithUploadify extends SketchFormComponent {
             <script type="text/javascript">
                 jQuery(function(){
                     jQuery('#<?=$field_id?>').uploadify({
-                        uploader:'/js/uploadify.swf',
+                        uploader:'/assets/js/uploadify.swf',
                         script:'<?=$this->getForm()->resolveInstanceParameters($uri)?>',
                         scriptData:{'<?=$form_name?>[command]':'<?=$this->getForm()->encodeCommand($command)?>','<?=$this->getSession()->getName()?>':'<?=$this->getSession()->getId()?>'},
                         fileDataName:'<?=$field_name?>',

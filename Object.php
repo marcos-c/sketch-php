@@ -109,7 +109,6 @@ abstract class SketchObject {
     /**
      * Get the locale translator instance
      *
-     * @param string $reference
      * @return SketchLocaleTranslator
      */
     function getTranslator($reference = 'default') {
@@ -119,7 +118,7 @@ abstract class SketchObject {
     /**
      * Get the locale formatter instance
      *
-     * @return SketchLocaleFormatter
+     * @return SketchLocalFormatter
      */
     function getFormatter() {
         return $this->getApplication()->getLocale()->getFormatter();
@@ -128,9 +127,10 @@ abstract class SketchObject {
     /**
      * Extend attributes method
      *
+     * @param array
      * @return array
      */
-    function extend() {
+    final protected function extend() {
         $o = array();
         for ($i = 0; $i < func_num_args(); $i++) {
             $t = func_get_arg($i);
@@ -155,29 +155,6 @@ abstract class SketchObject {
                     }
                 }
                 $o[$key] = $final_value;
-            }
-        }
-        return $o;
-    }
-
-    /**
-     *
-     * @return array
-     */
-    function expand() {
-        $o = array();
-        for ($i = 0; $i < func_num_args(); $i++) {
-            $t = func_get_arg($i);
-            if (is_array($t)) {
-                foreach ($t as $k1 => $v1) {
-                    if (is_array($v1)) {
-                        foreach ($v1 as $k2 => $v2) {
-                            $o[$k1][$k2] = $v2;
-                        }
-                    } else {
-                        $o[$k1] = $v1;
-                    }
-                }
             }
         }
         return $o;

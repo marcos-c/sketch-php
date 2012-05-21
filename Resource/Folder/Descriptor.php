@@ -30,10 +30,6 @@ require_once 'Sketch/Resource.php';
  * @package Sketch
  */
 class SketchResourceFolderDescriptor extends SketchResource {
-    /**
-     *
-     * @var array
-     */
     private static $mimeTypes = array(
         "323" => "text/h323",
         "acx" => "application/internet-property-stream",
@@ -222,7 +218,6 @@ class SketchResourceFolderDescriptor extends SketchResource {
         "z" => "application/x-compress",
         "zip" => "application/zip"
     );
-
     /**
      *
      * @var integer

@@ -38,16 +38,16 @@ abstract class SketchObjectSearchableList extends SketchObjectList {
 
     /**
      *
-     * @var array
+     * @var array 
      */
-    private $searchFilters;
+    private $filters;
 
     /**
      *
      * @return string
      */
     function getSearchText() {
-        if ($this->searchText == null && $this->getUseSessionObject()) {
+        if ($this->getUseSessionObject()) {
             $this->searchText = $this->getSessionObjectAttribute('search_text', $this->searchText);
         }
         return $this->searchText;
@@ -68,41 +68,16 @@ abstract class SketchObjectSearchableList extends SketchObjectList {
      *
      * @return array
      */
-    function getSearchFilters() {
-        if ($this->searchFilters == null && $this->getUseSessionObject()) {
-            $this->searchFilters = $this->getSessionObjectAttribute('search_filters', $this->searchFilters);
-        }
-        return $this->searchFilters;
-    }
-
-    /**
-     *
-     * @param array $search_filters
-     * @return void
-     */
-    function setSearchFilters(array $search_filters) {
-        $this->searchFilters = $search_filters;
-        if ($this->getUseSessionObject()) {
-            $this->setSessionObjectAttribute('search_filters', $search_filters);
-        }
-    }
-
-    /**
-     *
-     * @deprecated
-     * @return array
-     */
     function getFilters() {
-        return $this->getSearchFilters();
+        return $this->filters;
     }
 
     /**
-     *
-     * @deprecated
+     * 
      * @param array $filters
      * @return void
      */
     function setFilters(array $filters) {
-        $this->setSearchFilters($filters);
+        $this->filters = $filters;
     }
 }

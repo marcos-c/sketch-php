@@ -44,12 +44,12 @@ class SketchRouterRewrite extends SketchRouter {
         }
         foreach ($this->getContext()->query('//rewrite/rule') as $r) {
             $t1 = ($r->getAttribute('uri') == $uri);
-            $t2 = ($r->getAttribute('language') == $this->getLocale()->getLanguage());
+            $t2 = in_array($this->getLocale()->getLanguage(), array_map('trim', explode(',', $r->getAttribute('language'))));
             if ($t1 && $t2) {
                 return $base.$r->getCharacterData();
             }
         }
-        throw new Exception('No route found.');
+        throw new Exception(sprintf('Could not resolve route for %s (%s).', $uri, $this->getLocale()->getLanguage()));
     }
 
     /**
@@ -60,11 +60,21 @@ class SketchRouterRewrite extends SketchRouter {
     function getView() {
         $application = $this->getApplication();
         $redirect_url = str_replace($application->getURI(), '', $_SERVER['REDIRECT_URL']);
+        // Set language if present
         if (preg_match('/^\/(\w{2})\/[\w\.]+$/', $redirect_url, $matches)) {
             $application->setLocale(new SketchLocale($matches[1]));
         }
-        list($request_uri) = explode('?', $this->getRequest()->getResolvedURI());
-        preg_match('/[\w\.]+\.php$/', $request_uri, $matches);
-        return $matches[0];
+        foreach ($this->getContext()->query('//rewrite/rule') as $r) {
+            if ($r->getCharacterData() == $redirect_url) {
+                // Rule URIs can have parameters
+                list($request_uri, $parameters) = array_map('trim', explode('?', $r->getAttribute('uri')));
+                foreach (explode('&', $parameters) as $t) {
+                    list($key, $value) = array_map('trim', explode('=', $t));
+                    $this->getRequest()->setAttribute($key, $value);
+                }
+                return $request_uri;
+            }
+        }
+        throw new Exception(sprintf('No route found for %s.', $redirect_url));
     }
 }

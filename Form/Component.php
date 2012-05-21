@@ -40,7 +40,7 @@ abstract class SketchFormComponent extends SketchObject {
      * @param SketchFormView $form
      * @param $arguments
      */
-    final function __construct(SketchFormView $form, $arguments) {
+    function __construct(SketchFormView $form, $arguments) {
         $this->setForm($form);
         $this->setArguments($arguments);
     }
@@ -58,7 +58,7 @@ abstract class SketchFormComponent extends SketchObject {
      *
      * @return null|SketchFormView
      */
-    final protected function getForm() {
+    function getForm() {
         return $this->form;
     }
 
@@ -68,7 +68,7 @@ abstract class SketchFormComponent extends SketchObject {
      * @param SketchFormView $form
      * @return void
      */
-    final protected function setForm(SketchFormView $form) {
+    protected function setForm(SketchFormView $form) {
         $this->form = $form;
     }
 
@@ -77,7 +77,7 @@ abstract class SketchFormComponent extends SketchObject {
      *
      * @return arguments|null
      */
-    final protected function getArguments() {
+    protected function getArguments() {
         return $this->arguments;
     }
 
@@ -87,7 +87,7 @@ abstract class SketchFormComponent extends SketchObject {
      * @param array $arguments
      * @return void
      */
-    final protected function setArguments(array $arguments) {
+    protected function setArguments(array $arguments) {
         $this->arguments = $arguments;
     }
 }

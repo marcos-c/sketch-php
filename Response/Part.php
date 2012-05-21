@@ -3,7 +3,7 @@
  * This file is part of the Sketch Framework
  * (http://code.google.com/p/sketch-framework/)
  *
- * Copyright (C) 2011 Marcos Albaladejo Cooper
+ * Copyright (C) 2010 Marcos Albaladejo Cooper
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -25,45 +25,64 @@
 require_once 'Sketch/Object.php';
 require_once 'Sketch/Utils.php';
 require_once 'Sketch/Response/Exception.php';
-require_once 'Sketch/Response/Part/StopParseException.php';
 
 define('ETAG_LIFETIME', 3600);
 
 /**
- * SketchResponsePart
+ * SketchResponseComponent
+ *
+ * @package Sketch
  */
 class SketchResponsePart extends SketchObject {
-    /** @var null|string */
+    /**
+     *
+     * @var string
+     */
     static private $etag = null;
 
-    /** @var null|\SketchDateTime */
+    /**
+     *
+     * @var SketchDateTime
+     */
     static private $lastModified = null;
 
-    /** @var \DOMDocument */
+    /**
+     *
+     * @var DOMDocument
+     */
     private $document;
 
-    /** @var mixed */
+    /**
+     *
+     * @var string
+     */
     private $relativePath;
 
     /**
-     * Evaluate the response part
      *
+     * @var array
+     */
+    private $attributes = array();
+
+    /**
      * @static
      * @param $file_name
      * @param bool $etag
+     * @param array $attributes
+     * @param bool $update_include_path
      * @return DOMDocument
      */
-    static function evaluate($file_name, $etag = false) {
-        $part = new SketchResponsePart($file_name, $etag);
+    static function evaluate($file_name, $etag = false, $attributes = array(), $update_include_path = false) {
+        $part = new SketchResponsePart($file_name, $etag, $attributes, $update_include_path);
         return $part->getDocument();
     }
 
     /**
-     * Check and make sure that the encoding for the source file is UTF-8
+     * Make sure that the encoding for the source file is UTF-8
      *
-     * @throws Exception
      * @param $source
      * @return string
+     * @throws Exception
      */
     private function encode($source) {
         if (function_exists('mb_detect_encoding')) {
@@ -87,13 +106,12 @@ class SketchResponsePart extends SketchObject {
     }
 
     /**
-     * Constructor
-     *
-     * @throws Exception|SketchResponseException|SketchResponsePartStopParseException
      * @param $file_name
      * @param $etag
+     * @param $attributes
+     * @param $update_include_path
      */
-    private function __construct($file_name, $etag) {
+    private function __construct($file_name, $etag, $attributes, $update_include_path) {
         $document_root = $this->getApplication()->getRequest()->getDocumentRoot();
         if (substr($file_name, 0, 1) == '/') {
             list($request_uri) = explode('?', $this->getRequest()->getResolvedURI());
@@ -111,120 +129,120 @@ class SketchResponsePart extends SketchObject {
             }
         }
         $this->relativePath = str_replace($document_root, '', realpath(dirname($file_name)));
+        // Add to the include path the path to the layout
+        if ($update_include_path && strpos($this->relativePath, get_include_path()) === false) {
+            set_include_path(realpath(dirname($file_name)).PATH_SEPARATOR.get_include_path());
+        }
+        $this->attributes = $attributes;
         if (SketchUtils::Readable($file_name)) {
             try {
                 $response = $this->getController()->getResponse();
                 ob_start();
-                try {
-                    require $file_name;
-                    // Trimming the source before feeding it to the XML parser helps bad formed documents
-                    $source = $response->getForceEncoding() ? $this->encode(trim(ob_get_clean())) : trim(ob_get_clean());
-                    if ($source != '') {
-                        // ETag
-                        if ($etag && self::$etag == null) {
-                            self::$etag = md5(serialize($this->getSession()->getACL()).$source);
-                            self::$lastModified = SketchDateTime::Now();
-                            header('Etag: '.self::$etag);
-                            header('Last-Modified: '.gmdate('D, d M Y H:i:s', self::$lastModified->toUnixTimestamp()).' GMT');
-                            $if_modified_since = new SketchDateTime(strtotime($_SERVER['HTTP_IF_MODIFIED_SINCE']));
-                            if (self::$etag == $_SERVER['HTTP_IF_NONE_MATCH'] && !self::$lastModified->greater($if_modified_since->addInterval(ETAG_LIFETIME.' seconds'))) {
-                                header("HTTP/1.0 304 Not Modified");
-                                exit();
-                            }
+                require $file_name;
+                // Trimming the source before feeding it to the XML parser helps bad formed documents
+                $source = $response->getForceEncoding() ? $this->encode(trim(ob_get_clean())) : trim(ob_get_clean());
+                if ($source != '') {
+                    // ETag
+                    if ($etag && self::$etag == null) {
+                        self::$etag = md5(serialize($this->getSession()->getACL()).$source);
+                        self::$lastModified = SketchDateTime::Now();
+                        header('Etag: '.self::$etag);
+                        header('Last-Modified: '.gmdate('D, d M Y H:i:s', self::$lastModified->toUnixTimestamp()).' GMT');
+                        $if_modified_since = new SketchDateTime(strtotime($_SERVER['HTTP_IF_MODIFIED_SINCE']));
+                        if (self::$etag == $_SERVER['HTTP_IF_NONE_MATCH'] && !self::$lastModified->greater($if_modified_since->addInterval(ETAG_LIFETIME.' seconds'))) {
+                            header("HTTP/1.0 304 Not Modified");
+                            exit();
                         }
-                        libxml_use_internal_errors(true);
-                        $this->document = new DOMDocument();
-                        $this->document->preserveWhiteSpace = false;
-                        $this->document->resolveExternals = false;
-                        if ($response->isXHTML()) {
-                            $i = 0; do {
-                                $this->document->loadXML($source);
-                                $errors = libxml_get_errors();
-                                if (count($errors) > 0) {
-                                    $source_lines = explode("\n", $source);
-                                    foreach ($errors as $error) {
-                                        // Ignore warnings and recoverable errors, throw an exception if anything else
-                                        if (!in_array($error->level, array(LIBXML_ERR_WARNING, LIBXML_ERR_ERROR))) {
-                                            // Try and fix XML_ERR_ENTITYREF_SEMICOL_MISSING and XML_ERR_NAME_REQUIRED before giving up
-                                            if (in_array($error->code, array(XML_ERR_ENTITYREF_SEMICOL_MISSING, XML_ERR_NAME_REQUIRED))) {
-                                                $source_lines[$error->line - 1] = preg_replace('/&(?![A-Za-z0-9#]{1,7};)/', '&amp;', $source_lines[$error->line - 1]);
-                                            } else {
-                                                $exception = new SketchResponseException(trim($error->message).' ('.$error->level.'/'.$error->code.')');
-                                                $j = 1; foreach ($source_lines as $line) {
-                                                    $lc = sprintf('%03d', $j);
-                                                    $exception->addDebugInfo('<div '.(($j++ == $error->line) ? 'style="color: red;"' : '').'>'.$lc.' '.htmlentities($line).'</div>');
-                                                }
-                                                throw $exception;
+                    }
+                    libxml_use_internal_errors(true);
+                    $this->document = new DOMDocument();
+                    $this->document->preserveWhiteSpace = false;
+                    $this->document->resolveExternals = false;
+                    if ($response->isXHTML()) {
+                        $i = 0; do {
+                            $this->document->loadXML($source);
+                            $errors = libxml_get_errors();
+                            if (count($errors) > 0) {
+                                $source_lines = explode("\n", $source);
+                                foreach ($errors as $error) {
+                                    // Ignore warnings and recoverable errors, throw an exception if anything else
+                                    if (!in_array($error->level, array(LIBXML_ERR_WARNING, LIBXML_ERR_ERROR))) {
+                                        // Try and fix XML_ERR_ENTITYREF_SEMICOL_MISSING and XML_ERR_NAME_REQUIRED before giving up
+                                        if (in_array($error->code, array(XML_ERR_ENTITYREF_SEMICOL_MISSING, XML_ERR_NAME_REQUIRED))) {
+                                            $source_lines[$error->line - 1] = preg_replace('/&(?![A-Za-z0-9#]{1,7};)/', '&amp;', $source_lines[$error->line - 1]);
+                                        } else {
+                                            $exception = new SketchResponseException(trim($error->message).' ('.$error->level.'/'.$error->code.')');
+                                            $j = 1; foreach ($source_lines as $line) {
+                                                $lc = sprintf('%03d', $j);
+                                                $exception->addDebugInfo('<div '.(($j++ == $error->line) ? 'style="color: red;"' : '').'>'.$lc.' '.htmlentities($line).'</div>');
                                             }
+                                            throw $exception;
                                         }
                                     }
-                                    $source = implode("\n", $source_lines);
-                                    libxml_clear_errors();
-                                } else break;
-                            } while ($i++ < 4);
-                            $context = new DOMXPath($this->document);
-                            $context->registerNamespace('h', 'http://www.w3.org/1999/xhtml');
-                            $q = $context->query('//h:form');
-                            if ($q instanceof DOMNodeList) foreach ($q as $node) {
-                                $components = SketchForm::getComponents($node->getAttribute('name'));
-                                $class_stack = array();
-                                if (is_array($components)) foreach ($components as $component) {
-                                    $class = get_class($component);
-                                    if (method_exists($component, 'javascript') && !in_array($class, $class_stack)) {
-                                        $script = $this->document->createElementNs('http://www.w3.org/1999/xhtml', 'script');
-                                        $script->setAttribute('type', 'text/javascript');
-                                        $script->appendChild($this->document->createTextNode("\n//"));
-                                        $script->appendChild($this->document->createCDATASection("\n".trim($component->javascript())."\n//"));
-                                        $node->parentNode->insertBefore($script, $node);
-                                        $class_stack[] = $class;
-                                    }
+                                }
+                                $source = implode("\n", $source_lines);
+                                libxml_clear_errors();
+                            } else break;
+                        } while ($i++ < 4);
+                        $context = new DOMXPath($this->document);
+                        $context->registerNamespace('h', 'http://www.w3.org/1999/xhtml');
+                        $q = $context->query('//h:form');
+                        if ($q instanceof DOMNodeList) foreach ($q as $node) {
+                            $components = SketchForm::getComponents($node->getAttribute('name'));
+                            $class_stack = array();
+                            if (is_array($components)) foreach ($components as $component) {
+                                $class = get_class($component);
+                                if (method_exists($component, 'javascript') && !in_array($class, $class_stack)) {
+                                    $script = $this->document->createElementNs('http://www.w3.org/1999/xhtml', 'script');
+                                    $script->setAttribute('type', 'text/javascript');
+                                    $script->appendChild($this->document->createTextNode("\n//"));
+                                    $script->appendChild($this->document->createCDATASection("\n".trim($component->javascript())."\n//"));
+                                    $node->parentNode->insertBefore($script, $node);
+                                    $class_stack[] = $class;
                                 }
                             }
-                        } else {
-                            $this->document->loadHTML($source);
-                            $errors = libxml_get_errors();
-                            foreach ($errors as $error) {
-                                // Ignore warnings and recoverable errors, throw an exception if anything else
-                                if (!in_array($error->level, array(LIBXML_ERR_WARNING, LIBXML_ERR_ERROR))) {
-                                    $exception = new SketchResponseException(trim($error->message).' ('.$error->level.'/'.$error->code.')');
-                                    $i = 1; foreach (explode("\n", htmlspecialchars($source)) as $line) {
-                                        $lc = sprintf('%03d', $i);
-                                        $exception->addDebugInfo('<div '.(($i++ == $error->line) ? 'style="color: red;"' : '').'>'.$lc.' '.$line.'</div>');
-                                    }
-                                    throw $exception;
+                        }
+                    } else {
+                        $this->document->loadHTML($source);
+                        $errors = libxml_get_errors();
+                        foreach ($errors as $error) {
+                            // Ignore warnings and recoverable errors, throw an exception if anything else
+                            if (!in_array($error->level, array(LIBXML_ERR_WARNING, LIBXML_ERR_ERROR))) {
+                                $exception = new SketchResponseException(trim($error->message).' ('.$error->level.'/'.$error->code.')');
+                                $i = 1; foreach (explode("\n", htmlspecialchars($source)) as $line) {
+                                    $lc = sprintf('%03d', $i);
+                                    $exception->addDebugInfo('<div '.(($i++ == $error->line) ? 'style="color: red;"' : '').'>'.$lc.' '.$line.'</div>');
                                 }
+                                throw $exception;
                             }
-                            libxml_clear_errors();
-                            $context = new DOMXPath($this->document);
-                            $q = $context->query('//form');
-                            if ($q instanceof DOMNodeList) foreach ($q as $node) {
-                                $components = SketchForm::getComponents($node->getAttribute('name'));
-                                $class_stack = array();
-                                if (is_array($components)) foreach ($components as $component) {
-                                    $class = get_class($component);
-                                    if (method_exists($component, 'javascript') && !in_array($class, $class_stack)) {
-                                        $script = $this->document->createElement('script');
-                                        $script->setAttribute('type', 'text/javascript');
-                                        $script->appendChild($this->document->createTextNode("\n<!--\n".trim($component->javascript())."\n// -->"));
-                                        $node->parentNode->insertBefore($script, $node);
-                                        $class_stack[] = $class;
-                                    }
+                        }
+                        libxml_clear_errors();
+                        $context = new DOMXPath($this->document);
+                        $q = $context->query('//form');
+                        if ($q instanceof DOMNodeList) foreach ($q as $node) {
+                            $components = SketchForm::getComponents($node->getAttribute('name'));
+                            $class_stack = array();
+                            if (is_array($components)) foreach ($components as $component) {
+                                $class = get_class($component);
+                                if (method_exists($component, 'javascript') && !in_array($class, $class_stack)) {
+                                    $script = $this->document->createElement('script');
+                                    $script->setAttribute('type', 'text/javascript');
+                                    $script->appendChild($this->document->createTextNode("\n<!--\n".trim($component->javascript())."\n// -->"));
+                                    $node->parentNode->insertBefore($script, $node);
+                                    $class_stack[] = $class;
                                 }
                             }
                         }
                     }
-                } catch (SketchResponsePartStopParseException $e) {
-                    $this->document = new DOMDocument();
                 }
             } catch (Exception $e) {
                 ob_get_clean();
                 throw $e;
             }
-        } else throw new Exception();
+        } else throw new Exception($file_name);
     }
 
     /**
-     * Get document
      *
      * @return DOMDocument
      */
@@ -233,16 +251,14 @@ class SketchResponsePart extends SketchObject {
     }
 
     /**
-     * Get relative path
      *
-     * @return mixed
+     * @return string
      */
     function getRelativePath() {
         return $this->relativePath;
     }
 
     /**
-     * Resolve a universal resource locator using the router
      *
      * @param string $uri
      * @return string
@@ -252,7 +268,6 @@ class SketchResponsePart extends SketchObject {
     }
 
     /**
-     * Translate text using the current locale
      *
      * @param string $text
      * @return string
@@ -262,7 +277,6 @@ class SketchResponsePart extends SketchObject {
     }
 
     /**
-     * Escape a text string using the current formatter
      *
      * @param string $string
      * @return string
@@ -272,7 +286,6 @@ class SketchResponsePart extends SketchObject {
     }
 
     /**
-     * Escape a plant text using the current formatter
      *
      * @param string $text
      * @param integer $chars
@@ -296,7 +309,15 @@ class SketchResponsePart extends SketchObject {
     }
 
     /**
-     * Format a number using the current formatter
+     *
+     * @param string $text
+     * @return string
+     */
+    function formatMarkItUpText($text) {
+        return $this->getFormatter()->formatMarkItUpText($text);
+    }
+
+    /**
      *
      * @param float $number
      * @return string
@@ -306,7 +327,6 @@ class SketchResponsePart extends SketchObject {
     }
 
     /**
-     * Format a date using the current formatter
      *
      * @param SketchDateTime $date
      * @return string
@@ -316,10 +336,9 @@ class SketchResponsePart extends SketchObject {
     }
 
     /**
-     * Format a date using the current formatter with the provided time zone
      *
      * @param SketchDateTime $date
-     * @param $time_zone
+     * @param string $time_zone
      * @return string
      */
     function formatDateWithTimeZone(SketchDateTime $date, $time_zone) {
@@ -327,7 +346,6 @@ class SketchResponsePart extends SketchObject {
     }
 
     /**
-     * Format a time using the current formatter
      *
      * @param SketchDateTime $date
      * @return string
@@ -337,7 +355,6 @@ class SketchResponsePart extends SketchObject {
     }
 
     /**
-     * Format a date and time using the current formatter
      *
      * @param SketchDateTime $date
      * @return string
@@ -347,7 +364,6 @@ class SketchResponsePart extends SketchObject {
     }
 
     /**
-     * Format date and time using the current formatter with the provided time zone
      *
      * @param SketchDateTime $date
      * @param string $time_zone
@@ -355,5 +371,27 @@ class SketchResponsePart extends SketchObject {
      */
     function formatDateAndTimeWithTimeZone(SketchDateTime $date, $time_zone) {
         return $this->getFormatter()->formatDateAndTimeWithTimeZone($date, $time_zone);
+    }
+
+    /**
+     *
+     * @return array
+     */
+    function getAttributes() {
+        return $this->attributes;
+    }
+
+    /**
+     *
+     * @param $key
+     * @param string $default
+     * @return string
+     */
+    function getAttribute($key, $default = '') {
+        if (array_key_exists($key, $this->attributes)) {
+            return $this->attributes[$key];
+        } else {
+            return $default;
+        }
     }
 }
