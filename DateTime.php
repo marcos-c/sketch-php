@@ -31,20 +31,19 @@ require_once 'Sketch/DateTime/Exception.php';
  * @package Sketch
  */
 class SketchDateTime extends SketchObject {
-    /**
-     *
-     * @var integer
-     */
+    /** @var \DateTime|null */
     private $dateTime = null;
 
-    /**
-     *
-     * @var array
-     */
+    /** @var string|null */
+    private $dateTimeString = null;
+
+    /** @var array|null */
     private $dateTimeArray = null;
 
     /**
+     * Return the current date and time
      *
+     * @static
      * @return SketchDateTime
      */
     static function Now() {
@@ -52,7 +51,9 @@ class SketchDateTime extends SketchObject {
     }
 
     /**
+     * Return the current date
      *
+     * @static
      * @return SketchDateTime
      */
     static function Today() {
@@ -60,8 +61,9 @@ class SketchDateTime extends SketchObject {
     }
 
     /**
+     * Constructor
      *
-     * @param mixed $date_time
+     * @param null $date_time
      */
     function __construct($date_time = null) {
         if ($date_time instanceof SketchDateTime) {
@@ -88,18 +90,22 @@ class SketchDateTime extends SketchObject {
             }
             if (preg_match('/^((?:19|20)\d{2})-(\d{1,2})-(\d{1,2})(?: (\d{2}):(\d{2}))?(?::(\d{2}))?/', $date_time, $matches)) {
                 if (checkdate($matches[2], $matches[3], $matches[1])) {
-                    $this->dateTime = strtotime("$date_time GMT");
-                    $this->dateTimeArray = array(0, 0, 0, 0, 0, 0);
-                    $count = count($matches) - 1;
-                    for ($i = 0; $i < $count; $i++) {
-                        $this->dateTimeArray[$i] = intval($matches[$i + 1]);
-                    }
+                    $this->dateTime = new DateTime($date_time, new DateTimeZone('GMT'));
+                    $this->dateTimeArray = array(
+                        $this->dateTime->format('Y'),
+                        $this->dateTime->format('n'),
+                        $this->dateTime->format('j'),
+                        $this->dateTime->format('G'),
+                        intval($this->dateTime->format('i')),
+                        intval($this->dateTime->format('s')),
+                    );
                 }
             }
         }
     }
 
     /**
+     * Return the instance as a string
      *
      * @return string
      */
@@ -108,8 +114,32 @@ class SketchDateTime extends SketchObject {
     }
 
     /**
+     * Serialize
      *
-     * @return boolean
+     * @return array
+     */
+    public function __sleep(){
+        if ($this->dateTime instanceof DateTime) {
+            $this->dateTimeString = $this->dateTime->format('c');
+        }
+        return array('dateTimeString', 'dateTimeArray');
+    }
+
+    /**
+     * Unserialize
+     *
+     * @return void
+     */
+    public function __wakeup() {
+        if ($this->dateTimeString != null) {
+            $this->dateTime = new DateTime($this->dateTimeString);
+        }
+    }
+
+    /**
+     * Check if the instance is null
+     *
+     * @return bool
      */
     function isNull() {
         $test = true; if (is_array($this->dateTimeArray)) {
@@ -120,54 +150,49 @@ class SketchDateTime extends SketchObject {
     }
 
     /**
+     * Check if the instance is valid
      *
-     * @return boolean
+     * @return bool
      */
     function isValid() {
         return (!$this->isNull() && $this->dateTime != null);
     }
 
     /**
+     * Check if the instance is greater than another date
      *
      * @param SketchDateTime $date_time
-     * @return boolean
+     * @return bool
      */
     function greater(SketchDateTime $date_time) {
         if ($date_time instanceof SketchDateTime) {
-            return $this->dateTime > $date_time->dateTime;
+            return $this->toUnixTimestamp() > $date_time->toUnixTimestamp();
         } else return false;
     }
 
     /**
-     * 
-     * @param SketchDateTime $from_date_time
-     * @param SketchDateTime $to_date_time
-     * @return boolean
-     */
-    function between(SketchDateTime $from_date_time, SketchDateTime $to_date_time) {
-        return $this->dateTime >= $from_date_time->dateTime && $this->dateTime <= $to_date_time->dateTime;
-    }
-
-    /**
+     * Returned the formatted date
      *
      * @param string $format
-     * @return string
+     * @return null|string
      */
     function toString($format = 'Y-m-d H:i:s T') {
         if ($this->dateTime != null) {
-            return gmdate($format, $this->dateTime);
+            return $this->dateTime->format($format);
         } else return null;
     }
 
     /**
+     * Return the instance as an array
      *
-     * @return array
+     * @return array|null
      */
     function toArray() {
         return $this->dateTimeArray;
     }
 
     /**
+     * Get the instance year
      *
      * @return integer
      */
@@ -176,6 +201,7 @@ class SketchDateTime extends SketchObject {
     }
 
     /**
+     * Return the instance month
      *
      * @return integer
      */
@@ -184,6 +210,7 @@ class SketchDateTime extends SketchObject {
     }
 
     /**
+     * Return the instance day
      *
      * @return integer
      */
@@ -192,50 +219,55 @@ class SketchDateTime extends SketchObject {
     }
 
     /**
+     * Return the instances last day of the month
      *
-     * @return integer
+     * @return null|string
      */
     function getLastDay() {
-        return date('t', $this->dateTime);
+        return $this->toString('t');
     }
 
     /**
+     * Return the instance as a unix timestamp
      *
-     * @return integer
+     * @return null|string
      */
     function toUnixTimestamp() {
-        return $this->dateTime;
+        return $this->toString('U');
     }
 
     /**
+     * Add an interval to the instance
      *
-     * @param string $interval
+     * @param $interval
      * @return SketchDateTime
      */
     function addInterval($interval) {
-        if (preg_match('/^-?\d+ second(s)?$/', $interval)) {
-            return new SketchDateTime(strtotime($interval, $this->dateTime));
-        } else if (preg_match('/^-?\d+ minute(s)?$/', $interval)) {
-            return new SketchDateTime(strtotime($interval, $this->dateTime));
-        } else if (preg_match('/^-?\d+ hour(s)?$/', $interval)) {
-            return new SketchDateTime(strtotime($interval, $this->dateTime));
-        } else if (preg_match('/^-?\d+ day(s)?$/', $interval)) {
-            return new SketchDateTime(strtotime($interval, $this->dateTime));
-        } else if (preg_match('/^-?\d+ month(s)?$/', $interval)) {
-            return new SketchDateTime(strtotime($interval, $this->dateTime));
-        } else if (preg_match('/^-?\d+ week(s)?$/', $interval)) {
-            return new SketchDateTime(strtotime($interval, $this->dateTime));
-        } else if (preg_match('/^next month$/', $interval)) {
-            return new SketchDateTime(strtotime($interval, $this->dateTime));
-        } else if (preg_match('/^last month$/', $interval)) {
-            return new SketchDateTime(strtotime($interval, $this->dateTime));
+        if ($this->dateTime instanceof DateTime) {
+            $clone = clone $this->dateTime;
+            if ($this->dateTime != null) {
+                if (preg_match('/^-?\d+ second(s)?$/', $interval) ||
+                    preg_match('/^-?\d+ minute(s)?$/', $interval) ||
+                    preg_match('/^-?\d+ hour(s)?$/', $interval) ||
+                    preg_match('/^-?\d+ day(s)?$/', $interval) ||
+                    preg_match('/^-?\d+ month(s)?$/', $interval) ||
+                    preg_match('/^-?\d+ week(s)?$/', $interval) ||
+                    preg_match('/^next month$/', $interval) ||
+                    preg_match('/^last month$/', $interval)) {
+                    $clone->modify($interval);
+                }
+            }
+            return new SketchDateTime($clone->format('Y-m-d H:i:s'));
+        } else {
+            return new SketchDateTime();
         }
     }
 
     /**
+     * Substract from the instance another date
      *
      * @param SketchDateTime $date_time
-     * @return integer
+     * @return float
      */
     function substract(SketchDateTime $date_time) {
         $from = new SketchDateTime($this->toString('Y-m-d'));
@@ -244,9 +276,10 @@ class SketchDateTime extends SketchObject {
     }
 
     /**
+     * Check if the instance is equal to another date
      *
      * @param SketchDateTime $date_time
-     * @return boolean
+     * @return bool
      */
     function equals(SketchDateTime $date_time) {
         return ($this->toUnixTimestamp() == $date_time->toUnixTimestamp());
