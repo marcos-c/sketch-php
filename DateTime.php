@@ -139,6 +139,16 @@ class SketchDateTime extends SketchObject {
     }
 
     /**
+     * 
+     * @param SketchDateTime $from_date_time
+     * @param SketchDateTime $to_date_time
+     * @return boolean
+     */
+    function between(SketchDateTime $from_date_time, SketchDateTime $to_date_time) {
+        return $this->dateTime >= $from_date_time->dateTime && $this->dateTime <= $to_date_time->dateTime;
+    }
+
+    /**
      *
      * @param string $format
      * @return string
