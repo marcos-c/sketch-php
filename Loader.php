@@ -3,7 +3,7 @@
  * This file is part of the Sketch Framework
  * (http://code.google.com/p/sketch-framework/)
  *
- * Copyright (C) 2010 Marcos Albaladejo Cooper
+ * Copyright (C) 2011 Marcos Albaladejo Cooper
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -56,7 +56,7 @@ try {
     $application->setSession(new SketchSession());
     if (!($application->getSession()->getACL() instanceof SketchSessionACL)) {
         $acl = new SketchSessionACL();
-        $acl->addRule('guest');
+        $acl->addRole('guest');
         $application->getSession()->setACL($acl);
     }
     // Initialize default locale
@@ -86,11 +86,14 @@ try {
         print $application->getController()->getResponse();
     }
 } catch (Exception $e) {
-    // Can't rely on $_SERVER['DOCUMENT_ROOT'] because it doesn't return what you would
-    // expect on all situations (symbolic links, server configuration, etc.)
+    /**
+     * Can't rely on $_SERVER['DOCUMENT_ROOT'] because it doesn't return what you would expect on all situations
+     * (symbolic links, server configuration, etc.)
+     */
     $server_document_root = str_replace($_SERVER['SCRIPT_NAME'], '', realpath(basename($_SERVER['SCRIPT_NAME'])));
     $file_name = str_replace($server_document_root, '', $e->getFile());
-    if ($application->getContext()->getLayerName() != 'production') {
+    if ($application->getContext()->getLayerName() == 'development') {
+        ob_start();
         print '<pre>';
         print "<b>You have an exception!</b>\n".trim($e->getMessage())."\n<i>Thrown on line ".$e->getLine()." ($file_name)</i>\n";
         print "<b>Trace</b>\n";
@@ -111,12 +114,18 @@ try {
             }
             print "</pre>";
         }
+        if ($application->getRequest()->isJSON()) {
+            print SketchUtils::encodeJSON(array('html' => ob_get_clean()));
+        } else {
+            print ob_get_clean();
+        }
     } else {
-        $parameters = $application->getContext()->getParametersFor('library', 'Stub.php');
-        if ($parameters['send-exceptions-to']['email-address'] != null) {
+        $parameters = $application->getContext()->getParametersFor('library', 'Loader.php');
+        $name = $application->getContext()->getName();
+        if ($parameters['send-exceptions-from']['email-address'] != null && $parameters['send-exceptions-to']['email-address'] != null) {
             ob_start();
             print '<pre>';
-            print "<b>You have an exception!</b>\n".trim($e->getMessage())."\n<i>Thrown on line ".$e->getLine()." ($file_name)</i>\n";
+            print "<b>An exception was thrown in $name!</b>\n".trim($e->getMessage())."\n<i>Thrown on line ".$e->getLine()." ($file_name)</i>\n";
             print "<b>Trace</b>\n";
             foreach ($e->getTrace() as $r) {
                 if (array_key_exists('class', $r) && $r['function'] != 'exceptionErrorHandler') {
@@ -136,10 +145,11 @@ try {
                 print "</pre>";
             }
             $message = new SketchMailMessage();
-            $reply_to = new SketchMailAddress($parameters['send-exceptions-to']['email-address']);
+            $reply_to = new SketchMailAddress($parameters['send-exceptions-from']['email-address']);
             $message->setReplyTo($reply_to);
             $message->setFrom($reply_to);
-            $message->addRecipient(MESSAGE_TO, $reply_to);
+            $to = new SketchMailAddress($parameters['send-exceptions-to']['email-address']);
+            $message->addRecipient(MESSAGE_TO, $to);
             if ($parameters['send-exceptions-to']['email-address-2'] != null) {
                 $message->addRecipient(MESSAGE_CC, new SketchMailAddress($parameters['send-exceptions-to']['email-address-2']));
             }
@@ -152,11 +162,15 @@ try {
             if ($parameters['send-exceptions-to']['email-address-5'] != null) {
                 $message->addRecipient(MESSAGE_CC, new SketchMailAddress($parameters['send-exceptions-to']['email-address-5']));
             }
-            $message->setSubject('Exception in Sketch');
+            $message->setSubject("An exception was thrown in $name!");
             $message->setContent(ob_get_clean());
             SketchMailTransport::sendMessage($message);
         }
-        print "An error has occurred, please try again later.";
+        if ($application->getRequest()->isJSON()) {
+            print SketchUtils::encodeJSON(array('html' => "An error has occurred, please try again later."));
+        } else {
+            print "An error has occurred, please try again later.";
+        }
     }
 }
 exit();
