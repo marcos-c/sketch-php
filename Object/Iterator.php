@@ -24,6 +24,7 @@
 
 require_once 'Sketch/Object.php';
 require_once 'Sketch/Object/EmptyIterator.php';
+require_once 'Sketch/Object/ArrayIterator.php';
 
 /**
  * SketchObjectIterator
