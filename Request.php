@@ -38,12 +38,6 @@ class SketchRequest extends SketchObject {
 
     /**
      *
-     * @var boolean
-     */
-    private $fileUpload;
-
-    /**
-     *
      * @var string
      */
     private $onForwardReturn = null;
@@ -102,6 +96,32 @@ class SketchRequest extends SketchObject {
      */
     private $attributes = array();
 
+    /**
+     *
+     * @param string $string
+     * @return string
+     */
+    private static function encode($string) {
+        if (function_exists('mb_detect_encoding')) {
+            switch (mb_detect_encoding($string, 'UTF-8, ISO-8859-1')) {
+                case 'UTF-8': return $string;
+                case 'ISO-8859-1': return iconv('ISO-8859-1', 'UTF-8', $string);
+            }
+        } else {
+            $list = array('UTF-8', 'ISO-8859-1');
+            foreach ($list as $item) {
+                $sample = iconv($item, $item, $string);
+                if (md5($sample) == md5($string)) {
+                    switch ($item) {
+                        case 'UTF-8': return $string;
+                        case 'ISO-8859-1': return iconv('ISO-8859-1', 'UTF-8', $string);
+                    }
+                }
+            }
+        }
+        throw new Exception('Wrong ENCODING. Sketch recomends UTF-8 but it can sort of work around ISO-8859-1, please provide a valid ENCODING');
+    }
+
     function __construct() {
         $this->json = strpos($_SERVER['HTTP_ACCEPT'], 'application/json') !== false;
         $this->method = $_SERVER['REQUEST_METHOD'];
@@ -115,28 +135,31 @@ class SketchRequest extends SketchObject {
         $this->uri = $_SERVER['REQUEST_URI'];
         $this->resolvedURI = $_SERVER['PHP_SELF'].(($_SERVER['QUERY_STRING'] != null) ? '?'.$_SERVER['QUERY_STRING'] : '');
         $this->attributes = array_merge($_COOKIE, $_GET, $_POST);
-        if (is_array($_FILES) && count($_FILES) > 0) {
-            $this->fileUpload = true;
-            foreach ($_FILES as $file) {
-                foreach ($file['name'] as $form_name => $attributes) {
-                    foreach ($attributes as $attribute => $value) {
-                        $descriptor = new SketchResourceFolderDescriptor();
-                        $descriptor->setReference(base64_decode($attribute));
-                        $descriptor->setFileName($file['tmp_name'][$form_name][$attribute]);
-                        $descriptor->setSourceFileName($value);
-                        $descriptor->setFileType($file['type'][$form_name][$attribute]);
-                        $descriptor->setFileSize($file['size'][$form_name][$attribute]);
-                        if ($descriptor->isImage()) {
-                            list($width, $height) = getimagesize($descriptor->getFileName());
-                            $descriptor->setImageWidth($width);
-                            $descriptor->setImageHeight($height);
-                        }
-                        $this->attributes[$form_name]['attributes'][$attribute] = $descriptor;
+        foreach ($this->attributes as $key => $value) {
+            if (is_array($value)) {
+                array_walk_recursive($value, array('SketchRequest', 'encode'));
+            } else {
+                $value = SketchRequest::encode($value);
+            }
+            $this->attributes[$key] = $value;
+        }
+        if (is_array($_FILES)) foreach ($_FILES as $file) {
+            foreach ($file['name'] as $form_name => $attributes) {
+                foreach ($attributes as $attribute => $value) {
+                    $descriptor = new SketchResourceFolderDescriptor();
+                    $descriptor->setReference(base64_decode($attribute));
+                    $descriptor->setFileName($file['tmp_name'][$form_name][$attribute]);
+                    $descriptor->setSourceFileName($value);
+                    $descriptor->setFileType($file['type'][$form_name][$attribute]);
+                    $descriptor->setFileSize($file['size'][$form_name][$attribute]);
+                    if ($descriptor->isImage()) {
+                        list($width, $height) = getimagesize($descriptor->getFileName());
+                        $descriptor->setImageWidth($width);
+                        $descriptor->setImageHeight($height);
                     }
+                    $this->attributes[$form_name]['attributes'][$attribute] = $descriptor;
                 }
             }
-        } else {
-            $this->fileUpload = false;
         }
     }
 
@@ -146,14 +169,6 @@ class SketchRequest extends SketchObject {
      */
     function isJSON() {
         return $this->json;
-    }
-
-    /**
-     *
-     * @return boolean
-     */
-    function isFileUpload() {
-        return $this->fileUpload;
     }
 
     /**
@@ -246,24 +261,12 @@ class SketchRequest extends SketchObject {
 
     /**
      *
-     * @param $key
-     * @param bool $default
-     * @return bool
+     * @param string $key
+     * @return string
      */
-    function getAttribute($key, $default = false) {
+    function getAttribute($key) {
         if (array_key_exists($key, $this->attributes)) {
             return $this->attributes[$key];
-        } else {
-            return $default;
-        }
-    }
-
-    /**
-     *
-     * @param $key
-     * @param $value
-     */
-    function setAttribute($key, $value) {
-        $this->attributes[$key] = $value;
+        } else return false;
     }
 }
