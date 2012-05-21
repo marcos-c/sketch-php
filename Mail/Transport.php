@@ -33,7 +33,8 @@ require_once 'Sketch/Mail/Message.php';
 class SketchMailTransport extends SketchObject {
     static function sendMessage(SketchMailMessage $message) {
         if ($message->isValid()) {
-            return mail($message->getRecipientHeader(MESSAGE_TO), $message->getSubject(), $message->getContent(), $message->getHeaders());
+            $subject = '=?UTF-8?B?'.base64_encode($message->getSubject()).'?=';
+            return mail($message->getRecipientHeader(MESSAGE_TO), $subject, $message->getContent(), $message->getHeaders());
         } else return false;
     }
 }
