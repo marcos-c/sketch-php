@@ -3,7 +3,7 @@
  * This file is part of the Sketch Framework
  * (http://code.google.com/p/sketch-framework/)
  *
- * Copyright (C) 2010 Marcos Albaladejo Cooper
+ * Copyright (C) 2011 Marcos Albaladejo Cooper
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -25,25 +25,19 @@
 require_once 'Sketch/Object.php';
 
 /**
- * SketchISO
- *
- * @package Sketch
+ * SketchLocaleISO
  */
 class SketchLocaleISO extends SketchObject {
-    /**
-     *
-     * @var array
-     */
+    /** @var array */
     private static $localizedCountries = array();
 
-    /**
-     *
-     * @var array
-     */
+    /** @var array */
     private static $localizedLanguages = array();
 
     /**
+     * Get month names using the current locale
      *
+     * @static
      * @return array
      */
     static function getMonthNames() {
@@ -54,7 +48,9 @@ class SketchLocaleISO extends SketchObject {
     }
 
     /**
+     * Get a list of available countries using the current locale
      *
+     * @static
      * @return array
      */
     static function getCountries() {
@@ -311,13 +307,15 @@ class SketchLocaleISO extends SketchObject {
                 'zm' => $translator->_('Zambia'),
                 'zw' => $translator->_('Zimbabwe')
             );
-            asort(self::$localizedCountries[$locale_string]);
+            asort(self::$localizedCountries);
         }
         return self::$localizedCountries[$locale_string];
     }
 
     /**
+     * Get a list of available languages using the current locale
      *
+     * @static
      * @return array
      */
     static function getLanguages() {
