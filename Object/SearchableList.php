@@ -38,6 +38,12 @@ abstract class SketchObjectSearchableList extends SketchObjectList {
 
     /**
      *
+     * @var array
+     */
+    private $filters;
+
+    /**
+     *
      * @return string
      */
     function getSearchText() {
@@ -56,5 +62,22 @@ abstract class SketchObjectSearchableList extends SketchObjectList {
         if ($this->getUseSessionObject()) {
             $this->setSessionObjectAttribute('search_text', $search_text);
         }
+    }
+
+    /**
+     *
+     * @return array
+     */
+    function getFilters() {
+        return $this->filters;
+    }
+
+    /**
+     *
+     * @param array $filters
+     * @return void
+     */
+    function setFilters(array $filters) {
+        $this->filters = $filters;
     }
 }
