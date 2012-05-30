@@ -61,7 +61,7 @@ class GetTextLocaleTranslatorDriver extends SketchLocaleTranslatorDriver {
             throw new Exception();
         }
         // Revision
-        $input = unpack($byte_order.'1', fread($file, 4));
+        unpack($byte_order.'1', fread($file, 4));
         // Number of bytes
         $input = unpack($byte_order.'1', fread($file, 4));
         $total = $input[1];
@@ -76,6 +76,7 @@ class GetTextLocaleTranslatorDriver extends SketchLocaleTranslatorDriver {
         $original_strings = unpack($byte_order.(2 * $total), fread($file, 8 * $total));
         fseek($file, $tranlation_offset);
         $translation_strings = unpack($byte_order.(2 * $total), fread($file, 8 * $total));
+        $this->data[$domain] = array();
         for($count = 0; $count < $total; ++$count) {
             if ($original_strings[$count * 2 + 1] != 0) {
                 fseek($file, $original_strings[$count * 2 + 2]);
