@@ -53,7 +53,7 @@ class SketchController extends SketchObject {
      */
     function setResponse(SketchResponse $response) {
         $this->response = $response;
-        $this->response->setDocument(SketchResponsePart::evaluate($this->getRouter()->getView(), true));
+        $this->response->setDocument(SketchResponsePart::evaluate($this->getRouter()->getView(), false));
     }
 
     /**
