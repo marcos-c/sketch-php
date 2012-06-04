@@ -427,7 +427,7 @@ class SketchFormView extends SketchObject {
 
     function commandButton($command, $location = null, $label = null, $parameters = null) {
         $label = ($label != null) ? $label : $command;
-        return '<span><button type="button" onclick="return '.$this->command($command, $location).'" '.trim(!strpos(" $parameters", 'class="') ? "$parameters class=\"command-button\"" : $parameters).'>'.$label.'</button></span>';
+        return '<button type="button" onclick="return '.$this->command($command, $location).'" '.trim(!strpos(" $parameters", 'class="') ? "$parameters class=\"command-button\"" : $parameters).'>'.$label.'</button>';
     }
 
     function commandLink($command, $location = null, $label = null, $parameters = null) {
