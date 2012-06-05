@@ -58,7 +58,7 @@ class SketchFormComponentInputFileWithUploadify extends SketchFormComponent {
                         fileDataName:'<?=$field_name?>',
                         auto:true,
                         multi:false,
-                        buttonImg:'/i/browse-files.png',
+                        buttonImg:'/assets/css/jquery-plugin-pack-0.6/browse-files.png',
                         wmode:'transparent',
                         width:106,
                         height:24,
