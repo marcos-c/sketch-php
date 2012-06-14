@@ -360,7 +360,7 @@ class SketchFormView extends SketchObject {
                 $tmp[$matches[2]] = $value;
                 $value = $tmp;
             }
-            if ($instance instanceof SketchObjectView) {
+            if ($instance instanceof SketchObjectView || $instance instanceof SketchResourceFolderDescriptor) {
                 if (method_exists($instance, "set${set}")) {
                     eval('$instance->set'.$set.'($value);');
                     // Make sure that we have the same value inside form attributes
