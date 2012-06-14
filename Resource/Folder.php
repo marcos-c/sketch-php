@@ -24,6 +24,7 @@
 
 require_once 'Sketch/Resource.php';
 require_once 'Sketch/Resource/Folder/Descriptor.php';
+require_once 'Sketch/Resource/Folder/Descriptor/List.php';
 
 define('FORCE_GEOMETRY', 1);
 define('FILL_GEOMETRY', 2);
@@ -169,6 +170,14 @@ class SketchResourceFolder extends SketchResource {
      */
     function getDescriptors() {
         return $this->descriptors;
+    }
+
+    /**
+     *
+     * @return SketchResourceFolderDescriptorList
+     */
+    function getDescriptorList() {
+        return new SketchResourceFolderDescriptorList($this->descriptors);
     }
 
     /**
