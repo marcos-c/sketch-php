@@ -38,6 +38,12 @@ class GetTextLocaleTranslatorDriver extends SketchLocaleTranslatorDriver {
 
     /**
      *
+     * @var array
+     */
+    private $availableLanguages = array();
+
+    /**
+     *
      * @var string
      */
     private $domain = 'default';
@@ -108,6 +114,26 @@ class GetTextLocaleTranslatorDriver extends SketchLocaleTranslatorDriver {
                 $this->setLocaleString($locale_string);
                 $this->readData($folder, $domain);
             }
+            $this->setAvailableLanguages($folder);
+        }
+    }
+
+    /**
+     *
+     * @param $folder
+     */
+    private function setAvailableLanguages($folder) {
+        $this->availableLanguages = array();
+        if (is_dir($this->getApplication()->getDocumentRoot().$folder)) {
+            if ($r = opendir($this->getApplication()->getDocumentRoot().$folder)) {
+                while (($s = readdir($r)) !== false) {
+                    if (is_dir($this->getApplication()->getDocumentRoot().$folder.'/'.$s) && !in_array($s, array('.', '..'))) {
+                        list($language) = explode('_', $s);
+                        $this->availableLanguages[$language] = $language;
+                    }
+                }
+                closedir($r);
+            }
         }
     }
 
@@ -119,5 +145,13 @@ class GetTextLocaleTranslatorDriver extends SketchLocaleTranslatorDriver {
     function translate($text) {
         $md5 = md5($text);
         return (array_key_exists($md5, $this->data[$this->domain])) ? $this->data[$this->domain][$md5] : $text;
+    }
+
+    /**
+     *
+     * @return array
+     */
+    function getAvailableLanguages() {
+        return $this->availableLanguages;
     }
 }

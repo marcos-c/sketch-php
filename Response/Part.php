@@ -380,4 +380,22 @@ class SketchResponsePart extends SketchObject {
             return $default;
         }
     }
+
+    /**
+     *
+     * @param bool $with_descriptions
+     * @return array
+     */
+    function getAvailableLanguages($with_descriptions = false) {
+        if ($with_descriptions) {
+            $iso_languages = SketchLocaleISO::getLanguages();
+            $available_languages = array();
+            foreach ($this->getLocale()->getTranslator()->getDriver()->getAvailableLanguages() as $language) {
+                $available_languages[$language] = $iso_languages[$language];
+            }
+            return $available_languages;
+        } else {
+            return $this->getLocale()->getTranslator()->getDriver()->getAvailableLanguages();
+        }
+    }
 }

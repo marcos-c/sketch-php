@@ -76,4 +76,12 @@ class MySQLLocaleTranslatorDriver extends SketchLocaleTranslatorDriver {
         $md5 = md5($text);
         return (array_key_exists($md5, $this->data[$this->domain])) ? $this->data[$this->domain][$md5] : $text;
     }
+
+    /**
+     *
+     * @return array
+     */
+    function getAvailableLanguages() {
+        return array('es', 'en', 'de');
+    }
 }

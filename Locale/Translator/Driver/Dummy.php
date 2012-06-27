@@ -42,4 +42,12 @@ class DummyLocaleTranslatorDriver extends SketchLocaleTranslatorDriver {
     function translate($text) {
         return $text;
     }
+
+    /**
+     *
+     * @return array
+     */
+    function getAvailableLanguages() {
+        return array('es', 'en', 'de');
+    }
 }

@@ -58,4 +58,11 @@ abstract class SketchLocaleTranslatorDriver extends SketchObject {
      * @return string
      */
     abstract function translate($text);
+
+    /**
+     *
+     * @abstract
+     * @return array
+     */
+    abstract function getAvailableLanguages();
 }
