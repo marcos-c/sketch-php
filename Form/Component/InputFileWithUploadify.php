@@ -59,6 +59,7 @@ class SketchFormComponentInputFileWithUploadify extends SketchFormComponent {
                         auto:true,
                         multi:false,
                         buttonImg:'<?=$this->getApplication()->getURI()?>/assets/css/jquery-plugin-pack-0.6/browse-files.png',
+                        cancelImg:'<?=$this->getApplication()->getURI()?>/assets/css/jquery-plugin-pack-0.6/cancel.png',
                         wmode:'transparent',
                         width:106,
                         height:24,
