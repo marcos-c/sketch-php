@@ -46,6 +46,12 @@ class SketchFactory extends SketchObject {
 
     /**
      *
+     * @var array
+     */
+    static private $metadata = null;
+
+    /**
+     *
      * @return SketchObject
      */
     static function scaffold($table_name, $options = null) {
@@ -64,8 +70,10 @@ class SketchFactory extends SketchObject {
             $table_name = "${prefix}_${table_name}";
             $metadata_table_name = "${prefix}_${metadata_table_name}";
         }
-        $metadata = $connection->getTableDefinition($metadata_table_name);
-        $version = ($metadata['fields']['key'] != null) ? $connection->queryFirst("SELECT value FROM $metadata_table_name WHERE `key` = 'version'") : self::$version;
+        if (!is_array(self::$metadata)) {
+            self::$metadata = $connection->getTableDefinition($metadata_table_name);
+            self::$version = (self::$metadata['fields']['key'] != null) ? $connection->queryFirst("SELECT value FROM $metadata_table_name WHERE `key` = 'version'") : self::$version;
+        }
         if (array_key_exists('class_name', $options)) {
             $class_name = $options['class_name'];
         } else {
@@ -73,7 +81,7 @@ class SketchFactory extends SketchObject {
                 $class_name .= ucfirst($value);
             }
         }
-        return self::scaffoldFrom($version, $class_name, $table_name, $options['prefix'], $options['primary_key'], $options['generate_iterator'], $connection->getTableDefinition($table_name));
+        return self::scaffoldFrom(self::$version, $class_name, $table_name, $options['prefix'], $options['primary_key'], $options['generate_iterator'], $connection->getTableDefinition($table_name));
     }
 
     /**
