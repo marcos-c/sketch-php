@@ -90,8 +90,13 @@ class SketchResponseJSON extends SketchResponse {
                 }
             }
         }
-        // Log
-        $this->log = array();
+        // Log with memory usage and response time
+        $memory_usage = ceil(memory_get_usage() / 1024);
+        $response_time = number_format(microtime(true) - $this->getApplication()->getStartTime(), 3);
+        $this->log = array(
+            'Memory usage: '.$memory_usage.'kb',
+            'Response time: '.$response_time.'seg'
+        );
         foreach ($this->getLogger()->getMessages() as $message) {
             $this->log[] = $message;
         }

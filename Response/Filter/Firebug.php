@@ -76,9 +76,9 @@ class FirebugResponseFilter extends SketchResponseFilter {
                 $script .= "\t\tconsole.log('LIBXML Version: $libxml_version'); ";
                 // Memory usage and response time
                 $memory_usage = ceil(memory_get_usage() / 1024);
-                $script .= "\t\tconsole.log('Memory usage: %dkb', $memory_usage); ";
+                $script .= "\t\tconsole.log('Memory usage: ".$memory_usage."kb'); ";
                 $response_time = number_format(microtime(true) - $this->getApplication()->getStartTime(), 3);
-                $script .= "\t\tconsole.log('Response time: %dseg', $response_time); ";
+                $script .= "\t\tconsole.log('Response time: ".$response_time."seg'); ";
                 break;
         }
         $script .= "\t}";
