@@ -129,15 +129,17 @@ class SketchLocale extends SketchObject {
 
     /**
      *
-     * @return SketchLocaleTranslator 
+     * @param string $reference
+     * @return SketchLocaleTranslator
+     * @throws Exception
      */
     function getTranslator($reference = 'default') {
         if ($this->translator == null) {
             $this->translator = array();
             $drivers = $this->getContext()->query("//driver[@type='SketchLocaleTranslatorDriver']");
             foreach ($drivers as $driver) {
-                $reference = $driver->getAttribute('reference');
-                $reference = $reference != null ? $reference : 'default';
+                $ref = $driver->getAttribute('reference');
+                $ref = $ref != null ? $ref : 'default';
                 $type = $driver->getAttribute('type');
                 $class = $driver->getAttribute('class');
                 $source = $driver->getAttribute('source');
@@ -147,11 +149,11 @@ class SketchLocale extends SketchObject {
                         if (class_exists($class)) {
                             eval('$instance = new '.$class.'(\''.$this->toString().'\', $driver);');
                             if ($instance instanceof $type) {
-                                $this->translator[$reference] = new SketchLocaleTranslator($instance);
+                                $this->translator[$ref] = new SketchLocaleTranslator($instance);
                             } else throw new Exception(sprinf("Driver %s does not extend or implement %s", $class, $type));
                         } else throw new Exception(sprintf("Can't instantiate class %s", $class));
                     } catch (Exception $e) {
-                        $this->translator[$reference] = new SketchLocaleTranslator(new DummyLocaleTranslatorDriver());
+                        $this->translator[$ref] = new SketchLocaleTranslator(new DummyLocaleTranslatorDriver());
                     }
                 } else throw new Exception(sprintf("File %s can't be found", $source));
             }
