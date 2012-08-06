@@ -124,7 +124,7 @@ class SketchFormComponentInputDate extends SketchFormComponent {
                                             day.val(parseInt(new_date[2]));
                                         }
                                     });
-                                <? elseif (in_array($parameters['format'], array('m-Y', 'd-m-Y', 'M-d-Y', 'Y-m-d'))): ?>
+                                <? elseif (in_array($parameters['format'], array('m-Y', 'Y-m', 'd-m-Y', 'M-d-Y', 'Y-m-d'))): ?>
                                     var month = $(':input[name="<?=$field_name?>[month]"]');
                                     var year = $(':input[name="<?=$field_name?>[year]"]');
                                     day.change(function(){
@@ -213,7 +213,7 @@ class SketchFormComponentInputDate extends SketchFormComponent {
                                     }
                                 });
                                 year_month.change();
-                            <? elseif (in_array($parameters['format'], array('m-Y', 'd-m-Y', 'Y-m-d', 'M-d-Y'))): ?>
+                            <? elseif (in_array($parameters['format'], array('m-Y', 'Y-m', 'd-m-Y', 'Y-m-d', 'M-d-Y'))): ?>
                                 var month = $(':input[name="<?=$field_name?>[month]"]');
                                 var year = $(':input[name="<?=$field_name?>[year]"]');
                                 month.change(function(){
@@ -340,7 +340,7 @@ class SketchFormComponentInputDate extends SketchFormComponent {
             } else {
                 return '<input type="hidden" name="'.$field_name.'[day]" value="1" />'.$year_month_selector.$calendar;
             }
-        } elseif (in_array($parameters['format'], array('m-Y', 'd-m-Y', 'Y-m-d', 'M-d-Y'))) {
+        } elseif (in_array($parameters['format'], array('m-Y', 'Y-m', 'd-m-Y', 'Y-m-d', 'M-d-Y'))) {
             $month_selector = $this->getMonthSelector($field_name, $parameters, $months[$year], $month);
             if ($parameters['inverse']) $years = array_reverse($years, true);
             $year_selector = $this->getYearSelector($field_name, $parameters, $years, $year);
@@ -350,6 +350,8 @@ class SketchFormComponentInputDate extends SketchFormComponent {
                 return $month_selector.$this->getDaySelector($field_name, $parameters, $days, $day).$year_selector.$calendar;
             } elseif ($parameters['format'] == 'Y-m-d') {
                 return $year_selector.$month_selector.$this->getDaySelector($field_name, $parameters, $days, $day).$calendar;
+            } elseif ($parameters['format'] == 'Y-m') {
+                return $year_selector.$month_selector.'<input type="hidden" name="'.$field_name.'[day]" value="1" />'.$calendar;
             } else {
                 return $month_selector.'<input type="hidden" name="'.$field_name.'[day]" value="1" />'.$year_selector.$calendar;
             }
