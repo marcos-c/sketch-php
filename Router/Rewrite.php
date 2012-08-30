@@ -32,10 +32,15 @@ require_once 'Sketch/Router.php';
 class SketchRouterRewrite extends SketchRouter {
     /**
      *
-     * @param string $uri
+     * @param $uri
+     * @param null $language
      * @return string
+     * @throws Exception
      */
-    function resolve($uri) {
+    function resolve($uri, $language = null) {
+        if ($language == null) {
+            $language = $this->getLocale()->getLanguage();
+        }
         // If relative path
         if (substr($uri, 0, 1) != DIRECTORY_SEPARATOR) {
             $base = rtrim(dirname($this->getRequest()->getResolvedURI()), DIRECTORY_SEPARATOR);
@@ -44,12 +49,12 @@ class SketchRouterRewrite extends SketchRouter {
         }
         foreach ($this->getContext()->query('//rewrite/rule') as $r) {
             $t1 = ($r->getAttribute('uri') == $uri);
-            $t2 = in_array($this->getLocale()->getLanguage(), array_map('trim', explode(',', $r->getAttribute('language'))));
+            $t2 = in_array($language, array_map('trim', explode(',', $r->getAttribute('language'))));
             if ($t1 && $t2) {
                 return $base.$r->getCharacterData();
             }
         }
-        throw new Exception(sprintf('Could not resolve route for %s (%s).', $uri, $this->getLocale()->getLanguage()));
+        throw new Exception(sprintf('Could not resolve route for %s (%s).', $uri, $language));
     }
 
     /**

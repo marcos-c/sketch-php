@@ -263,8 +263,8 @@ class SketchResponsePart extends SketchObject {
      * @param string $uri
      * @return string
      */
-    function routerResolve($uri) {
-        return $this->getController()->getRouter()->resolve($uri);
+    function routerResolve($uri, $language = null) {
+        return $this->getController()->getRouter()->resolve($uri, $language);
     }
 
     /**
