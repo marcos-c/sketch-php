@@ -85,6 +85,7 @@ class SketchResourceFolder extends SketchResource {
         if ($parent_id = $this->getParentId()) {
             $table = $this->getName();
             foreach ($connection->executeQuery("SELECT * FROM $table WHERE parent_id = $parent_id ORDER BY source_file_name") as $current) {
+                $current['table_name'] = $this->name;
                 $this->descriptors[$current['reference']] = new SketchResourceFolderDescriptor($current);
             }
         }
@@ -290,17 +291,35 @@ class SketchResourceFolder extends SketchResource {
      */
     function updateDescriptor(SketchResourceFolderDescriptor $descriptor) {
         $connection = $this->getConnection();
-        $table_name = $this->getName();
-        $reference = $connection->escapeString($descriptor->getReference());
-        $caption = $connection->escapeString($descriptor->getCaption());
-        $tags = $connection->escapeString($descriptor->getTags());
-        return $connection->executeUpdate("UPDATE $table_name SET caption = '$caption', tags = '$tags' WHERE reference = '$reference'");
+        $descriptor_id = $descriptor->getId(0);
+        $table_name = $descriptor->getTableName();
+        $data = array();
+        foreach ($descriptor->getData() as $key => $value) {
+            list($key, $language) = explode('|', $key);
+            $data[$language][$key] = $value;
+        }
+        $test = true;
+        foreach ($data as $language => $r) {
+            foreach ($r as $key => $value) {
+                switch ($key) {
+                    case 'caption':
+                        $caption = $connection->escapeString($value);
+                        break;
+                    case 'tags':
+                        $tags = $connection->escapeString($value);
+                        break;
+                }
+            }
+            $test = $test && $connection->executeUpdate("REPLACE INTO ${table_name}_data (descriptor_id, `language`, caption, tags) VALUES ($descriptor_id, '$language', '$caption', '$tags')");
+        }
+        return $test;
     }
 
     /**
      *
-     * @param string $reference
-     * @return boolean
+     * @param $reference
+     * @return bool
+     * @throws Exception
      */
     function removeDescriptor($reference) {
         $connection = $this->getConnection();
@@ -335,6 +354,7 @@ class SketchResourceFolder extends SketchResource {
         $table = $this->getName();
         $descriptors = array();
         foreach ($connection->executeQuery("SELECT * FROM $table") as $current) {
+            $current['table_name'] = $this->getName();
             $descriptor = new SketchResourceFolderDescriptor($current);
             $descriptors[] = $descriptor->getFileName();
         }

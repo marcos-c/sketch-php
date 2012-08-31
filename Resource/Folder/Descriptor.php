@@ -279,16 +279,15 @@ class SketchResourceFolderDescriptor extends SketchResource {
     private $imageHeight;
 
     /**
-     *
      * @var string
      */
-    private $caption;
+    private $tableName;
 
     /**
      *
-     * @var string
+     * @var array
      */
-    private $tags;
+    private $data;
 
     /**
      *
@@ -304,8 +303,7 @@ class SketchResourceFolderDescriptor extends SketchResource {
         $this->setFileSize($parameters['file_size']);
         $this->setImageWidth($parameters['image_width']);
         $this->setImageHeight($parameters['image_height']);
-        $this->setCaption($parameters['caption']);
-        $this->setTags($parameters['tags']);
+        $this->setTableName($parameters['table_name']);
     }
 
     /**
@@ -488,33 +486,46 @@ class SketchResourceFolderDescriptor extends SketchResource {
 
     /**
      *
-     * @return string
+     * @param $table_name
      */
-    function getCaption() {
-        return $this->caption;
-    }
-
-    /**
-     *
-     * @param string $caption
-     */
-    function setCaption($caption) {
-        $this->caption = $caption;
+    function setTableName($table_name) {
+        $this->tableName = $table_name;
     }
 
     /**
      *
      * @return string
      */
-    function getTags() {
-        return $this->tags;
+    function getTableName() {
+        return $this->tableName;
     }
 
     /**
      *
-     * @param string $tags
+     * @param array $data
      */
-    function setTags($tags) {
-        $this->tags = $tags;
+    function setData($data) {
+        $this->data = $data;
+    }
+
+    private function queryData() {
+        $connection = $this->getConnection();
+        $table_name = $this->getTableName();
+        $descriptor_id = $this->getId(0);
+        foreach ($connection->query("SELECT * FROM ${table_name}_data WHERE descriptor_id = $descriptor_id") as $r) {
+            $this->data['caption|'.$r['language']] = $r['caption'];
+            $this->data['tags|'.$r['language']] = $r['tags'];
+        }
+    }
+
+    /**
+     *
+     * @return array
+     */
+    function getData() {
+        if ($this->data == null) {
+            $this->queryData();
+        }
+        return $this->data;
     }
 }

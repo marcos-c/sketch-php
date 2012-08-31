@@ -217,6 +217,7 @@ class SketchFormView extends SketchObject {
                         if (method_exists($this->instance, "addDescriptor") && (is_array($this->form) && array_key_exists('attributes', $this->form) && is_array($this->form['attributes']))) {
                             foreach ($this->form['attributes'] as $attribute => $value) {
                                 if ($value instanceof SketchResourceFolderDescriptor) {
+                                    $value->setTableName($this->getInstance()->getFolder()->getTableName());
                                     eval('$this->instance->addDescriptor($value);');
                                 }
                             }
