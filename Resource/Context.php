@@ -40,6 +40,12 @@ class SketchResourceContext extends SketchResourceXML {
      *
      * @var string
      */
+    private $version = '1.0';
+
+    /**
+     *
+     * @var string
+     */
     private $locale;
 
     /**
@@ -65,6 +71,9 @@ class SketchResourceContext extends SketchResourceXML {
                     foreach ($document->documentElement->attributes as $attribute) {
                         if ($attribute->name == 'name') {
                             $this->setName($attribute->value);
+                            $root->setAttribute($attribute->name, $attribute->value);
+                        } else if ($attribute->name == 'version') {
+                            $this->setVersion($attribute->value);
                             $root->setAttribute($attribute->name, $attribute->value);
                         } else if ($attribute->name == 'layer') {
                             $this->setLayerName($attribute->value);
@@ -106,6 +115,26 @@ class SketchResourceContext extends SketchResourceXML {
         $context = $this->document->getElementsByTagName('context')->item(0);
         if ($context instanceof DOMElement) {
             $context->setAttribute('name', $name);
+        }
+    }
+
+    /**
+     *
+     * @return string
+     */
+    function getVersion() {
+        return $this->version;
+    }
+
+    /**
+     *
+     * @param string $version
+     */
+    function setVersion($version) {
+        $this->version = $version;
+        $context = $this->document->getElementsByTagName('context')->item(0);
+        if ($context instanceof DOMElement) {
+            $context->setAttribute('version', $version);
         }
     }
 
