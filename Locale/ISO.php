@@ -57,7 +57,7 @@ class SketchLocaleISO extends SketchObject {
      *
      * @return array
      */
-    static function getCountries() {
+    static function getCountries($filter = null) {
         $application = SketchApplication::getInstance();
         $locale = $application->getLocale();
         $translator = ($locale instanceof SketchLocale) ? $locale->getTranslator() : new SketchLocaleTranslator(new DummyLocaleTranslatorDriver());
@@ -313,7 +313,11 @@ class SketchLocaleISO extends SketchObject {
             );
             asort(self::$localizedCountries[$locale_string]);
         }
-        return self::$localizedCountries[$locale_string];
+        if (is_array($filter)) {
+            return array_intersect_key(self::$localizedCountries[$locale_string], array_flip($filter));
+        } else {
+            return self::$localizedCountries[$locale_string];
+        }
     }
 
     /**
