@@ -87,15 +87,20 @@ abstract class SketchObjectIterator extends SketchObject implements Iterator {
 
     /**
      *
+     * @param bool $full
      * @return array
      */
-    final function toArray() {
+    final function toArray($full = true) {
         $output = array();
         $copy_of_this = clone $this;
         $copy_of_this->rewind();
         foreach ($copy_of_this as $record) {
             if ($record instanceof SketchObjectView) {
-                $output[$record->getViewId()] = $record;
+                if ($full) {
+                    $output[$record->getViewId()] = $record;
+                } else {
+                    $output[$record->getViewId()] = method_exists($record, '__toString') ? $record->__toString() : (method_exists($record, 'getDefaultDescription') ? $record->getDefaultDescription() : $record->getDescription());
+                }
             } else {
                 $output[] = $record;
             }
