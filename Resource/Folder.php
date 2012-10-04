@@ -299,19 +299,21 @@ class SketchResourceFolder extends SketchResource {
             $data[$language][$key] = $value;
         }
         $test = true;
-        foreach ($data as $language => $r) {
-            foreach ($r as $key => $value) {
-                switch ($key) {
-                    case 'caption':
-                        $caption = $connection->escapeString($value);
-                        break;
-                    case 'tags':
-                        $tags = $connection->escapeString($value);
-                        break;
+        try {
+            foreach ($data as $language => $r) {
+                foreach ($r as $key => $value) {
+                    switch ($key) {
+                        case 'caption':
+                            $caption = $connection->escapeString($value);
+                            break;
+                        case 'tags':
+                            $tags = $connection->escapeString($value);
+                            break;
+                    }
                 }
+                $test = $test && $connection->executeUpdate("REPLACE INTO ${table_name}_data (descriptor_id, `language`, caption, tags) VALUES ($descriptor_id, '$language', '$caption', '$tags')");
             }
-            $test = $test && $connection->executeUpdate("REPLACE INTO ${table_name}_data (descriptor_id, `language`, caption, tags) VALUES ($descriptor_id, '$language', '$caption', '$tags')");
-        }
+        } catch (Exception $e) {}
         return $test;
     }
 
