@@ -512,6 +512,7 @@ class SketchResourceFolderDescriptor extends SketchResource {
         $connection = $this->getConnection();
         $table_name = $this->getTableName();
         $descriptor_id = $this->getId(0);
+        $this->data = array();
         foreach ($connection->query("SELECT * FROM ${table_name}_data WHERE descriptor_id = $descriptor_id") as $r) {
             $this->data['caption|'.$r['language']] = $r['caption'];
             $this->data['tags|'.$r['language']] = $r['tags'];
