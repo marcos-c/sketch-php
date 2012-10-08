@@ -197,13 +197,13 @@ class SketchFormComponentInputDateOld extends SketchFormComponent {
             $from_year_month = sprintf('%04d%02d', $from_year, $from_month);
             $from_day = ($from_year_month == $year_month) ? intval(date('d')) : 1;
             if ($from_day > date('t')) $from_day = 1;
-            $count = 24;
+            $count = 12;
         } else {
             $from_year = intval(date('Y')) - floor($parameters['input-date-year-month-count'] / 24);
             $from_month = $from_day = 1;
             $count = $parameters['input-date-year-month-count'];
         }
-        $stamp = mktime(12, 0, 0, $count, 15, $from_year);
+        $stamp = mktime(12, 0, 0, $from_month + $count, 15, $from_year);
         $last_year = date('Y', $stamp);
         $last_month = date('m', $stamp);
         $last_day = date('t', $stamp);
@@ -212,7 +212,7 @@ class SketchFormComponentInputDateOld extends SketchFormComponent {
         } else {
             $months = array(); $month_days = array();
         }
-        for ($i = $from_month; $i <= $count; $i++) {
+        for ($i = $from_month; $i <= $from_month + $count; $i++) {
             $stamp = mktime(12, 0, 0, $i, 15, $from_year);
             $syear = date('Y', $stamp);
             $month_days[$syear.date('m', $stamp)] = date('t', $stamp);
@@ -226,7 +226,7 @@ class SketchFormComponentInputDateOld extends SketchFormComponent {
         ob_start(); ?>
     <select id="<?=$field_name?>[day]" name="<?=$field_name?>[day]" onchange="<? if ($parameters['onchange'] != null): ?><?=$parameters['onchange']?><? else: ?><?=$form_name?>OnDayChange('<?=$field_name?>', <?=$from_field_name?>, <?=$to_field_name?>, <?=$nights_field_name?>)<? endif; ?>"<?=$parameters['input-date-day'].$disabled?>>
         <? foreach ($days as $key => $value): ?>
-        <option value="<?=htmlspecialchars($key)?>" <?=(($day == $key) ? 'selected="selected" class="select-option selected"' : 'class="select-option"')?>><?=htmlspecialchars($value)?></option>
+            <option value="<?=htmlspecialchars($key)?>" <?=(($day == $key) ? 'selected="selected" class="select-option selected"' : 'class="select-option"')?>><?=htmlspecialchars($value)?></option>
         <? endforeach; ?>
     </select>
     <?php $day_selector = ob_get_clean();
@@ -236,7 +236,7 @@ class SketchFormComponentInputDateOld extends SketchFormComponent {
         ob_start(); ?>
     <select name="<?=$field_name?>[year_month]" onchange="<? if ($parameters['onchange'] != null): ?><?=$parameters['onchange']?><? else: ?><?=$form_name?>OnMonthChange('<?=$field_name?>', <?=$from_field_name?>, <?=$to_field_name?>, <?=$nights_field_name?>)<? endif; ?>"<?=$parameters['input-date-year-month'].$disabled?>>
         <? foreach ($months as $key => $value): ?>
-        <option value="<?=htmlspecialchars($key)?>" <?=(($year_month == $key) ? 'selected="selected" class="select-option selected"' : 'class="select-option"')?>><?=htmlspecialchars($value)?></option>
+            <option value="<?=htmlspecialchars($key)?>" <?=(($year_month == $key) ? 'selected="selected" class="select-option selected"' : 'class="select-option"')?>><?=htmlspecialchars($value)?></option>
         <? endforeach; ?>
     </select>
     <?php $year_month_selector = ob_get_clean();
