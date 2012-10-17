@@ -531,4 +531,44 @@ class SketchResourceFolderDescriptor extends SketchResource {
         }
         return $this->data;
     }
+
+    /**
+     *
+     * @return mixed
+     */
+    function getCaptionCL() {
+        if ($this->data == null) {
+            $this->queryData();
+        }
+        return $this->data['caption|'.$this->getLocale()->getLanguage()];
+    }
+
+    /**
+     *
+     * @deprecated
+     * @return mixed
+     */
+    function getCaption() {
+        return $this->getCaptionCL();
+    }
+
+    /**
+     *
+     * @return string
+     */
+    function getTagsCL() {
+        if ($this->data == null) {
+            $this->queryData();
+        }
+        return $this->data['caption|'.$this->getLocale()->getLanguage()];
+    }
+
+    /**
+     *
+     * @deprecated
+     * @return mixed
+     */
+    function getTags() {
+        return $this->getTagsCL();
+    }
 }
