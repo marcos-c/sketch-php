@@ -68,14 +68,16 @@ abstract class SketchObjectView extends SketchObject {
      *
      * @param string $key
      * @param string $default
+     * @param bool $global
      * @return string
      */
-    protected final function getSessionObjectAttribute($key, $default) {
+    protected final function getSessionObjectAttribute($key, $default, $global = false) {
         $session = $this->getSession();
         $data = $session->getAttribute('__list');
-        if (is_array($data) && array_key_exists($this->getViewName(), $data)) {
-            if (array_key_exists($key, $data[$this->getViewName()])) {
-                return $data[$this->getViewName()][$key];
+        $view_name = ($global) ? '__global' : $this->getViewName();
+        if (is_array($data) && array_key_exists($view_name, $data)) {
+            if (array_key_exists($key, $data[$view_name])) {
+                return $data[$view_name][$key];
             }
         }
         return $default;
@@ -83,18 +85,24 @@ abstract class SketchObjectView extends SketchObject {
 
     /**
      *
-     * @param <type> $key
-     * @param <type> $value
+     * @param $key
+     * @param $value
+     * @param bool $global
+     * @return void
+     * @internal param $ <type> $key
+     * @internal param $ <type> $value
      */
-    protected final function setSessionObjectAttribute($key, $value) {
+    protected final function setSessionObjectAttribute($key, $value, $global = false) {
         $session = $this->getSession();
         $data = $session->getAttribute('__list');
-        $data[$this->getViewName()][$key] = $value;
+        $view_name = ($global) ? '__global' : $this->getViewName();
+        $data[$view_name][$key] = $value;
         $session->setAttribute('__list', $data);
     }
 
     /**
      *
+     * @param bool $default
      * @return string
      */
     final function getViewId($default = false) {
@@ -119,6 +127,7 @@ abstract class SketchObjectView extends SketchObject {
 
     /**
      *
+     * @param bool $default
      * @return mixed
      */
     final function getId($default = false) {
