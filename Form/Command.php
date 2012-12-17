@@ -36,7 +36,7 @@ class SketchFormCommand extends SketchObject {
 
     private $targetForError = false;
 
-    final function __construct($command = null) {
+    final function __construct() {
         $a = func_get_args();
         if (array_key_exists(0, $a)) {
             if (is_array($a[0])) {

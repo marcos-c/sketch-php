@@ -258,7 +258,7 @@ class SketchFormView extends SketchObject {
                 case 'SketchFormCommandPropagate': $alias = 'sfcp'; break;
                 case 'SketchFormCommand': $alias = 'sfc'; break;
             }
-            return $alias.':'.$mixed->getCommand().':'.base64_encode(serialize($mixed->getParameters())).':'.($mixed->getTargetForError() ? '1': '0');
+            return $alias.':'.$mixed->getCommand().':'.base64_encode(serialize($mixed->getParameters())).':'.($mixed->getTargetForError() ? $mixed->getTargetForError() : '0');
         } else {
             return $mixed;
         }
