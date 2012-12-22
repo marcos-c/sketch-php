@@ -39,7 +39,10 @@ class SketchFormComponentInputTime extends SketchFormComponent {
             'null-text' => '...',
             'daylight-hours-only' => false,
             'working-hours-only' => false,
+            'from-hour' => 0,
+            'till-hour' => 23,
             'minutes-step' => 1,
+            '24-hours' => false,
             'span' => array('id' => null, 'class' => 'input-time', 'style' => null),
             'input-time' => array('id' => null, 'class' => 'input-time', 'style' => null),
             'input-time-hour' => array('id' => null, 'class' => 'input-time-hour', 'style' => null),
@@ -50,18 +53,40 @@ class SketchFormComponentInputTime extends SketchFormComponent {
         if ($field_value instanceof SketchDateTime) list($year, $month, $day, $hour, $minute) = $field_value->toArray();
         $disabled = ($parameters['disabled'] !== false) ? ' disabled="disabled"' : '';
         if ($parameters['daylight-hours-only'] !== false) {
-            $hours = array(5 => '5 am', 6 => '6 am', 7 => '7 am', 8 => '8 am', 9 => '9 am', 10 => '10 am', 11 => '11 am', 12 => '12 pm', 13 => '1 pm', 14 => '2 pm', 15 => '3 pm', 16 => '4 pm', 17 => '5 pm', 18 => '6 pm', 19 => '7 pm');
+            $parameters['from-hour'] = 5;
+            $parameters['till-hour'] = 19;
         } else if ($parameters['working-hours-only'] !== false) {
-            $hours = array(9 => '9 am', 10 => '10 am', 11 => '11 am', 12 => '12 pm', 13 => '1 pm', 14 => '2 pm', 15 => '3 pm', 16 => '4 pm', 17 => '5 pm', 18 => '6 pm', 19 => '7 pm', 20 => '8 pm', 21 => '9 pm');
-        } else {
-            $hours = array(1 => '1 am', 2 => '2 am', 3 => '3 am', 4 => '4 am', 5 => '5 am', 6 => '6 am', 7 => '7 am', 8 => '8 am', 9 => '9 am', 10 => '10 am', 11 => '11 am', 12 => '12 pm', 13 => '1 pm', 14 => '2 pm', 15 => '3 pm', 16 => '4 pm', 17 => '5 pm', 18 => '6 pm', 19 => '7 pm', 20 => '8 pm', 21 => '9 pm', 22 => '10 pm', 23 => '11 pm', 0 => '12 pm');
+            $parameters['from-hour'] = 9;
+            $parameters['till-hour'] = 21;
         }
-        $options = ($parameters['null']) ? array(null => $parameters['null-text']) : array();
-        foreach ($hours as $key => $value) {
-            list($key_hour, $period) = explode(' ', $value);
-            foreach (range(0, 59, $parameters['minutes-step']) as $i) {
-                $new_key = sprintf('%02s', $key).':'.sprintf('%02s', $i);
-                $options[$new_key] = htmlspecialchars(sprintf('%s:%02s %s', $key_hour, $i, $period));
+        if ($parameters['24-hours']) {
+            $hours = array();
+            for ($i = $parameters['from-hour']; $i <= $parameters['till-hour']; $i++) {
+                $hours[$i] = $i;
+            }
+            $options = ($parameters['null']) ? array(null => $parameters['null-text']) : array();
+            foreach ($hours as $key => $value) {
+                foreach (range(0, 59, $parameters['minutes-step']) as $i) {
+                    $new_key = sprintf('%02d:%02d', $key, $i);
+                    $options[$new_key] = htmlspecialchars($new_key);
+                }
+            }
+        } else {
+            $hours = array();
+            for ($i = $parameters['from-hour']; $i <= $parameters['till-hour']; $i++) {
+                if ($i == 0) {
+                    $hours[$i] = "12 am";
+                } else {
+                    $hours[$i] = ($i >= 12) ? (($i > 12) ? $i - 12 : $i).' pm' : "$i am";
+                }
+            }
+            $options = ($parameters['null']) ? array(null => $parameters['null-text']) : array();
+            foreach ($hours as $key => $value) {
+                list($key_hour, $period) = explode(' ', $value);
+                foreach (range(0, 59, $parameters['minutes-step']) as $i) {
+                    $new_key = sprintf('%02d:%02d', $key, $i);
+                    $options[$new_key] = sprintf('%d:%02d %s', $key_hour, $i, $period);
+                }
             }
         }
         ob_start(); ?>
