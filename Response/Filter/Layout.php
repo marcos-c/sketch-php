@@ -87,14 +87,16 @@ class LayoutResponseFilter extends SketchResponseFilter {
     /**
      *
      * @param SketchResourceXML $resource
+     * @param $uri
+     * @throws Exception
      */
-    function apply(SketchResourceXML $resource) {
+    function applyForURI(SketchResourceXML $resource, $uri) {
         $layout_path = null;
         $attributes = array();
         if ($this->getContext()->getLayerName() != 'installer') {
             foreach ($resource->query("//layout[@for][@class][@source]") as $layout) {
                 $for = $layout->getAttribute('for');
-                if (strpos($this->getRequest()->getResolvedURI(), $for) !== false) {
+                if (strpos($uri, $for) !== false) {
                     $context = $this->getContext();
                     $class = $layout->getAttribute('class');
                     $source = $layout->getAttribute('source');
@@ -112,7 +114,7 @@ class LayoutResponseFilter extends SketchResponseFilter {
         }
         foreach ($resource->query("//layout[@for][not(@class)]") as $layout) {
             $for = $layout->getAttribute('for');
-            if (strpos($this->getRequest()->getResolvedURI(), $for) !== false) {
+            if (strpos($uri, $for) !== false) {
                 $layout_path = $layout->getCharacterData();
             }
         }
@@ -199,5 +201,13 @@ class LayoutResponseFilter extends SketchResponseFilter {
                 }
             }
         }
+    }
+
+    /**
+     *
+     * @param SketchResourceXML $resource
+     */
+    function apply(SketchResourceXML $resource) {
+        $this->applyForURI($resource, $this->getRequest()->getResolvedURI());
     }
 }
