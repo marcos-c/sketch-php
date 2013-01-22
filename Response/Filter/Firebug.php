@@ -99,7 +99,7 @@ class FirebugResponseFilter extends SketchResponseFilter {
             if ($q instanceof DOMNodeList) foreach ($q as $node) {
                 $element = $document->createElement('script');
                 $element->setAttribute('type', 'text/javascript');
-                $element->appendChild($document->createTextNode("\n<!--\n".trim($script)."\n// -->"));
+                $element->appendChild($document->createTextNode("\n".trim($script)."\n"));
                 $node->appendChild($element);
             }
         }

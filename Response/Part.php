@@ -227,7 +227,7 @@ class SketchResponsePart extends SketchObject {
                                 if (method_exists($component, 'javascript') && !in_array($class, $class_stack)) {
                                     $script = $this->document->createElement('script');
                                     $script->setAttribute('type', 'text/javascript');
-                                    $script->appendChild($this->document->createTextNode("\n<!--\n".trim($component->javascript())."\n// -->"));
+                                    $script->appendChild($this->document->createTextNode("\n".trim($component->javascript())."\n"));
                                     $node->parentNode->insertBefore($script, $node);
                                     $class_stack[] = $class;
                                 }
