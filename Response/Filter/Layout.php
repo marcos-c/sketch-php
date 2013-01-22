@@ -118,6 +118,12 @@ class LayoutResponseFilter extends SketchResponseFilter {
                 $layout_path = $layout->getCharacterData();
             }
         }
+        if ($this->getSession()->getAttribute('layout_for') != '' && $this->getSession()->getAttribute('layout_path') != '') {
+            $for = $this->getSession()->getAttribute('layout_for');
+            if (strpos($uri, $for) !== false) {
+                $layout_path = $this->getSession()->getAttribute('layout_path');
+            }
+        }
         $response = $this->getResponse();
         $context = new DOMXPath($response->getDocument());
         if ($response->isXHTML()) {
