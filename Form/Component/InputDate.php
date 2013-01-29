@@ -316,7 +316,7 @@ class SketchFormComponentInputDate extends SketchFormComponent {
             $days = array(); $months = array(); $years = array(); $year_months = array();
         }
         $year_month_days = array();
-        $date = $parameters['from_date'];
+        $date = new SketchDateTime($parameters['from_date']->toString('Y-m-1'));
         $month_names = SketchLocaleISO::getMonthNames();
         do {
             $years[$date->getYear()] = $date->getYear();
