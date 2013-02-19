@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<context name="tests" locale="es" layer="development">
+    <layer name="development,production">
+        <!-- Locale -->
+        <driver type="SketchLocaleTranslatorDriver" class="GetTextLocaleTranslatorDriver" source="GetText.php">
+            <folder>/locale</folder>
+            <domain>default</domain>
+        </driver>
+        <!-- Sketch Response Filter Extension -->
+        <extension type="SketchResponseFilter" class="LayoutResponseFilter" source="Layout.php">
+            <layout for="/" class="\GBook\Layout" />
+        </extension>
+        <parameters for="library" name="Application.php">
+            <send-exceptions-to>
+                <email-address>marcos.ac@gmail.com</email-address>
+            </send-exceptions-to>
+        </parameters>
+    </layer>
+    <layer name="development">
+        <driver type="ResourceConnectionDriver" class="Sketch\ResourceConnectionDriverMySQL">
+            <table-prefix>gbook</table-prefix>
+            <host>localhost</host>
+            <database>gbook</database>
+            <user>root</user>
+            <password>570tnky1</password>
+        </driver>
+        <extension type="ResourceConnectionDriver" class="Sketch\FirebugResponseFilter">
+            <debug-level>3</debug-level>
+        </extension>
+    </layer>
+    <layer name="production">
+        <driver type="ResourceConnectionDriver" class="Sketch\ResourceConnectionDriverMySQL">
+            <table-prefix>gbook</table-prefix>
+            <host>localhost</host>
+            <database>gbook</database>
+            <user>root</user>
+            <password>570tnky1</password>
+        </driver>
+    </layer>
+</context>
