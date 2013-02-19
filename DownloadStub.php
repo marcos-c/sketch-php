@@ -1,9 +1,12 @@
 <?php
 /**
- * This file is part of the Sketch Framework
- * (http://code.google.com/p/sketch-framework/)
+ * This file is part of the Sketch library
  *
- * Copyright (C) 2010 Marcos Albaladejo Cooper
+ * @author Marcos Cooper <marcos@releasepad.com>
+ * @version 2.0.12
+ * @copyright 2007 Marcos Cooper
+ * @link http://releasepad.com/sketch
+ * @package Sketch
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -18,27 +21,7 @@
  * You should have received a copy of the GNU Lesser General Public
  * License along with this library; if not, you can get a copy from the
  * following link: http://opensource.org/licenses/lgpl-2.1.php
- *
- * @package Sketch
  */
-
-require_once 'Sketch/Application.php';
-require_once 'Sketch/Resource/Factory.php';
-require_once 'Sketch/Resource/Context.php';
-require_once 'Sketch/Logger/Simple.php';
-require_once 'Sketch/Resource/Connection.php';
-require_once 'Sketch/Request.php';
-require_once 'Sketch/Controller.php';
-require_once 'Sketch/Router/Factory.php';
-require_once 'Sketch/Response.php';
-require_once 'Sketch/Response/JSON.php';
-require_once 'Sketch/Response/Exception.php';
-require_once 'Sketch/Session.php';
-require_once 'Sketch/Form.php';
-require_once 'Sketch/DateTime.php';
-require_once 'Sketch/DateTime/Iterator.php';
-require_once 'Sketch/Mail/Message.php';
-require_once 'Sketch/Mail/Transport.php';
 
 // Initialize application and context
 $application = SketchApplication::getInstance();

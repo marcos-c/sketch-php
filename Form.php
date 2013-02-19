@@ -1,9 +1,12 @@
 <?php
 /**
- * This file is part of the Sketch Framework
- * (http://code.google.com/p/sketch-framework/)
+ * This file is part of the Sketch library
  *
- * Copyright (C) 2010 Marcos Albaladejo Cooper
+ * @author Marcos Cooper <marcos@releasepad.com>
+ * @version 2.0.12
+ * @copyright 2007 Marcos Cooper
+ * @link http://releasepad.com/sketch
+ * @package Sketch
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -18,24 +21,8 @@
  * You should have received a copy of the GNU Lesser General Public
  * License along with this library; if not, you can get a copy from the
  * following link: http://opensource.org/licenses/lgpl-2.1.php
- *
- * @package Sketch
  */
 
-require_once 'Sketch/Object.php';
-require_once 'Sketch/Object/View.php';
-require_once 'Sketch/Object/List.php';
-require_once 'Sketch/Form/View.php';
-require_once 'Sketch/Form/List.php';
-require_once 'Sketch/Form/Command.php';
-require_once 'Sketch/Form/Command/Propagate.php';
-require_once 'Sketch/Form/Component.php';
-
-/**
- * SketchForm
- *
- * @package Sketch
- */
 class SketchForm extends SketchObject {
     /**
      *

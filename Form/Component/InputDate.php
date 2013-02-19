@@ -1,9 +1,12 @@
 <?php
 /**
- * This file is part of the Sketch Framework
- * (http://code.google.com/p/sketch-framework/)
+ * This file is part of the Sketch library
  *
- * Copyright (c) 2011 Marcos Cooper | http://marcoscooper.com
+ * @author Marcos Cooper <marcos@releasepad.com>
+ * @version 2.0.12
+ * @copyright 2007 Marcos Cooper
+ * @link http://releasepad.com/sketch
+ * @package Sketch
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -18,17 +21,8 @@
  * You should have received a copy of the GNU Lesser General Public
  * License along with this library; if not, you can get a copy from the
  * following link: http://opensource.org/licenses/lgpl-2.1.php
- *
- * @package Sketch
  */
 
-require_once 'Sketch/Form/Component.php';
-
-/**
- * SketchFormComponentInputDate
- *
- * @package Components
- */
 class SketchFormComponentInputDate extends SketchFormComponent {
     private function getDaySelector($field_name, $parameters, $days, $day) {
         $disabled = ($parameters['disabled'] !== false) ? ' disabled="disabled"' : '';
