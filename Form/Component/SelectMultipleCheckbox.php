@@ -25,7 +25,7 @@
 
 class SketchFormComponentSelectMultipleCheckbox extends SketchFormComponent {
     /**
-     * @return int
+     * @return integer
      */
     function getVersion() {
         return 2;

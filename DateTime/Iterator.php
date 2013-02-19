@@ -50,49 +50,49 @@ class SketchDateTimeIterator extends SketchObject implements Iterator {
     }
 
     /**
-     * @param \SketchDateTime $fromDate
+     * @param SketchDateTime $fromDate
      */
     public function setFromDate($fromDate) {
         $this->fromDate = $fromDate;
     }
 
     /**
-     * @return \SketchDateTime
+     * @return SketchDateTime
      */
     public function getFromDate() {
         return $this->fromDate;
     }
 
     /**
-     * @param \SketchDateTime $toDate
+     * @param SketchDateTime $toDate
      */
     public function setToDate($toDate) {
         $this->toDate = $toDate;
     }
 
     /**
-     * @return \SketchDateTime
+     * @return SketchDateTime
      */
     public function getToDate() {
         return $this->toDate;
     }
 
     /**
-     * @param \SketchDateTime $currentDate
+     * @param SketchDateTime $currentDate
      */
     public function setCurrentDate($currentDate) {
         $this->currentDate = $currentDate;
     }
 
     /**
-     * @return \SketchDateTime
+     * @return SketchDateTime
      */
     public function getCurrentDate() {
         return $this->currentDate;
     }
 
     /**
-     * @return \SketchDateTime
+     * @return SketchDateTime
      */
     public function current() {
         return $this->getCurrentDate();
@@ -110,7 +110,7 @@ class SketchDateTimeIterator extends SketchObject implements Iterator {
     }
 
     /**
-     * @return bool
+     * @return boolean
      */
     public function valid() {
         return !$this->getCurrentDate()->greater($this->getToDate());

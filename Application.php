@@ -27,85 +27,71 @@ define('WITH_PROTOCOL_AND_DOMAIN', 1);
 
 class SketchApplication {
     /**
-     *
      * @var SketchApplication
      */
     private static $instance = null;
 
     /**
-     *
      * @var float
      */
     private $startTime;
 
     /**
-     *
      * @var SketchResourceContext
      */
     private $context;
 
     /**
-     *
      * @var SketchLogger
      */
     private $logger;
 
     /**
-     *
      * @var SketchResourceConnection
      */
     private $connection;
 
     /**
-     *
      * @var SketchController
      */
     private $controller;
 
     /**
-     *
      * @var SketchRequest
      */
     private $request;
 
     /**
-     *
      * @var SketchSession
      */
     private $session;
 
     /**
-     *
      * @var array
      */
     private $sessionNotices = array();
 
     /**
-     *
      * @var array
      */
     private $notices = array();
 
     /**
-     *
      * @var SketchLocale
      */
     private $locale;
 
     /**
-     *
      * @var string
      */
     private $documentRoot;
 
     /**
-     *
      * @var string
      */
     private $uri;
 
     /**
-     *
      * @return SketchApplication
      */
     static function getInstance() {
@@ -116,11 +102,11 @@ class SketchApplication {
     }
 
     /**
-     *
-     * @param <type> $errno
-     * @param <type> $errstr
-     * @param <type> $errfile
-     * @param <type> $errline
+     * @param $errno
+     * @param $errstr
+     * @param $errfile
+     * @param $errline
+     * @throws ErrorException
      */
     static function exceptionErrorHandler($errno, $errstr, $errfile, $errline) {
         if (version_compare(PHP_VERSION, '5.3') === 1) {
@@ -134,9 +120,6 @@ class SketchApplication {
         }
     }
 
-    /**
-     *
-     */
     private function __construct() {
         date_default_timezone_set('UCT');
         if (date_default_timezone_get() != 'UCT') {
@@ -146,7 +129,6 @@ class SketchApplication {
     }
 
     /**
-     *
      * @return float
      */
     function getStartTime() {
@@ -154,7 +136,6 @@ class SketchApplication {
     }
 
     /**
-     *
      * @param float $start_time
      */
     function setStartTime($start_time) {
@@ -162,7 +143,6 @@ class SketchApplication {
     }
 
     /**
-     *
      * @return SketchResourceContext
      */
     function getContext() {
@@ -170,7 +150,6 @@ class SketchApplication {
     }
 
     /**
-     *
      * @param SketchResourceContext $context
      */
     function setContext(SketchResourceContext $context) {
@@ -178,7 +157,6 @@ class SketchApplication {
     }
 
     /**
-     *
      * @return SketchLogger
      */
     function getLogger() {
@@ -186,7 +164,6 @@ class SketchApplication {
     }
 
     /**
-     *
      * @param SketchLogger $logger 
      */
     function setLogger(SketchLogger $logger) {
@@ -194,7 +171,6 @@ class SketchApplication {
     }
 
     /**
-     *
      * @return SketchResourceConnection
      */
     function getConnection() {
@@ -202,7 +178,6 @@ class SketchApplication {
     }
 
     /**
-     *
      * @param SketchResourceConnection $connection 
      */
     function setConnection(SketchResourceConnection $connection = null) {
@@ -210,7 +185,6 @@ class SketchApplication {
     }
 
     /**
-     *
      * @return SketchController
      */
     function getController() {
@@ -218,7 +192,6 @@ class SketchApplication {
     }
 
     /**
-     *
      * @param SketchController $controller
      */
     function setController(SketchController $controller) {
@@ -226,7 +199,6 @@ class SketchApplication {
     }
 
     /**
-     *
      * @return SketchRequest
      */
     function getRequest() {
@@ -234,7 +206,6 @@ class SketchApplication {
     }
 
     /**
-     *
      * @param SketchRequest $request
      */
     function setRequest(SketchRequest $request) {
@@ -242,7 +213,6 @@ class SketchApplication {
     }
 
     /**
-     *
      * @return SketchSession
      */
     function getSession() {
@@ -250,7 +220,6 @@ class SketchApplication {
     }
 
     /**
-     *
      * @param SketchSession $session
      */
     function setSession(SketchSession $session) {
@@ -262,7 +231,7 @@ class SketchApplication {
     }
 
     /**
-     *
+     * @param boolean $skipFormNotices
      * @return array
      */
     function getNotices($skipFormNotices = true) {
@@ -275,7 +244,7 @@ class SketchApplication {
             if ($skipFormNotices) {
                 $notices = array();
                 foreach ($all_notices as $notice) {
-                    if (!($notice instanceof FormNotice)) array_push($notices, $notice);
+                    if (!($notice instanceof SketchFormNotice)) array_push($notices, $notice);
                 }
                 return $notices;
             } else {
@@ -287,7 +256,6 @@ class SketchApplication {
     }
 
     /**
-     *
      * @param SketchApplicationNotice $notice 
      */
     function addNotice(SketchApplicationNotice $notice) {
@@ -299,7 +267,6 @@ class SketchApplication {
     }
 
     /**
-     *
      * @return SketchLocale 
      */
     function getLocale() {
@@ -307,7 +274,6 @@ class SketchApplication {
     }
 
     /**
-     *
      * @param SketchLocale $locale 
      */
     function setLocale(SketchLocale $locale) {
@@ -316,8 +282,7 @@ class SketchApplication {
     }
 
     /**
-     *
-     * @param SketchLocale $locale 
+     * @param SketchLocale $default_locale
      */
     function setDefaultLocale(SketchLocale $default_locale) {
         try {
@@ -332,7 +297,6 @@ class SketchApplication {
     }
 
     /**
-     *
      * @return string
      */
     function getDocumentRoot() {
@@ -340,7 +304,6 @@ class SketchApplication {
     }
 
     /**
-     *
      * @param string $document_root
      */
     function setDocumentRoot($document_root) {
@@ -350,9 +313,9 @@ class SketchApplication {
         $server_document_root = str_replace($_SERVER['SCRIPT_NAME'], '', realpath(basename($_SERVER['SCRIPT_NAME'])));
         $this->uri = str_replace($server_document_root, '', $document_root);
     }
-    
+
     /**
-     *
+     * @param null $options
      * @return string
      */
     function getURI($options = null) {

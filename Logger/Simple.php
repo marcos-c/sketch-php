@@ -25,13 +25,11 @@
 
 class SketchLoggerSimple extends SketchLogger {
     /**
-     *
      * @var array
      */
     static private $messages = array();
 
     /**
-     *
      * @var array
      */
     static private $md5 = array();
@@ -48,8 +46,9 @@ class SketchLoggerSimple extends SketchLogger {
     }
 
     /**
-     *
      * @param string $message
+     * @param int $level
+     * @return mixed|void
      */
     function log($message, $level = 5) {
         if ($level >= self::$level) {
@@ -67,7 +66,6 @@ class SketchLoggerSimple extends SketchLogger {
     }
 
     /**
-     *
      * @return array
      */
     function getMessages() {

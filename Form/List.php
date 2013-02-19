@@ -96,7 +96,6 @@ class SketchFormList extends SketchFormView {
     }
 
     function getLimitedPager() {
-        $form_name = $this->getFormName();
         $size = $this->getInstance()->getSize();
         $limit = $this->getInstance()->getLimit();
         $current_offset = $this->getInstance()->getOffset();
@@ -127,7 +126,6 @@ class SketchFormList extends SketchFormView {
     }
 
     function getRangedPager() {
-        $form_name = $this->getFormName();
         $size = $this->instance->getSize();
         $limit = $this->instance->getLimit();
         $offset = $this->instance->getOffset();

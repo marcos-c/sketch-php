@@ -25,13 +25,11 @@
 
 class SketchLocaleFormatter extends SketchObject {
     /**
-     *
      * @var string
      */
     private $localeString;
 
     /**
-     *
      * @param string $locale_string
      */
     function  __construct($locale_string) {
@@ -39,7 +37,6 @@ class SketchLocaleFormatter extends SketchObject {
     }
 
     /**
-     *
      * @return string
      */
     function getLocaleString() {
@@ -47,7 +44,6 @@ class SketchLocaleFormatter extends SketchObject {
     }
 
     /**
-     *
      * @param string $locale_string
      */
     function setLocaleString($locale_string) {
@@ -55,7 +51,6 @@ class SketchLocaleFormatter extends SketchObject {
     }
 
     /**
-     *
      * @param string $string
      * @return string
      */
@@ -64,8 +59,7 @@ class SketchLocaleFormatter extends SketchObject {
     }
 
     /**
-     *
-     * @param string $string
+     * @param $text
      * @return string
      */
     function formatPlainText($text) {
@@ -73,8 +67,7 @@ class SketchLocaleFormatter extends SketchObject {
     }
 
     /**
-     *
-     * @param string $string
+     * @param $text
      * @return string
      */
     function formatMarkitUpText($text) {
@@ -104,7 +97,6 @@ class SketchLocaleFormatter extends SketchObject {
     }
 
     /**
-     *
      * @param float $number
      * @return string
      */
@@ -117,7 +109,6 @@ class SketchLocaleFormatter extends SketchObject {
     }
 
     /**
-     *
      * @param SketchDateTime $date
      * @return string
      */
@@ -126,7 +117,6 @@ class SketchLocaleFormatter extends SketchObject {
     }
 
     /**
-     * 
      * @param SketchDateTime $date
      * @param string $time_zone
      * @return string
@@ -142,7 +132,6 @@ class SketchLocaleFormatter extends SketchObject {
     }
 
     /**
-     *
      * @param SketchDateTime $date
      * @return string
      */
@@ -151,7 +140,6 @@ class SketchLocaleFormatter extends SketchObject {
     }
 
     /**
-     *
      * @param SketchDateTime $date
      * @return string
      */
@@ -160,7 +148,6 @@ class SketchLocaleFormatter extends SketchObject {
     }
 
     /**
-     *
      * @param SketchDateTime $date
      * @param string $time_zone
      * @return string

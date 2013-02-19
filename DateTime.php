@@ -25,19 +25,16 @@
 
 class SketchDateTime extends SketchObject {
     /**
-     *
      * @var integer
      */
     private $dateTime = null;
 
     /**
-     *
      * @var array
      */
     private $dateTimeArray = null;
 
     /**
-     *
      * @return SketchDateTime
      */
     static function Now() {
@@ -45,7 +42,6 @@ class SketchDateTime extends SketchObject {
     }
 
     /**
-     *
      * @return SketchDateTime
      */
     static function Today() {
@@ -53,7 +49,6 @@ class SketchDateTime extends SketchObject {
     }
 
     /**
-     *
      * @return array
      */
     static function getTimeZoneIdentifiers() {
@@ -69,8 +64,8 @@ class SketchDateTime extends SketchObject {
     }
 
     /**
-     *
      * @param mixed $date_time
+     * @throws SketchDateTimeException
      */
     function __construct($date_time = null) {
         if ($date_time instanceof SketchDateTime) {
@@ -111,7 +106,6 @@ class SketchDateTime extends SketchObject {
     }
 
     /**
-     *
      * @return string
      */
     function __toString() {
@@ -119,7 +113,6 @@ class SketchDateTime extends SketchObject {
     }
 
     /**
-     *
      * @return boolean
      */
     function isNull() {
@@ -131,7 +124,6 @@ class SketchDateTime extends SketchObject {
     }
 
     /**
-     *
      * @return boolean
      */
     function isValid() {
@@ -139,7 +131,6 @@ class SketchDateTime extends SketchObject {
     }
 
     /**
-     *
      * @param SketchDateTime $date_time
      * @return boolean
      */
@@ -150,7 +141,6 @@ class SketchDateTime extends SketchObject {
     }
 
     /**
-     * 
      * @param SketchDateTime $from_date_time
      * @param SketchDateTime $to_date_time
      * @return boolean
@@ -160,7 +150,6 @@ class SketchDateTime extends SketchObject {
     }
 
     /**
-     *
      * @param string $format
      * @return string
      */
@@ -171,7 +160,6 @@ class SketchDateTime extends SketchObject {
     }
 
     /**
-     *
      * @return array
      */
     function toArray() {
@@ -179,7 +167,6 @@ class SketchDateTime extends SketchObject {
     }
 
     /**
-     *
      * @return integer
      */
     function getYear() {
@@ -187,7 +174,6 @@ class SketchDateTime extends SketchObject {
     }
 
     /**
-     *
      * @return integer
      */
     function getMonth() {
@@ -195,7 +181,6 @@ class SketchDateTime extends SketchObject {
     }
 
     /**
-     *
      * @return integer
      */
     function getDay() {
@@ -203,7 +188,6 @@ class SketchDateTime extends SketchObject {
     }
 
     /**
-     *
      * @return integer
      */
     function getLastDay() {
@@ -211,7 +195,6 @@ class SketchDateTime extends SketchObject {
     }
 
     /**
-     *
      * @return integer
      */
     function getDayOfTheWeek() {
@@ -220,7 +203,6 @@ class SketchDateTime extends SketchObject {
     }
 
     /**
-     *
      * @return integer
      */
     function toUnixTimestamp() {
@@ -228,8 +210,8 @@ class SketchDateTime extends SketchObject {
     }
 
     /**
-     *
      * @param string $interval
+     * @throws Exception
      * @return SketchDateTime
      */
     function addInterval($interval) {
@@ -249,11 +231,12 @@ class SketchDateTime extends SketchObject {
             return new SketchDateTime(strtotime($interval, $this->dateTime));
         } else if (preg_match('/^last month$/', $interval)) {
             return new SketchDateTime(strtotime($interval, $this->dateTime));
+        } else {
+            throw new Exception($this->getTranslator()->_("Wrong interval format"));
         }
     }
 
     /**
-     *
      * @param SketchDateTime $date_time
      * @return integer
      */
@@ -264,7 +247,6 @@ class SketchDateTime extends SketchObject {
     }
 
     /**
-     *
      * @param SketchDateTime $date_time
      * @return boolean
      */

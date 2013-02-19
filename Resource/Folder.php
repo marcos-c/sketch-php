@@ -29,37 +29,31 @@ define('FOLDER_MD5_SIZE', 20);
 
 class SketchResourceFolder extends SketchResource {
     /**
-     *
      * @var string
      */
     private $name;
 
     /**
-     *
      * @var string
      */
     private $uri;
 
     /**
-     *
      * @var integer
      */
     private $parentId;
 
     /**
-     *
      * @var array
      */
     private $descriptors;
 
     /**
-     *
      * @var array
      */
     private $geometry;
 
     /**
-     *
      * @param string $name
      * @param integer $parent_id
      */
@@ -84,7 +78,6 @@ class SketchResourceFolder extends SketchResource {
     }
 
     /**
-     *
      * @return string
      * @deprecated
      */
@@ -93,7 +86,6 @@ class SketchResourceFolder extends SketchResource {
     }
 
     /**
-     *
      * @return string
      */
     function getName() {
@@ -101,7 +93,6 @@ class SketchResourceFolder extends SketchResource {
     }
 
     /**
-     *
      * @return string
      * @deprecated
      */
@@ -110,7 +101,6 @@ class SketchResourceFolder extends SketchResource {
     }
 
     /**
-     *
      * @return string
      */
     function getURI() {
@@ -118,7 +108,6 @@ class SketchResourceFolder extends SketchResource {
     }
     
     /**
-     *
      * @return string
      * @deprecated
      */
@@ -127,7 +116,6 @@ class SketchResourceFolder extends SketchResource {
     }
 
     /**
-     *
      * @return string
      */
     function getDocumentRoot() {
@@ -141,7 +129,6 @@ class SketchResourceFolder extends SketchResource {
     }
 
     /**
-     *
      * @return integer
      */
     function getParentId() {
@@ -149,7 +136,6 @@ class SketchResourceFolder extends SketchResource {
     }
 
     /**
-     *
      * @param string $reference
      * @return SketchResourceFolderDescriptor
      */
@@ -158,7 +144,6 @@ class SketchResourceFolder extends SketchResource {
     }
 
     /**
-     *
      * @return array
      */
     function getDescriptors() {
@@ -166,7 +151,6 @@ class SketchResourceFolder extends SketchResource {
     }
 
     /**
-     *
      * @return SketchResourceFolderDescriptorList
      */
     function getDescriptorList() {
@@ -174,7 +158,6 @@ class SketchResourceFolder extends SketchResource {
     }
 
     /**
-     *
      * @param string $reference
      * @param string $extra
      * @return string
@@ -219,7 +202,6 @@ class SketchResourceFolder extends SketchResource {
     }
 
     /**
-     *
      * @param SketchResourceFolderDescriptor $descriptor
      */
     function addDescriptor($descriptor) {
@@ -250,7 +232,7 @@ class SketchResourceFolder extends SketchResource {
                 if (array_key_exists($descriptor->getReference(), $this->descriptors)) {
                     $test = $connection->executeUpdate("UPDATE $table_name SET file_name = '$file_name', source_file_name = '$source_file_name', file_type = '$file_type', file_size = $file_size, image_width = $image_width, image_height = $image_height WHERE parent_id = $parent_id AND reference = '$reference'");
                     if ($test) {
-                        $application->addNotice(new SketchApplicationNotice(sprintf($this->getTranslator()->_("Descriptor <b>%s</b> (%s) has been updated"), $reference, $file_type)));
+                        $application->addNotice(new SketchApplicationNotice(sprintf($this->getTranslator()->_("Descriptor <strong>%s</strong> (%s) has been updated"), $reference, $file_type)));
                     }
                 } else {
                     if ($connection->supports('nextval')) {
@@ -263,7 +245,7 @@ class SketchResourceFolder extends SketchResource {
                         }
                     }
                     if ($test) {
-                        $application->addNotice(new SketchApplicationNotice(sprintf($this->getTranslator()->_("Descriptor <b>%s</b> (%s) was added to folder"), $reference, $file_type)));
+                        $application->addNotice(new SketchApplicationNotice(sprintf($this->getTranslator()->_("Descriptor <strong>%s</strong> (%s) was added to folder"), $reference, $file_type)));
                     }
                 }
             }
@@ -271,13 +253,12 @@ class SketchResourceFolder extends SketchResource {
                 $this->descriptors[$reference] = $descriptor;
                 $this->clean();
             } else {
-                $application->addNotice(new SketchApplicationNotice(sprintf($this->getTranslator()->_("Descriptor <b>%s</b> (%s) couldn't be added to folder"), $descriptor->getReference(), $descriptor->getFileType())));
+                $application->addNotice(new SketchApplicationNotice(sprintf($this->getTranslator()->_("Descriptor <strong>%s</strong> (%s) couldn't be added to folder"), $descriptor->getReference(), $descriptor->getFileType())));
             }
         }
     }
 
     /**
-     *
      * @param SketchResourceFolderDescriptor $descriptor
      * @return boolean
      */
@@ -310,15 +291,13 @@ class SketchResourceFolder extends SketchResource {
     }
 
     /**
-     *
      * @param $reference
-     * @return bool
+     * @return boolean
      * @throws Exception
      */
     function removeDescriptor($reference) {
         $connection = $this->getConnection();
         $table = $this->getName();
-        $parent_id = $this->getParentId();
         if ($descriptor = $this->getDescriptor($reference)) {
             unset($this->descriptors[$reference]);
             try {
@@ -329,6 +308,8 @@ class SketchResourceFolder extends SketchResource {
                 }
             }
             return $connection->executeUpdate("DELETE FROM $table WHERE file_name = '".$descriptor->getFileName()."'");
+        } else {
+            return false;
         }
     }
 
@@ -358,15 +339,13 @@ class SketchResourceFolder extends SketchResource {
     }
 
     /**
-     *
-     * @return array|false
+     * @return array|boolean
      */
     function getOutputGeometry() {
         return (is_array($this->geometry)) ? $this->geometry : false;
     }
 
     /**
-     *
      * @param integer $width
      * @param integer $height
      * @param integer $model
@@ -378,7 +357,6 @@ class SketchResourceFolder extends SketchResource {
     }
 
     /**
-     *
      * @param SketchResourceFolderDescriptor $descriptor
      * @return boolean
      */
@@ -395,16 +373,13 @@ class SketchResourceFolder extends SketchResource {
     }
 
     /**
-     *
-     * @param SketchResourceFolderDescriptor $descriptor
      * @return boolean
      */
-    function imlibSave($descriptor) {
+    function imlibSave() {
         return false;
     }
 
     /**
-     *
      * @param SketchResourceFolderDescriptor $descriptor
      * @return boolean
      */

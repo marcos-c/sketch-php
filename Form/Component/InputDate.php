@@ -76,8 +76,8 @@ class SketchFormComponentInputDate extends SketchFormComponent {
                     <script type="text/javascript">
                         //<![CDATA[
                             jQuery(function($){
-                                var months = <?=SketchUtils::encodeJSON($months)?>;
-                                var year_month_days = <?=SketchUtils::encodeJSON($year_month_days)?>;
+                                var months = <?=json_encode($months)?>;
+                                var year_month_days = <?=json_encode($year_month_days)?>;
                                 var calendar = $('#<?=$calendar_field_id?>');
                                 calendar.datepicker({firstDay: 1, minDate: new Date(<?=$from_year?>, <?=$from_month - 1?>, <?=$from_day?>), maxDate: new Date(<?=$to_year?>, <?=$to_month - 1?>, <?=$to_day?>), dayNamesMin: ['<?=$this->getTranslator()->_('Sun')?>', '<?=$this->getTranslator()->_('Mon')?>', '<?=$this->getTranslator()->_('Tue')?>', '<?=$this->getTranslator()->_('Wed')?>', '<?=$this->getTranslator()->_('Thu')?>', '<?=$this->getTranslator()->_('Fri')?>', '<?=$this->getTranslator()->_('Sat')?>'], monthNames: ['<?=$this->getTranslator()->_('January')?>', '<?=$this->getTranslator()->_('February')?>', '<?=$this->getTranslator()->_('March')?>', '<?=$this->getTranslator()->_('April')?>', '<?=$this->getTranslator()->_('May')?>', '<?=$this->getTranslator()->_('June')?>', '<?=$this->getTranslator()->_('July')?>', '<?=$this->getTranslator()->_('August')?>', '<?=$this->getTranslator()->_('September')?>', '<?=$this->getTranslator()->_('October')?>', '<?=$this->getTranslator()->_('November')?>', '<?=$this->getTranslator()->_('December')?>'], dateFormat: 'yy-mm-dd', showOn: 'button', buttonText: '<?=$this->getTranslator()->_('Calendar')?>'});
                                 var day = $(':input[name="<?=$field_name?>[day]"]');
@@ -188,8 +188,8 @@ class SketchFormComponentInputDate extends SketchFormComponent {
                 <script type="text/javascript">
                     //<![CDATA[
                         jQuery(function($){
-                            var months = <?=SketchUtils::encodeJSON($months)?>;
-                            var year_month_days = <?=SketchUtils::encodeJSON($year_month_days)?>;
+                            var months = <?=json_encode($months)?>;
+                            var year_month_days = <?=json_encode($year_month_days)?>;
                             var day = $(':input[name="<?=$field_name?>[day]"]');
                             <? if (in_array($parameters['format'], array('mY', 'd-mY'))): ?>
                                 var year_month = $(':input[name="<?=$field_name?>[year_month]"]');
@@ -242,7 +242,7 @@ class SketchFormComponentInputDate extends SketchFormComponent {
     }
 
     /**
-     *
+     * @throws Exception
      * @return string
      */
     function saveHTML() {
@@ -264,7 +264,6 @@ class SketchFormComponentInputDate extends SketchFormComponent {
             'input-date-calendar' => array('id' => null, 'class' => 'input-date-calendar', 'style' => null),
             'onchange' => null
         ), array_shift($arguments));
-        $form_name = $form->getFormName();
         // Field names
         $field_name = $form->getFieldName($attribute);
         $calendar_field_id = md5($field_name);
@@ -295,6 +294,8 @@ class SketchFormComponentInputDate extends SketchFormComponent {
             $day = $field_value['day'];
         } else if ($parameters['null'] == false) {
             list($year, $month, $day) = $parameters['from_date']->toArray();
+        } else {
+            throw new Exception("Unreadable date format");
         }
         $year_month = sprintf('%04d%02d', $year, $month);
         $year = sprintf('%04d', $year);

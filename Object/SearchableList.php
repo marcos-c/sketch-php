@@ -25,19 +25,16 @@
 
 abstract class SketchObjectSearchableList extends SketchObjectList {
     /**
-     *
      * @var string
      */
     private $searchText;
 
     /**
-     *
      * @var array
      */
     private $searchFilters;
 
     /**
-     *
      * @return string
      */
     function getSearchText() {
@@ -48,7 +45,6 @@ abstract class SketchObjectSearchableList extends SketchObjectList {
     }
 
     /**
-     *
      * @param string $search_text
      */
     function setSearchText($search_text) {
@@ -59,7 +55,6 @@ abstract class SketchObjectSearchableList extends SketchObjectList {
     }
 
     /**
-     *
      * @return array
      */
     function getSearchFilters() {
@@ -70,7 +65,6 @@ abstract class SketchObjectSearchableList extends SketchObjectList {
     }
 
     /**
-     *
      * @param array $search_filters
      * @return void
      */
@@ -82,7 +76,6 @@ abstract class SketchObjectSearchableList extends SketchObjectList {
     }
 
     /**
-     *
      * @deprecated
      * @return array
      */
@@ -91,7 +84,6 @@ abstract class SketchObjectSearchableList extends SketchObjectList {
     }
 
     /**
-     *
      * @deprecated
      * @param array $filters
      * @return void

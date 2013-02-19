@@ -25,25 +25,21 @@
 
 abstract class SketchObjectView extends SketchObject {
     /**
-     *
      * @var boolean
      */
     private $useSessionObject = false;
 
     /**
-     *
      * @var string
      */
     private $viewId;
 
     /**
-     *
      * @var string
      */
     private $id;
 
     /**
-     *
      * @return boolean
      */
     function getUseSessionObject() {
@@ -51,7 +47,6 @@ abstract class SketchObjectView extends SketchObject {
     }
 
     /**
-     *
      * @param boolean $use_session_object
      */
     function setUseSessionObject($use_session_object) {
@@ -59,10 +54,9 @@ abstract class SketchObjectView extends SketchObject {
     }
 
     /**
-     *
      * @param string $key
      * @param string $default
-     * @param bool $global
+     * @param boolean $global
      * @return string
      */
     protected final function getSessionObjectAttribute($key, $default, $global = false) {
@@ -78,13 +72,10 @@ abstract class SketchObjectView extends SketchObject {
     }
 
     /**
-     *
      * @param $key
      * @param $value
-     * @param bool $global
+     * @param boolean $global
      * @return void
-     * @internal param $ <type> $key
-     * @internal param $ <type> $value
      */
     protected final function setSessionObjectAttribute($key, $value, $global = false) {
         $session = $this->getSession();
@@ -95,8 +86,7 @@ abstract class SketchObjectView extends SketchObject {
     }
 
     /**
-     *
-     * @param bool $default
+     * @param boolean $default
      * @return string
      */
     final function getViewId($default = false) {
@@ -104,7 +94,6 @@ abstract class SketchObjectView extends SketchObject {
     }
 
     /**
-     *
      * @param mixed $view_id
      */
     final function setViewId($view_id) {
@@ -112,7 +101,6 @@ abstract class SketchObjectView extends SketchObject {
     }
 
     /**
-     *
      * @return mixed
      */
     final function getViewName() {
@@ -120,8 +108,7 @@ abstract class SketchObjectView extends SketchObject {
     }
 
     /**
-     *
-     * @param bool $default
+     * @param boolean $default
      * @return mixed
      */
     final function getId($default = false) {
@@ -129,7 +116,6 @@ abstract class SketchObjectView extends SketchObject {
     }
 
     /**
-     *
      * @param mixed $id
      */
     final function setId($id) {

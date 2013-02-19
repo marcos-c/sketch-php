@@ -25,49 +25,41 @@
 
 class SketchCalendar extends SketchObject {
     /**
-     *
      * @var array
      */
     private $monthDescriptions;
 
     /**
-     *
      * @var array
      */
     private $monthShortDescriptions;
 
     /**
-     *
      * @var array
      */
     private $dayDescriptions;
 
     /**
-     *
      * @var array
      */
     private $dayShortDescriptions;
 
     /**
-     *
      * @var array
      */
     private $dayOneLetterDescriptions;
 
     /**
-     *
      * @var integer
      */
     private $month;
 
     /**
-     *
      * @var integer
      */
     private $year;
 
     /**
-     *
      * @param integer $month
      * @param integer $year
      */
@@ -90,7 +82,6 @@ class SketchCalendar extends SketchObject {
     }
 
     /**
-     *
      * @return integer
      */
     function getMonth() {
@@ -98,7 +89,6 @@ class SketchCalendar extends SketchObject {
     }
 
     /**
-     *
      * @return integer
      */
     function getYear() {
@@ -106,7 +96,6 @@ class SketchCalendar extends SketchObject {
     }
 
     /**
-     *
      * @return array
      */
     function getMonthDescriptions() {
@@ -114,7 +103,6 @@ class SketchCalendar extends SketchObject {
     }
 
     /**
-     *
      * @return string
      */
     function getMonthDescription() {
@@ -122,7 +110,6 @@ class SketchCalendar extends SketchObject {
     }
 
     /**
-     *
      * @return array
      */
     function getMonthShortDescriptions() {
@@ -130,7 +117,6 @@ class SketchCalendar extends SketchObject {
     }
 
     /**
-     *
      * @return string
      */
     function getMonthShortDescription() {
@@ -138,7 +124,6 @@ class SketchCalendar extends SketchObject {
     }
 
     /**
-     *
      * @return array
      */
     function getDayDescriptions() {
@@ -146,7 +131,6 @@ class SketchCalendar extends SketchObject {
     }
 
     /**
-     *
      * @return array
      */
     function getDayShortDescriptions() {
@@ -154,7 +138,6 @@ class SketchCalendar extends SketchObject {
     }
 
     /**
-     *
      * @return array
      */
     function getDayOneLetterDescriptions() {
@@ -162,7 +145,6 @@ class SketchCalendar extends SketchObject {
     }
 
     /**
-     *
      * @return array
      */
     function output() {

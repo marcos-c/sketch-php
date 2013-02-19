@@ -25,12 +25,9 @@
 
 class SketchFormComponentInputDateExtended extends SketchFormComponent {
     /**
-     *
      * @return string
      */
     function javascript() {
-        $arguments = $this->getArguments();
-        $attribute = array_shift($arguments);
         $form_name = $this->getForm()->getFormName();        
         ob_start(); ?>
         function <?=$form_name?>UpdateDays(input) {
@@ -148,7 +145,6 @@ class SketchFormComponentInputDateExtended extends SketchFormComponent {
     }
 
     /**
-     *
      * @return string
      */
     function saveHTML() {
@@ -224,7 +220,7 @@ class SketchFormComponentInputDateExtended extends SketchFormComponent {
             $days[$i] = '...';
         }
         ob_start(); ?>
-        <select id="<?=$field_name?>[day]" name="<?=$field_name?>[day]" onchange="<? if ($parameters['onchange'] != null): ?><?=$parameters['onchange']?><? else: ?><?=$form_name?>OnDayChange('<?=$field_name?>', <?=$from_field_name?>, <?=$to_field_name?>, <?=$nights_field_name?>)<? endif; ?>"<?=$parameters['input-date-day'].$disabled?>>
+        <select id="<?=$field_name?>[day]" name="<?=$field_name?>[day]" onchange="<? if ($parameters['onchange'] != null): ?><?=$parameters['onchange']?><? else: ?><?=$form_name?>OnDayChange('<?=$field_name?>', <?=$from_field_name?>, <?=$to_field_name?>, <?=$nights_field_name?>);<? endif; ?>"<?=$parameters['input-date-day'].$disabled?>>
             <? foreach ($days as $key => $value): ?>
                 <option value="<?=htmlspecialchars($key)?>" <?=(($day == $key) ? 'selected="selected" class="select-option selected"' : 'class="select-option"')?>><?=htmlspecialchars($value)?></option>
             <? endforeach; ?>
@@ -234,7 +230,7 @@ class SketchFormComponentInputDateExtended extends SketchFormComponent {
         <input type="hidden" name="<?=$field_name?>[day]" value="1" />
         <?php $day_hidden = ob_get_clean();
         ob_start(); ?>
-        <select name="<?=$field_name?>[year_month]" onchange="<? if ($parameters['onchange'] != null): ?><?=$parameters['onchange']?><? else: ?><?=$form_name?>OnMonthChange('<?=$field_name?>', <?=$from_field_name?>, <?=$to_field_name?>, <?=$nights_field_name?>)<? endif; ?>"<?=$parameters['input-date-year-month'].$disabled?>>
+        <select name="<?=$field_name?>[year_month]" onchange="<? if ($parameters['onchange'] != null): ?><?=$parameters['onchange']?><? else: ?><?=$form_name?>OnMonthChange('<?=$field_name?>', <?=$from_field_name?>, <?=$to_field_name?>, <?=$nights_field_name?>);<? endif; ?>"<?=$parameters['input-date-year-month'].$disabled?>>
             <? foreach ($months as $key => $value): ?>
                 <option value="<?=htmlspecialchars($key)?>" <?=(($year_month == $key) ? 'selected="selected" class="select-option selected"' : 'class="select-option"')?>><?=htmlspecialchars($value)?></option>
             <? endforeach; ?>

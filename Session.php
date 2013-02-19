@@ -23,15 +23,15 @@
  * following link: http://opensource.org/licenses/lgpl-2.1.php
  */
 
+define('SESSION_LIFETIME', 0);
+
 class SketchSession extends SketchObject {
     /**
-     *
      * @var array
      */
     private $attributes = array();
 
     /**
-     *
      * @var string
      */
     private $contextName;
@@ -49,15 +49,12 @@ class SketchSession extends SketchObject {
         session_cache_limiter('nocache');
         $drivers = $this->getContext()->query("//driver[@type='SketchSessionSaveHandler']");
         foreach ($drivers as $driver) {
-            $type = $driver->getAttribute('type');
             $class = $driver->getAttribute('class');
-            $source = $driver->getAttribute('source');
-            if (SketchUtils::Readable("Sketch/Session/SaveHandler/$source")) {
-                require_once "Sketch/Session/SaveHandler/$source";
-                if (class_exists($class)) {
-                    session_set_save_handler(array($class, 'open'), array($class, 'close'), array($class, 'read'), array($class, 'write'), array($class, 'destroy'), array($class, 'gc'));
-                } else throw new Exception(sprintf("Can't instantiate class %s", $class));
-            } else throw new Exception(sprintf("File %s can't be found", $source));
+            if (class_exists($class)) {
+                session_set_save_handler(array($class, 'open'), array($class, 'close'), array($class, 'read'), array($class, 'write'), array($class, 'destroy'), array($class, 'gc'));
+            } else {
+                throw new Exception(sprintf("Can't instantiate class %s", $class));
+            }
         }
         if (session_start() != false) {
             header("Cache-Control: private, max-age=0, post-check=0, pre-check=0");
@@ -71,7 +68,6 @@ class SketchSession extends SketchObject {
     }
 
     /**
-     *
      * @return string
      */
     function getId() {
@@ -79,7 +75,6 @@ class SketchSession extends SketchObject {
     }
 
     /**
-     *
      * @return string
      */
     function getName() {
@@ -87,7 +82,6 @@ class SketchSession extends SketchObject {
     }
 
     /**
-     *
      * @return string
      */
     function getContextName() {
@@ -95,7 +89,6 @@ class SketchSession extends SketchObject {
     }
 
     /**
-     *
      * @param string $context_name
      */
     function setContextName($context_name) {
@@ -103,7 +96,6 @@ class SketchSession extends SketchObject {
     }
 
     /**
-     *
      * @return array
      */
     function getAttributes() {
@@ -113,7 +105,6 @@ class SketchSession extends SketchObject {
     }
 
     /**
-     *
      * @param string $key
      * @return string
      */
@@ -124,7 +115,6 @@ class SketchSession extends SketchObject {
     }
 
     /**
-     *
      * @param string $key
      * @param string $value
      */
@@ -135,7 +125,6 @@ class SketchSession extends SketchObject {
     }
 
     /**
-     *
      * @return SketchSessionACL
      */
     function getACL() {
@@ -143,7 +132,6 @@ class SketchSession extends SketchObject {
     }
 
     /**
-     *
      * @param SketchSessionACL $acl
      */
     function setACL(SketchSessionACL $acl) {
@@ -151,7 +139,6 @@ class SketchSession extends SketchObject {
     }
 
     /**
-     *
      * @param boolean $remember
      */
     function setRememberMe($remember) {

@@ -25,13 +25,13 @@
 
 class SketchLoggerDummy extends SketchLogger {
     /**
-     *
      * @param string $message
+     * @param int $level
+     * @return mixed|void
      */
     function log($message, $level = 5) {}
 
     /**
-     *
      * @return array
      */
     function getMessages() {

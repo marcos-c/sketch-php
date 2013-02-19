@@ -29,13 +29,11 @@ define('XML_ERR_ENTITYREF_SEMICOL_MISSING', 23);
 
 class SketchResourceXML extends SketchResource {
     /**
-     *
      * @var DOMDocument
      */
     protected $document;
 
     /**
-     *
      * @param DOMDocument $document 
      */
     function __construct(DOMDocument $document) {
@@ -43,7 +41,6 @@ class SketchResourceXML extends SketchResource {
     }
 
     /**
-     *
      * @param string $attribute
      * @return string
      */
@@ -52,7 +49,6 @@ class SketchResourceXML extends SketchResource {
     }
 
     /**
-     *
      * @return array
      */
     function getAttributes() {
@@ -64,7 +60,6 @@ class SketchResourceXML extends SketchResource {
     }
 
     /**
-     *
      * @return string
      */
     function getCharacterData() {
@@ -79,7 +74,6 @@ class SketchResourceXML extends SketchResource {
     }
 
     /**
-     *
      * @param string $expression
      * @return array
      */
@@ -92,14 +86,13 @@ class SketchResourceXML extends SketchResource {
                 $document->resolveExternals = false;
                 $document->appendChild($document->importNode($node, true));
                 $o[] = new SketchResourceXML($document);
-            } else if ($node instanceof DOMAttribute) {
+            } else if ($node instanceof DOMAttr) {
                 $o[] = $node->nodeValue;
             }
         } return $o;
     }
 
     /**
-     *
      * @param string $expression
      * @return mixed
      */
@@ -108,8 +101,8 @@ class SketchResourceXML extends SketchResource {
     }
 
     /**
-     *
      * @param string $query_string
+     * @param null $default
      * @return string
      */
     function queryCharacterData($query_string, $default = null) {

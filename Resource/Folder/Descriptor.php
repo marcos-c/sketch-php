@@ -25,7 +25,6 @@
 
 class SketchResourceFolderDescriptor extends SketchResource {
     /**
-     *
      * @var array
      */
     private static $mimeTypes = array(
@@ -219,55 +218,46 @@ class SketchResourceFolderDescriptor extends SketchResource {
     );
 
     /**
-     *
      * @var integer
      */
     private $id;
 
     /**
-     *
      * @var integer
      */
     private $parentId;
 
     /**
-     *
      * @var string
      */
     private $reference;
 
     /**
-     *
      * @var string
      */
     private $fileName;
 
     /**
-     *
      * @var string;
      */
     private $sourceFileName;
 
     /**
-     *
      * @var string
      */
     private $fileType;
 
     /**
-     *
      * @var integer
      */
     private $fileSize;
 
     /**
-     *
      * @var integer
      */
     private $imageWidth;
 
     /**
-     *
      * @var integer
      */
     private $imageHeight;
@@ -278,13 +268,11 @@ class SketchResourceFolderDescriptor extends SketchResource {
     private $tableName;
 
     /**
-     *
      * @var array
      */
     private $data;
 
     /**
-     *
      * @param array $parameters
      */
     function __construct($parameters = null) {
@@ -301,7 +289,6 @@ class SketchResourceFolderDescriptor extends SketchResource {
     }
 
     /**
-     *
      * @return boolean
      */
     function isImage() {
@@ -309,7 +296,6 @@ class SketchResourceFolderDescriptor extends SketchResource {
     }
 
     /**
-     *
      * @return integer
      */
     function getId() {
@@ -317,7 +303,6 @@ class SketchResourceFolderDescriptor extends SketchResource {
     }
 
     /**
-     *
      * @param integer $id
      */
     function setId($id) {
@@ -325,7 +310,6 @@ class SketchResourceFolderDescriptor extends SketchResource {
     }
 
     /**
-     *
      * @return integer
      */
     function getParentId() {
@@ -333,7 +317,6 @@ class SketchResourceFolderDescriptor extends SketchResource {
     }
 
     /**
-     *
      * @param integer $parent_id
      */
     function setParentId($parent_id) {
@@ -341,7 +324,6 @@ class SketchResourceFolderDescriptor extends SketchResource {
     }
 
     /**
-     *
      * @return string
      */
     function getReference() {
@@ -349,7 +331,6 @@ class SketchResourceFolderDescriptor extends SketchResource {
     }
 
     /**
-     *
      * @param string $reference
      */
     function setReference($reference) {
@@ -357,7 +338,6 @@ class SketchResourceFolderDescriptor extends SketchResource {
     }
 
     /**
-     *
      * @return string
      */
     function getFileName() {
@@ -365,7 +345,6 @@ class SketchResourceFolderDescriptor extends SketchResource {
     }
 
     /**
-     *
      * @param string $name
      */
     function setFileName($name) {
@@ -373,7 +352,6 @@ class SketchResourceFolderDescriptor extends SketchResource {
     }
 
     /**
-     *
      * @return string
      */
     function getSourceFileName() {
@@ -381,7 +359,6 @@ class SketchResourceFolderDescriptor extends SketchResource {
     }
 
     /**
-     *
      * @param string $source_name
      */
     function setSourceFileName($source_name) {
@@ -389,7 +366,6 @@ class SketchResourceFolderDescriptor extends SketchResource {
     }
 
     /**
-     *
      * @return string
      */
     function getFileExtension() {
@@ -398,7 +374,6 @@ class SketchResourceFolderDescriptor extends SketchResource {
     }
 
     /**
-     *
      * @return string
      */
     function getFileType() {
@@ -406,7 +381,6 @@ class SketchResourceFolderDescriptor extends SketchResource {
     }
 
     /**
-     *
      * @param string $type
      */
     function setFileType($type) {
@@ -423,7 +397,6 @@ class SketchResourceFolderDescriptor extends SketchResource {
     }
 
     /**
-     *
      * @return integer
      */
     function getFileSize() {
@@ -431,7 +404,6 @@ class SketchResourceFolderDescriptor extends SketchResource {
     }
 
     /**
-     *
      * @param integer $size
      */
     function setFileSize($size) {
@@ -439,7 +411,6 @@ class SketchResourceFolderDescriptor extends SketchResource {
     }
 
     /**
-     *
      * @return string
      */
     function getFormattedFileSize() {
@@ -447,7 +418,6 @@ class SketchResourceFolderDescriptor extends SketchResource {
     }
 
     /**
-     *
      * @return integer
      */
     function getImageWidth() {
@@ -455,7 +425,6 @@ class SketchResourceFolderDescriptor extends SketchResource {
     }
 
     /**
-     *
      * @param integer $image_width
      */
     function setImageWidth($image_width) {
@@ -463,7 +432,6 @@ class SketchResourceFolderDescriptor extends SketchResource {
     }
 
     /**
-     *
      * @return integer
      */
     function getImageHeight() {
@@ -471,7 +439,6 @@ class SketchResourceFolderDescriptor extends SketchResource {
     }
 
     /**
-     *
      * @param integer $image_height
      */
     function setImageHeight($image_height) {
@@ -479,7 +446,6 @@ class SketchResourceFolderDescriptor extends SketchResource {
     }
 
     /**
-     *
      * @param $table_name
      */
     function setTableName($table_name) {
@@ -487,7 +453,6 @@ class SketchResourceFolderDescriptor extends SketchResource {
     }
 
     /**
-     *
      * @return string
      */
     function getTableName() {
@@ -495,7 +460,6 @@ class SketchResourceFolderDescriptor extends SketchResource {
     }
 
     /**
-     *
      * @param array $data
      */
     function setData($data) {
@@ -516,7 +480,6 @@ class SketchResourceFolderDescriptor extends SketchResource {
     }
 
     /**
-     *
      * @return array
      */
     function getData() {
@@ -527,7 +490,6 @@ class SketchResourceFolderDescriptor extends SketchResource {
     }
 
     /**
-     *
      * @return mixed
      */
     function getCaptionCL() {
@@ -538,7 +500,6 @@ class SketchResourceFolderDescriptor extends SketchResource {
     }
 
     /**
-     *
      * @deprecated
      * @return mixed
      */
@@ -547,7 +508,6 @@ class SketchResourceFolderDescriptor extends SketchResource {
     }
 
     /**
-     *
      * @return string
      */
     function getTagsCL() {
@@ -558,7 +518,6 @@ class SketchResourceFolderDescriptor extends SketchResource {
     }
 
     /**
-     *
      * @deprecated
      * @return mixed
      */

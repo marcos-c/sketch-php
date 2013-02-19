@@ -44,7 +44,10 @@ class SketchFormComponentInputTime extends SketchFormComponent {
         ), array_shift($arguments));
         $field_name = $this->getForm()->getFieldName($attribute);
         $field_value = $this->getForm()->getFieldValue($attribute);
-        if ($field_value instanceof SketchDateTime) list($year, $month, $day, $hour, $minute) = $field_value->toArray();
+        if ($field_value instanceof SketchDateTime) {
+            /** @noinspection PhpUnusedLocalVariableInspection */
+            list($year, $month, $day, $hour, $minute) = $field_value->toArray();
+        }
         $disabled = ($parameters['disabled'] !== false) ? ' disabled="disabled"' : '';
         if ($parameters['daylight-hours-only'] !== false) {
             $parameters['from-hour'] = 5;

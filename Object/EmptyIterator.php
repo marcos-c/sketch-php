@@ -25,7 +25,6 @@
 
 class SketchEmptyIterator extends EmptyIterator {
     /**
-     * 
      * @return int
      */
     function size() {

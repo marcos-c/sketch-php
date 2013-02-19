@@ -25,19 +25,16 @@
 
 abstract class SketchFormComponent extends SketchObject {
     /**
-     *
      * @var SketchFormView
      */
     private $form = null;
 
     /**
-     *
      * @var array
      */
     private $arguments = null;
 
     /**
-     *
      * @param SketchFormView $form
      * @param array $arguments
      */
@@ -50,7 +47,6 @@ abstract class SketchFormComponent extends SketchObject {
     abstract function saveHTML();
 
     /**
-     *
      * @return SketchFormView
      */
     function getForm() {
@@ -58,7 +54,6 @@ abstract class SketchFormComponent extends SketchObject {
     }
 
     /**
-     *
      * @param SketchFormView $form 
      */
     protected function setForm(SketchFormView $form) {
@@ -66,7 +61,6 @@ abstract class SketchFormComponent extends SketchObject {
     }
 
     /**
-     *
      * @return array
      */
     protected function getArguments() {
@@ -74,7 +68,6 @@ abstract class SketchFormComponent extends SketchObject {
     }
 
     /**
-     *
      * @param array $arguments 
      */
     protected function setArguments(array $arguments) {

@@ -25,73 +25,61 @@
 
 class SketchRequest extends SketchObject {
     /**
-     *
      * @var boolean
      */
     private $json;
 
     /**
-     *
      * @var boolean
      */
     private $fileUpload;
 
     /**
-     *
      * @var string
      */
     private $onForwardReturn = null;
 
     /**
-     *
      * @var string
      */
     private $method;
 
     /**
-     *
      * @var boolean
      */
     private $redirect;
 
     /**
-     *
      * @var string
      */
     private $serverProtocol;
 
     /**
-     *
      * @var string
      */
     private $serverName;
 
     /**
-     *
      * @var integer
      */
     private $serverPort;
 
     /**
-     *
      * @var string
      */
     private $documentRoot;
 
     /**
-     *
      * @var string
      */
     private $uri;
 
     /**
-     *
      * @var string
      */
     private $resolvedURI;
 
     /**
-     *
      * @var array
      */
     private $attributes = array();
@@ -135,7 +123,6 @@ class SketchRequest extends SketchObject {
     }
 
     /**
-     *
      * @return boolean
      */
     function isJSON() {
@@ -143,7 +130,6 @@ class SketchRequest extends SketchObject {
     }
 
     /**
-     *
      * @return boolean
      */
     function isFileUpload() {
@@ -151,7 +137,6 @@ class SketchRequest extends SketchObject {
     }
 
     /**
-     *
      * @return string
      */
     function getOnForwardReturn() {
@@ -159,7 +144,6 @@ class SketchRequest extends SketchObject {
     }
 
     /**
-     *
      * @param string $on_forward_return
      */
     function setOnForwardReturn($on_forward_return) {
@@ -167,7 +151,6 @@ class SketchRequest extends SketchObject {
     }
 
     /**
-     *
      * @return string
      */
     function getMethod() {
@@ -175,7 +158,6 @@ class SketchRequest extends SketchObject {
     }
 
     /**
-     *
      * @return boolean
      */
     function isRedirect() {
@@ -183,7 +165,6 @@ class SketchRequest extends SketchObject {
     }
 
     /**
-     *
      * @return string
      */
     function getServerProtocol() {
@@ -191,7 +172,6 @@ class SketchRequest extends SketchObject {
     }
 
     /**
-     *
      * @return string
      */
     function getServerName() {
@@ -199,7 +179,6 @@ class SketchRequest extends SketchObject {
     }
 
     /**
-     *
      * @return integer
      */
     function getServerPort() {
@@ -207,7 +186,6 @@ class SketchRequest extends SketchObject {
     }
 
     /**
-     *
      * @return string
      */
     function getDocumentRoot() {
@@ -215,7 +193,6 @@ class SketchRequest extends SketchObject {
     }
 
     /**
-     *
      * @return string
      */
     function getURI() {
@@ -223,7 +200,6 @@ class SketchRequest extends SketchObject {
     }
 
     /**
-     *
      * @return string
      */
     function getResolvedURI() {
@@ -231,7 +207,6 @@ class SketchRequest extends SketchObject {
     }
 
     /**
-     *
      * @return array
      */
     function getAttributes() {
@@ -239,10 +214,9 @@ class SketchRequest extends SketchObject {
     }
 
     /**
-     *
      * @param $key
-     * @param bool $default
-     * @return bool
+     * @param boolean $default
+     * @return mixed
      */
     function getAttribute($key, $default = false) {
         if (array_key_exists($key, $this->attributes)) {
@@ -253,7 +227,6 @@ class SketchRequest extends SketchObject {
     }
 
     /**
-     *
      * @param $key
      * @param $value
      */

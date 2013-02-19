@@ -25,13 +25,11 @@
 
 abstract class SketchResponseFilter extends SketchObject {
     /**
-     *
      * @var SketchResponse
      */
     private $response;
 
     /**
-     *
      * @param SketchResponse $response
      */
     final function  __construct(SketchResponse $response) {
@@ -39,7 +37,6 @@ abstract class SketchResponseFilter extends SketchObject {
     }
 
     /**
-     *
      * @return SketchResponse
      */
     final function getResponse() {
@@ -47,7 +44,6 @@ abstract class SketchResponseFilter extends SketchObject {
     }
 
     /**
-     *
      * @param SketchResponse $response
      */
     final function setResponse($response) {

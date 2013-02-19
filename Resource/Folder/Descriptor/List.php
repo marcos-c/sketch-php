@@ -25,11 +25,13 @@
 
 class SketchResourceFolderDescriptorList extends SketchObjectSearchableList {
     /**
-     *
-     * @var array
+     * @var SketchResourceFolderDescriptor[]
      */
     private $descriptors;
 
+    /**
+     * @param SketchResourceFolderDescriptor[] $descriptors
+     */
     function __construct(array $descriptors) {
         foreach ($descriptors as $key => $value) {
             if (strpos($value->getReference(), '_') === false) {
@@ -40,7 +42,6 @@ class SketchResourceFolderDescriptorList extends SketchObjectSearchableList {
     }
 
     /**
-     *
      * @return integer
      */
     function getSize() {

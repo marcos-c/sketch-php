@@ -40,11 +40,6 @@ class PostgreSQLResultSet extends SketchObjectIterator {
     }
 }
 
-/**
- * PostgreSQLConnectionDriver
- *
- * @package Sketch
- */
 class PostgreSQLConnectionDriver extends SketchConnectionDriver {
     private $connection;
 
@@ -73,8 +68,7 @@ class PostgreSQLConnectionDriver extends SketchConnectionDriver {
     }
 
     /**
-     *
-     * @param string $expression
+     * @param string $table_name
      * @return array
      */
     function getTableDefinition($table_name) {
@@ -114,7 +108,6 @@ class PostgreSQLConnectionDriver extends SketchConnectionDriver {
     }
 
     /**
-     *
      * @param string $string
      * @return string
      */
@@ -129,6 +122,7 @@ class PostgreSQLConnectionDriver extends SketchConnectionDriver {
      * This version uses pg_result_error_field to get better error states so requires PHP v5.1 or later.
      *
      * @param string $expression
+     * @throws SketchResourceConnectionException
      * @return PostgreSQLResultSet
      */
     function executeQuery($expression) {
@@ -148,8 +142,9 @@ class PostgreSQLConnectionDriver extends SketchConnectionDriver {
      * Execute update expression and return true on success
      *
      * This version uses pg_result_error_field to get better error states so requires PHP v5.1 or later.
-     * 
+     *
      * @param string $expression
+     * @throws SketchResourceConnectionException
      * @return boolean
      */
     function executeUpdate($expression) {
@@ -166,7 +161,6 @@ class PostgreSQLConnectionDriver extends SketchConnectionDriver {
     }
 
     /**
-     *
      * @return boolean
      */
     function beginTransaction() {
@@ -174,7 +168,6 @@ class PostgreSQLConnectionDriver extends SketchConnectionDriver {
     }
 
     /**
-     *
      * @return boolean
      */
     function commitTransaction() {
@@ -182,7 +175,6 @@ class PostgreSQLConnectionDriver extends SketchConnectionDriver {
     }
 
     /**
-     *
      * @return boolean
      */
     function rollbackTransaction() {
@@ -190,7 +182,6 @@ class PostgreSQLConnectionDriver extends SketchConnectionDriver {
     }
 
     /**
-     *
      * @param string $attribute
      * @return boolean
      */

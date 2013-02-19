@@ -23,53 +23,73 @@
  * following link: http://opensource.org/licenses/lgpl-2.1.php
  */
 
+/**
+ * @method inputCheckbox
+ * @method inputDate
+ * @method inputDateExtended
+ * @method inputDateOld
+ * @method inputDateSimple
+ * @method inputFile
+ * @method inputFileWithPreview
+ * @method inputFileWithUploadify
+ * @method inputHidden
+ * @method inputNights
+ * @method inputRichText
+ * @method inputSecret
+ * @method inputTextArea
+ * @method inputTime
+ * @method selectCheckbox
+ * @method selectMultiple
+ * @method selectMultipleCheckbox
+ * @method selectOne
+ * @method selectOneRadio
+ * @method selectRadio
+ */
 class SketchFormView extends SketchObject {
     /**
-     *
      * @var boolean
      */
     private static $executeCommand = true;
 
     /**
-     *
      * @var SketchObjectView
      */
     protected $fromInstance;
 
     /**
-     *
-     * @var SketchObjectView
+     * @var SketchObjectView|SketchObjectList
      */
     protected $instance;
 
     /**
-     *
+     * @var mixed
+     */
+    protected $form;
+
+    /**
      * @var string
      */
     protected $formName;
 
     /**
-     *
      * @var string
      */
     protected $action;
 
     /**
-     *
      * @var boolean
      */
     protected $javascript = false;
 
     /**
-     *
-     * @var SketchFormCommand
+     * @var null|string
      */
     protected $defaultCommand = null;
 
     /**
-     *
      * @param string $name
      * @param array $arguments
+     * @throws Exception
      * @return string
      */
     function __call($name, $arguments) {
@@ -78,16 +98,19 @@ class SketchFormView extends SketchObject {
         foreach ($split as $key => $value) {
             $split[$key] = ucfirst(strtolower($value));
         }
-        require_once 'Sketch/Form/Component/'.implode('', $split).'.php';
         if (class_exists('SketchFormComponent'.$name)) {
-            $component = eval('return new SketchFormComponent'.$name.'($this, $arguments);');
-            SketchForm::addComponent($form_name, $component);
-            return trim($component->saveHTML());
-        } else throw new Exception();
+            $reflection = new ReflectionClass("SketchFormComponent$name");
+            if ($reflection->isSubclassOf('SketchFormComponent')) {
+                /** @var $component SketchFormComponent */
+                $component = $reflection->newInstance($this, $arguments);
+                SketchForm::addComponent($form_name, $component);
+                return trim($component->saveHTML());
+            }
+        }
+        throw new Exception('Component not found');
     }
 
     /**
-     *
      * @param SketchObjectView $data_view
      * @param string $form_name
      */
@@ -131,7 +154,6 @@ class SketchFormView extends SketchObject {
     }
 
     /**
-     *
      * @param string $location
      * @return string
      */
@@ -156,7 +178,6 @@ class SketchFormView extends SketchObject {
     }
 
     /**
-     *
      * @param string $location
      * @param array $attributes
      * @param boolean $set_and_clear
@@ -192,26 +213,25 @@ class SketchFormView extends SketchObject {
     }
 
     /**
-     *
      * @param mixed $command
      * @param string $target
+     * @throws Exception
      */
     function executeCommand(SketchFormCommand $command, $target) {
         if ($command instanceof SketchFormCommand && $command->getCommand() != null) {
             if (method_exists($this->instance, $command->getCommand())) {
-                $parameters = $command->getParameters();
-                $cp = null; for ($i = 0; $i < count($parameters); $i++) $cp .= ', $parameters['.$i.']';
-                $result = eval('return $this->instance->'.$command->getCommand().'($this'.$cp.');');
+                $reflection = new ReflectionMethod('SketchFormCommand', $command->getCommand());
+                $result = $reflection->invoke($this->instance, $command->getParameters());
                 // Check result
                 if ($result === true || is_string($result)) {
                     $location = (is_array($target)) ? $target[$result] : (($result) ? trim($target) : null);
                     if ($location != null || $target == null) {
                         // Update instance after calling action commands
                         if (method_exists($this->instance, "addDescriptor") && (is_array($this->form) && array_key_exists('attributes', $this->form) && is_array($this->form['attributes']))) {
-                            foreach ($this->form['attributes'] as $attribute => $value) {
+                            foreach ($this->form['attributes'] as $value) {
                                 if ($value instanceof SketchResourceFolderDescriptor) {
                                     $value->setTableName($this->getInstance()->getFolder()->getName());
-                                    eval('$this->instance->addDescriptor($value);');
+                                    $this->instance->addDescriptor($value);
                                 }
                             }
                         }
@@ -240,7 +260,6 @@ class SketchFormView extends SketchObject {
     }
 
     /**
-     *
      * @param string $mixed
      * @return string
      */
@@ -258,7 +277,6 @@ class SketchFormView extends SketchObject {
     }
 
     /**
-     *
      * @param string $mixed
      * @return string
      */
@@ -277,7 +295,6 @@ class SketchFormView extends SketchObject {
     }
 
     /**
-     *
      * @param string $mixed
      * @return string
      */
@@ -332,7 +349,8 @@ class SketchFormView extends SketchObject {
                 $key = null;
             }
             if (method_exists($instance, "get${attribute}")) {
-                $instance = eval('return $instance->get'.$attribute.'();');
+                $reflection = new ReflectionMethod($instance, "get$attribute");
+                $instance = $reflection->invoke($instance);
                 if ($key != null && is_array($instance)) $instance = (array_key_exists($key, $instance)) ? $instance[$key] : null;
             } else {
                 throw new Exception(sprintf($this->getTranslator()->_("Can't get %1\$s field for %2\$s"), $attribute, get_class($instance)));
@@ -356,7 +374,8 @@ class SketchFormView extends SketchObject {
             }
             if ($instance instanceof SketchObjectView || $instance instanceof SketchResourceFolderDescriptor) {
                 if (method_exists($instance, "set${set}")) {
-                    eval('$instance->set'.$set.'($value);');
+                    $reflection = new ReflectionMethod($instance, "set$set");
+                    $reflection->invoke($instance, $value);
                     // Make sure that we have the same value inside form attributes
                     $this->form['attributes'][base64_encode($ape)] = $value;
                 } else {
@@ -367,7 +386,6 @@ class SketchFormView extends SketchObject {
     }
 
     /**
-     *
      * @param string $attribute
      * @return SketchFormNotice
      */
@@ -380,17 +398,6 @@ class SketchFormView extends SketchObject {
             }
         }
         return false;
-    }
-
-    function getIterator($attribute) {
-        $attribute = strtolower($attribute);
-        $object = eval('return $this->instance->get'.$attribute.'();');
-        if (method_exists($object, "getiterator")) {
-            $iterator = $object->getIterator();
-        } else if ($object instanceof Iterator) {
-            $iterator = $object;
-        } else throw new Exception($this->getTranslator()->_("Field doesn't return a valid iterator object."));
-        return new SketchFormIterator($iterator);
     }
 
     function openForm($parameters = null) {

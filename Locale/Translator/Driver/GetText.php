@@ -25,26 +25,24 @@
 
 class GetTextLocaleTranslatorDriver extends SketchLocaleTranslatorDriver {
     /**
-     *
      * @var array
      */
     private $data = array();
 
     /**
-     *
      * @var array
      */
     private $availableLanguages = array();
 
     /**
-     *
      * @var string
      */
     private $domain = 'default';
 
     /**
-     *
-     * @param string $filename
+     * @param string folder
+     * @param sstring $domain
+     * @throws Exception
      */
     private function readData($folder, $domain) {
         $filename = $this->getApplication()->getDocumentRoot().$folder.'/'.$this->getLocaleString().'/LC_MESSAGES/'.$domain.'.mo';
@@ -91,7 +89,6 @@ class GetTextLocaleTranslatorDriver extends SketchLocaleTranslatorDriver {
     }
 
     /**
-     *
      * @param string $locale_string
      * @param SketchResourceXML $resource 
      */
@@ -113,8 +110,7 @@ class GetTextLocaleTranslatorDriver extends SketchLocaleTranslatorDriver {
     }
 
     /**
-     *
-     * @param $folder
+     * @param string $folder
      */
     private function setAvailableLanguages($folder) {
         $this->availableLanguages = array();
@@ -132,7 +128,6 @@ class GetTextLocaleTranslatorDriver extends SketchLocaleTranslatorDriver {
     }
 
     /**
-     *
      * @param string $text
      * @return string
      */
@@ -142,8 +137,7 @@ class GetTextLocaleTranslatorDriver extends SketchLocaleTranslatorDriver {
     }
 
     /**
-     *
-     * @return array
+     * @return string[]
      */
     function getAvailableLanguages() {
         return $this->availableLanguages;

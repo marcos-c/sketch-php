@@ -25,7 +25,6 @@
 
 abstract class SketchRouter extends SketchObject {
     /**
-     *
      * @return string
      */
     abstract function getView();

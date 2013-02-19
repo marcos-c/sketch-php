@@ -25,25 +25,21 @@
 
 abstract class SketchObjectList extends SketchObjectView {
     /**
-     *
      * @var string
      */
     private $orderBy;
 
     /**
-     *
      * @var integer
      */
     private $limit;
 
     /**
-     *
      * @var integer
      */
     private $offset;
 
     /**
-     *
      * @param SketchFormList $form
      * @param string $parameters
      * @return boolean
@@ -55,7 +51,6 @@ abstract class SketchObjectList extends SketchObjectView {
     }
 
     /**
-     *
      * @return string
      */
     final function getOrderBy() {
@@ -66,7 +61,6 @@ abstract class SketchObjectList extends SketchObjectView {
     }
 
     /**
-     *
      * @param <type> string
      */
     final function setOrderBy($order_by) {
@@ -77,7 +71,6 @@ abstract class SketchObjectList extends SketchObjectView {
     }
 
     /**
-     *
      * @param SketchFormView $form
      * @param mixed $parameters
      * @return boolean
@@ -92,7 +85,6 @@ abstract class SketchObjectList extends SketchObjectView {
     }
 
     /**
-     *
      * @param string $order_by
      */
     final function setDefaultOrderBy($order_by) {
@@ -104,7 +96,7 @@ abstract class SketchObjectList extends SketchObjectView {
     abstract function getSize();
 
     /**
-     *
+     * @param boolean $default
      * @return integer
      */
     final function getLimit($default = false) {
@@ -115,7 +107,6 @@ abstract class SketchObjectList extends SketchObjectView {
     }
 
     /**
-     *
      * @param integer $limit
      */
     final function setLimit($limit) {
@@ -134,7 +125,6 @@ abstract class SketchObjectList extends SketchObjectView {
     }
 
     /**
-     *
      * @param integer $limit
      */
     final function setDefaultLimit($limit) {
@@ -144,7 +134,6 @@ abstract class SketchObjectList extends SketchObjectView {
     }
 
     /**
-     *
      * @param SketchFormList $form
      * @param integer $parameters
      * @return integer
@@ -155,7 +144,7 @@ abstract class SketchObjectList extends SketchObjectView {
     }
 
     /**
-     *
+     * @param boolean $default
      * @return integer
      */
     final function getOffset($default = false) {
@@ -171,7 +160,6 @@ abstract class SketchObjectList extends SketchObjectView {
     }
 
     /**
-     *
      * @param integer $offset
      */
     final function setOffset($offset) {
@@ -182,7 +170,6 @@ abstract class SketchObjectList extends SketchObjectView {
     }
 
     /**
-     *
      * @param SketchFormView $form
      * @return boolean
      */

@@ -41,13 +41,10 @@ class MySQLResultSet extends SketchObjectIterator {
     }
 }
 
-/**
- * MySQLConnectionDriver
- *
- * @package Sketch
- */
 class MySQLConnectionDriver extends SketchConnectionDriver {
     private $databaseName;
+
+    private $connection;
 
     protected function connect($host, $database, $user, $password, $encoding) {
         $connection = mysql_connect($host, $user, $password);
@@ -80,7 +77,6 @@ class MySQLConnectionDriver extends SketchConnectionDriver {
     }
 
     /**
-     *
      * @param string $table_name
      * @return array
      */
@@ -106,7 +102,6 @@ class MySQLConnectionDriver extends SketchConnectionDriver {
     }
 
     /**
-     *
      * @param string $string
      * @return string
      */
@@ -118,6 +113,7 @@ class MySQLConnectionDriver extends SketchConnectionDriver {
      * Execute query expression and return result set
      *
      * @param string $expression
+     * @throws SketchResourceConnectionException
      * @return PostgreSQLResultSet
      */
     function executeQuery($expression) {
@@ -136,6 +132,7 @@ class MySQLConnectionDriver extends SketchConnectionDriver {
      * Execute update expression and return true on success
      *
      * @param string $expression
+     * @throws SketchResourceConnectionException
      * @return boolean
      */
     function executeUpdate($expression) {
@@ -151,7 +148,6 @@ class MySQLConnectionDriver extends SketchConnectionDriver {
     }
 
     /**
-     *
      * @return boolean
      */
     function beginTransaction() {
@@ -159,7 +155,6 @@ class MySQLConnectionDriver extends SketchConnectionDriver {
     }
 
     /**
-     *
      * @return boolean
      */
     function commitTransaction() {
@@ -167,7 +162,6 @@ class MySQLConnectionDriver extends SketchConnectionDriver {
     }
 
     /**
-     *
      * @return boolean
      */
     function rollbackTransaction() {
@@ -175,7 +169,6 @@ class MySQLConnectionDriver extends SketchConnectionDriver {
     }
 
     /**
-     *
      * @param string $attribute
      * @return boolean
      */

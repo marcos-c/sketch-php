@@ -25,25 +25,31 @@
 
 class SketchResponseJSON extends SketchResponse {
     /**
-     *
      * @var string
      */
     public $html;
 
     /**
-     *
+     * @var array
+     */
+    public $fragment;
+
+    /**
      * @var string
      */
     public $forward = "";
 
     /**
-     *
      * @var string
      */
     public $forwardLocation = "";
 
     /**
-     *
+     * @var array
+     */
+    public $log;
+
+    /**
      * @param DOMDocument $document
      */
     function setDocument(DOMDocument $document) {

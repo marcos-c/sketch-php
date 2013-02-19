@@ -33,7 +33,7 @@ class SketchFormComponentInputFile extends SketchFormComponent {
         $parameters = (($parameters != null && strpos(" $parameters", 'class="')) ? $parameters : implode(' ', array($parameters, 'class="input-file"')));
         if (method_exists($this->getForm()->getInstance(), 'getFolder')) {
             $folder = $this->getForm()->getInstance()->getFolder();
-            $descriptor = $folder->getDescriptor(($preview != null) ? $preview : $attribute);
+            $descriptor = $folder->getDescriptor($attribute);
             $info = null; if ($descriptor instanceof SketchResourceFolderDescriptor) {
                 $info = $this->getForm()->commandLink(new SketchFormCommand('removeDescriptor', $attribute), null, $this->getTranslator()->_('Remove')).' '.htmlspecialchars($descriptor->getSourceFileName()).', '.$descriptor->getFormattedFileSize().', '.$descriptor->getFileType().'<br />';
             } return $info.'<input type="file" name="'.$field_name.'" '.$parameters.' />';

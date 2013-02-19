@@ -23,15 +23,14 @@
  * following link: http://opensource.org/licenses/lgpl-2.1.php
  */
 
+
 class SketchForm extends SketchObject {
     /**
-     *
      * @var array
      */
     static private $components = array();
 
     /**
-     *
      * @param string $form_name
      * @return array
      */
@@ -42,7 +41,6 @@ class SketchForm extends SketchObject {
     }
 
     /**
-     *
      * @param string $form_name
      * @param array $components
      */
@@ -51,7 +49,6 @@ class SketchForm extends SketchObject {
     }
 
     /**
-     *
      * @param string $form_name
      * @param SketchFormComponent $component
      */
@@ -60,11 +57,9 @@ class SketchForm extends SketchObject {
     }
 
     /**
-     *
-     * @param string $command
      * @return SketchFormCommand
      */
-    static function Command($command = null) {
+    static function Command() {
         $a = func_get_args();
         $cp = ($a[0] != null) ? $a[0] : 'null';
         $parameters = array_slice($a, 1);
@@ -75,11 +70,9 @@ class SketchForm extends SketchObject {
     }
 
     /**
-     *
-     * @param string $command
      * @return SketchFormCommandPropagate
      */
-    static function Propagate($command = null) {
+    static function Propagate() {
         $a = func_get_args();
         $cp = ($a[0] != null) ? $a[0] : 'null';
         $parameters = array_slice($a, 1);
@@ -90,9 +83,9 @@ class SketchForm extends SketchObject {
     }
 
     /**
-     *
-     * @param SketchObject $data_object
-     * @param string $view_name
+     * @param SketchObjectView $data_object
+     * @param null $view_id
+     * @throws Exception
      * @return mixed
      */
     static function Factory(SketchObjectView $data_object, $view_id = null) {

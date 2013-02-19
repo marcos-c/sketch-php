@@ -25,19 +25,16 @@
 
 class SketchSessionACL extends SketchObject {
     /**
-     *
      * @var array
      */
     private $attributes = array();
 
     /**
-     *
      * @var array
      */
     private $rules = array();
 
     /**
-     *
      * @param string $key
      * @return string
      */
@@ -48,7 +45,6 @@ class SketchSessionACL extends SketchObject {
     }
 
     /**
-     *
      * @param string $key
      * @param string $value
      */
@@ -59,7 +55,6 @@ class SketchSessionACL extends SketchObject {
     }
 
     /**
-     *
      * @param string $rule
      */
     function addRule($rule) {
@@ -69,7 +64,6 @@ class SketchSessionACL extends SketchObject {
     }
 
     /**
-     *
      * @param mixed $mixed
      * @return boolean
      */

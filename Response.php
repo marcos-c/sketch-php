@@ -25,25 +25,21 @@
 
 class SketchResponse extends SketchObject {
     /**
-     *
      * @var boolean
      */
     private $isXHTML = false;
 
     /**
-     *
      * @var boolean
      */
     private $forceEncoding = false;
 
     /**
-     *
      * @var DOMDocument
      */
     protected $document;
 
     /**
-     *
      * @return string
      */
     function  __toString() {
@@ -55,7 +51,6 @@ class SketchResponse extends SketchObject {
     }
 
     /**
-     *
      * @return boolean
      */
     function getIsXHTML() {
@@ -63,7 +58,6 @@ class SketchResponse extends SketchObject {
     }
 
     /**
-     *
      * @return boolean
      */
     function isXHTML() {
@@ -71,7 +65,6 @@ class SketchResponse extends SketchObject {
     }
 
     /**
-     *
      * @return boolean
      */
     function getForceEncoding() {
@@ -79,7 +72,6 @@ class SketchResponse extends SketchObject {
     }
 
     /**
-     *
      * @param boolean $force_encoding
      */
     function setForceEncoding($force_encoding) {
@@ -87,7 +79,6 @@ class SketchResponse extends SketchObject {
     }
 
     /**
-     *
      * @param boolean $is_xhtml
      */
     function setIsXHTML($is_xhtml) {
@@ -95,7 +86,6 @@ class SketchResponse extends SketchObject {
     }
 
     /**
-     *
      * @return DOMDocument
      */
     function getDocument() {
@@ -103,7 +93,6 @@ class SketchResponse extends SketchObject {
     }
 
     /**
-     *
      * @param DOMDocument $document
      */
     function setDocument(DOMDocument $document) {

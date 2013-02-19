@@ -25,19 +25,16 @@
 
 class SketchLocaleISO extends SketchObject {
     /**
-     *
      * @var array
      */
     private static $localizedCountries = array();
 
     /**
-     *
      * @var array
      */
     private static $localizedLanguages = array();
 
     /**
-     *
      * @return array
      */
     static function getMonthNames() {
@@ -48,7 +45,7 @@ class SketchLocaleISO extends SketchObject {
     }
 
     /**
-     *
+     * @param null $filter
      * @return array
      */
     static function getCountries($filter = null) {
@@ -315,7 +312,6 @@ class SketchLocaleISO extends SketchObject {
     }
 
     /**
-     *
      * @return array
      */
     static function getLanguages() {

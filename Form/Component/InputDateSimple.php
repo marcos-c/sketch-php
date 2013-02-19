@@ -25,12 +25,9 @@
 
 class SketchFormComponentInputDateSimple extends SketchFormComponent {
     /**
-     *
      * @return string
      */
     function javascript() {
-        $arguments = $this->getArguments();
-        $attribute = array_shift($arguments);
         $form_name = $this->getForm()->getFormName();
         ob_start(); ?>
         function <?=$form_name?>UpdateDate(input, date, calendar_input) {
@@ -104,7 +101,6 @@ class SketchFormComponentInputDateSimple extends SketchFormComponent {
     }
 
     /**
-     *
      * @return string
      */
     function saveHTML() {

@@ -25,13 +25,11 @@
 
 class MySQLLocaleTranslatorDriver extends SketchLocaleTranslatorDriver {
     /**
-     *
      * @var array
      */
     private $data = array();
 
     /**
-     *
      * @var string
      */
     private $domain = 'default';
@@ -52,7 +50,6 @@ class MySQLLocaleTranslatorDriver extends SketchLocaleTranslatorDriver {
     }
 
     /**
-     *
      * @param string $locale_string
      * @param SketchResourceXML $resource
      */
@@ -62,7 +59,6 @@ class MySQLLocaleTranslatorDriver extends SketchLocaleTranslatorDriver {
     }
     
     /**
-     *
      * @param string $text
      * @return string
      */
@@ -72,7 +68,6 @@ class MySQLLocaleTranslatorDriver extends SketchLocaleTranslatorDriver {
     }
 
     /**
-     *
      * @return array
      */
     function getAvailableLanguages() {

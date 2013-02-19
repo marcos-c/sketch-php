@@ -25,14 +25,13 @@
 
 class SketchResourceFactory {
     /**
-     *
      * @var string
      */
-    static private $defaultContext = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<context name=\"sketch\" layer=\"default\">\n\t<layer name=\"default\" />\n</context>";
+    static private $defaultContext = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<context name=\"sketch\" layer=\"default\">\n\t<layer name=\"default\"></layer>\n</context>";
 
     /**
-     *
      * @param SketchResourceContext $context
+     * @throws Exception
      * @return SketchResourceConnection
      */
     static function getConnection(SketchResourceContext $context) {
@@ -40,22 +39,25 @@ class SketchResourceFactory {
         if ($driver) {
             $type = $driver->getAttribute('type');
             $class = $driver->getAttribute('class');
-            $source = $driver->getAttribute('source');
-            if (SketchUtils::Readable("Sketch/Resource/Connection/Driver/$source")) {
-                require_once "Sketch/Resource/Connection/Driver/$source";
-                if (class_exists($class)) {
-                    eval('$instance = new '.$class.'($driver);');
-                    if ($instance instanceof $type) {
-                        return new SketchResourceConnection($instance);
-                    } else throw new Exception(sprinf($context->getTranslator()->_("Driver %s does not extend or implement %s"), $class, $type));
-                } else throw new Exception(sprintf($context->getTranslator()->_("Can't instantiate class %s"), $class));
-            } else throw new Exception(sprintf($context->getTranslator()->_("File %s can't be found"), $source));
+            if (class_exists($class)) {
+                $reflection = new ReflectionClass($class);
+                $instance = $reflection->newInstance($driver);
+                if ($instance instanceof $type) {
+                    return new SketchResourceConnection($instance);
+                } else {
+                    throw new Exception(sprintf($context->getTranslator()->_("Driver %s does not extend or implement %s"), $class, $type));
+                }
+            } else {
+                throw new Exception(sprintf($context->getTranslator()->_("Can't instantiate class %s"), $class));
+            }
+        } else {
+            throw new Exception($context->getTranslator()->_("No driver configuration in context"));
         }
     }
 
     /**
-     *
      * @param string $file
+     * @throws Exception
      * @return SketchResourceContext
      */
     static function getContext($file) {
@@ -80,8 +82,8 @@ class SketchResourceFactory {
     }
 
     /**
-     *
      * @param string $file
+     * @throws Exception
      * @return SketchResourceXML
      */
     static function getXML($file) {

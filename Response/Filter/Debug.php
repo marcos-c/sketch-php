@@ -25,7 +25,6 @@
 
 class DebugResponseFilter extends SketchResponseFilter {
     /**
-     *
      * @param SketchResourceXML $resource 
      */
     function apply(SketchResourceXML $resource) {

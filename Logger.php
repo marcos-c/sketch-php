@@ -25,13 +25,11 @@
 
 abstract class SketchLogger extends SketchObject {
     /**
-     *
      * @var integer
      */
     static protected $level = 5;
 
     /**
-     *
      * @return integer
      */
     function getLevel() {
@@ -39,7 +37,6 @@ abstract class SketchLogger extends SketchObject {
     }
 
     /**
-     *
      * @param integer $level
      */
     function setLevel($level) {
@@ -47,13 +44,13 @@ abstract class SketchLogger extends SketchObject {
     }
 
     /**
-     *
      * @param string $message
+     * @param int $level
+     * @return mixed
      */
     abstract function log($message, $level = 5);
 
     /**
-     *
      * @return array
      */
     abstract function getMessages();

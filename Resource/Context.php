@@ -51,6 +51,7 @@ class SketchResourceContext extends SketchResourceXML {
     /**
      *
      * @param DOMDocument $document
+     * @throws Exception
      */
     function __construct(DOMDocument $document) {
         $context = $document->getElementsByTagName('context')->item(0);
@@ -170,6 +171,7 @@ class SketchResourceContext extends SketchResourceXML {
 
     /**
      *
+     * @param $reference
      * @param string $type
      * @param string $class
      * @param string $source
@@ -201,6 +203,7 @@ class SketchResourceContext extends SketchResourceXML {
      * @param string $type
      * @param string $class
      * @param string $source
+     * @param null $excludes
      * @param array $parameters
      */
     function addExtension($type, $class, $source, $excludes = null, array $parameters = null) {
@@ -233,6 +236,7 @@ class SketchResourceContext extends SketchResourceXML {
      *
      * @param string $for
      * @param string $name
+     * @return array
      */
     function getParametersFor($for, $name) {
         $parameters = array();
@@ -251,7 +255,7 @@ class SketchResourceContext extends SketchResourceXML {
                     } else if ($n2->hasAttributes()) {
                         $attributes = array('type' => $n2->nodeName);
                         foreach ($n2->attributes as $attribute) {
-                            /* @var $attribute DOMAttribute */
+                            /* @var $attribute DOMAttr */
                             $attributes[$attribute->name] = $attribute->value;
                         }
                         if (array_key_exists('reference', $attributes)) {

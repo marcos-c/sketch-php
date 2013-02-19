@@ -25,7 +25,6 @@
 
 class SketchRouterRewrite extends SketchRouter {
     /**
-     *
      * @param $uri
      * @param null $language
      * @return string
@@ -53,7 +52,6 @@ class SketchRouterRewrite extends SketchRouter {
     }
 
     /**
-     *
      * @return string
      */
     function getView() {

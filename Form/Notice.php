@@ -25,13 +25,11 @@
 
 class SketchFormNotice extends SketchApplicationNotice {
     /**
-     *
      * @var string
      */
     private $fieldName = null;
 
     /**
-     *
      * @param string $field_name
      * @param string $message
      */
@@ -42,7 +40,6 @@ class SketchFormNotice extends SketchApplicationNotice {
     }
 
     /**
-     *
      * @return string
      */
     function getFieldName() {
@@ -50,7 +47,6 @@ class SketchFormNotice extends SketchApplicationNotice {
     }
 
     /**
-     *
      * @param string $field_name
      */
     function setFieldName($field_name) {

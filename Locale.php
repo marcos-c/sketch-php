@@ -25,25 +25,21 @@
 
 class SketchLocale extends SketchObject {
     /**
-     *
      * @var SketchLocaleTranslator
      */
     private $translator;
 
     /**
-     *
      * @var string
      */
     private $language;
 
     /**
-     *
      * @var string
      */
     private $country;
 
     /**
-     *
      * @return string
      */
     function getLanguage() {
@@ -51,8 +47,8 @@ class SketchLocale extends SketchObject {
     }
 
     /**
-     *
      * @param string $language
+     * @throws Exception
      */
     function setLanguage($language) {
         $language = strtolower($language);
@@ -62,7 +58,6 @@ class SketchLocale extends SketchObject {
     }
     
     /**
-     *
      * @return string
      */
     function getCountry() {
@@ -70,8 +65,8 @@ class SketchLocale extends SketchObject {
     }
 
     /**
-     *
      * @param string $country
+     * @throws Exception
      */
     function setCountry($country) {
         if ($country != null) {
@@ -83,7 +78,6 @@ class SketchLocale extends SketchObject {
     }
 
     /**
-     *
      * @param string $language
      * @param string $country
      */
@@ -93,7 +87,6 @@ class SketchLocale extends SketchObject {
     }
 
     /**
-     *
      * @param string $locale_string
      * @return SketchLocale 
      */
@@ -103,7 +96,7 @@ class SketchLocale extends SketchObject {
     }
 
     /**
-     *
+     * @throws Exception
      * @return string
      */
     function toString() {
@@ -119,7 +112,6 @@ class SketchLocale extends SketchObject {
     }
 
     /**
-     *
      * @param string $reference
      * @return SketchLocaleTranslator
      * @throws Exception
@@ -133,20 +125,21 @@ class SketchLocale extends SketchObject {
                 $ref = $ref != null ? $ref : 'default';
                 $type = $driver->getAttribute('type');
                 $class = $driver->getAttribute('class');
-                $source = $driver->getAttribute('source');
-                if (SketchUtils::Readable("Sketch/Locale/Translator/Driver/$source")) {
-                    require_once "Sketch/Locale/Translator/Driver/$source";
-                    try {
-                        if (class_exists($class)) {
-                            eval('$instance = new '.$class.'(\''.$this->toString().'\', $driver);');
-                            if ($instance instanceof $type) {
-                                $this->translator[$ref] = new SketchLocaleTranslator($instance);
-                            } else throw new Exception(sprinf("Driver %s does not extend or implement %s", $class, $type));
-                        } else throw new Exception(sprintf("Can't instantiate class %s", $class));
-                    } catch (Exception $e) {
-                        $this->translator[$ref] = new SketchLocaleTranslator(new DummyLocaleTranslatorDriver());
+                try {
+                    if (class_exists($class)) {
+                        $reflection = new ReflectionClass($class);
+                        $instance = $reflection->newInstance($this->toString(), $driver);
+                        if ($instance instanceof $type) {
+                            $this->translator[$ref] = new SketchLocaleTranslator($instance);
+                        } else {
+                            throw new Exception(sprintf("Driver %s does not extend or implement %s", $class, $type));
+                        }
+                    } else {
+                        throw new Exception(sprintf("Can't instantiate class %s", $class));
                     }
-                } else throw new Exception(sprintf("File %s can't be found", $source));
+                } catch (Exception $e) {
+                    $this->translator[$ref] = new SketchLocaleTranslator(new DummyLocaleTranslatorDriver());
+                }
             }
         }
         if (array_key_exists($reference, $this->translator)) {
@@ -157,7 +150,6 @@ class SketchLocale extends SketchObject {
     }
 
     /**
-     *
      * @return SketchLocaleFormatter 
      */
     function getFormatter() {

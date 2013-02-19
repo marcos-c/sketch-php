@@ -25,19 +25,16 @@
 
 class SketchResponseException extends Exception {
     /**
-     *
      * @var array
      */
     private $debugInfo = array();
 
     /**
-     *
      * @var array
      */
     private $stack = array();
 
     /**
-     *
      * @return array
      */
     function getDebugInfo() {
@@ -45,7 +42,6 @@ class SketchResponseException extends Exception {
     }
 
     /**
-     *
      * @param mixed $debug_info
      */
     function addDebugInfo($debug_info) {
@@ -53,7 +49,6 @@ class SketchResponseException extends Exception {
     }
 
     /**
-     *
      * @return array
      */
     function getStack() {
@@ -61,7 +56,6 @@ class SketchResponseException extends Exception {
     }
 
     /**
-     *
      * @param Exception $exception 
      */
     function addToStack(Exception $exception) {

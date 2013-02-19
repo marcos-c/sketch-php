@@ -25,13 +25,11 @@
 
 abstract class SketchLocaleTranslatorDriver extends SketchObject {
     /**
-     *
      * @var string
      */
     private $localeString;
 
     /**
-     *
      * @return string
      */
     function getLocaleString() {
@@ -39,7 +37,6 @@ abstract class SketchLocaleTranslatorDriver extends SketchObject {
     }
 
     /**
-     *
      * @param string $locale_string
      */
     function setLocaleString($locale_string) {
@@ -47,14 +44,12 @@ abstract class SketchLocaleTranslatorDriver extends SketchObject {
     }
 
     /**
-     *
      * @param string $text
      * @return string
      */
     abstract function translate($text);
 
     /**
-     *
      * @abstract
      * @return array
      */

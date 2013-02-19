@@ -25,7 +25,6 @@
 
 class AnalyticsResponseFilter extends SketchResponseFilter {
     /**
-     *
      * @param SketchResourceXML $resource
      * @throws Exception
      */
@@ -44,21 +43,15 @@ class AnalyticsResponseFilter extends SketchResponseFilter {
         $r = $resource->query('//add-transaction-handler');
         foreach ($r as $transaction_handler) {
             $class = $transaction_handler->getAttribute('class');
-            $source = $transaction_handler->getAttribute('source');
-            if (SketchUtils::Readable($source)) {
-                require_once $source;
-                if (class_exists($class)) {
-                    $reflection = new ReflectionClass($class);
-                    if ($reflection->implementsInterface('AnalyticsResponseFilterTransactionHandlerInterface')) {
-                        $script .= $reflection->newInstance()->execute();
-                    } else {
-                        throw new Exception(sprinf($this->getTranslator()->_("Handler %s does not implement AnalyticsResponseFilterTransactionHandlerInterface"), $class));
-                    }
+            if (class_exists($class)) {
+                $reflection = new ReflectionClass($class);
+                if ($reflection->implementsInterface('AnalyticsResponseFilterTransactionHandlerInterface')) {
+                    $script .= $reflection->newInstance()->execute();
                 } else {
-                    throw new Exception(sprintf($this->getTranslator()->_("Can't instantiate class %s"), $class));
+                    throw new Exception(sprintf($this->getTranslator()->_("Handler %s does not implement AnalyticsResponseFilterTransactionHandlerInterface"), $class));
                 }
             } else {
-                throw new Exception(sprintf($this->getTranslator()->_("File %s can't be found"), $source));
+                throw new Exception(sprintf($this->getTranslator()->_("Can't instantiate class %s"), $class));
             }
         }
         $script .= "\n(function() {\nvar ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;\nga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';\nvar s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);\n})();";

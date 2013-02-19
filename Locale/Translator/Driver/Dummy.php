@@ -29,7 +29,6 @@ class DummyLocaleTranslatorDriver extends SketchLocaleTranslatorDriver {
     }
 
     /**
-     *
      * @param string $text
      * @return string
      */
@@ -38,7 +37,6 @@ class DummyLocaleTranslatorDriver extends SketchLocaleTranslatorDriver {
     }
 
     /**
-     *
      * @return array
      */
     function getAvailableLanguages() {

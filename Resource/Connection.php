@@ -25,7 +25,6 @@
 
 class SketchResourceConnection extends SketchResource {
     /**
-     *
      * @var SketchConnectionDriver
      */
     private $driver;
@@ -35,7 +34,6 @@ class SketchResourceConnection extends SketchResource {
     }
 
     /**
-     *
      * @return SketchConnectionDriver
      */
     function getDriver() {
@@ -43,7 +41,6 @@ class SketchResourceConnection extends SketchResource {
     }
 
     /**
-     *
      * @param SketchConnectionDriver $driver
      */
     function setDriver(SketchConnectionDriver $driver) {
@@ -51,7 +48,6 @@ class SketchResourceConnection extends SketchResource {
     }
 
     /**
-     *
      * @param string $default
      * @return string
      */
@@ -60,7 +56,6 @@ class SketchResourceConnection extends SketchResource {
     }
 
     /**
-     *
      * @param mixed $do_not_show
      * @return array
      */
@@ -69,7 +64,6 @@ class SketchResourceConnection extends SketchResource {
     }
 
     /**
-     *
      * @param string $table_name
      * @return array
      */
@@ -78,7 +72,6 @@ class SketchResourceConnection extends SketchResource {
     }
 
     /**
-     *
      * @param string $string
      * @return string
      */
@@ -87,8 +80,8 @@ class SketchResourceConnection extends SketchResource {
     }
 
     /**
-     *
      * @param string $string
+     * @param $encoding
      * @return string
      */
     function toASCII($string, $encoding) {
@@ -97,15 +90,14 @@ class SketchResourceConnection extends SketchResource {
     }
 
     /**
-     *
      * @param string $expression
+     * @return SketchObjectIterator
      */
     function executeQuery($expression) {
         return $this->driver->executeQuery($expression);
     }
 
     /**
-     *
      * @param string $expression
      * @return boolean
      */
@@ -114,7 +106,6 @@ class SketchResourceConnection extends SketchResource {
     }
 
     /**
-     *
      * @return boolean
      */
     function beginTransaction() {
@@ -122,7 +113,6 @@ class SketchResourceConnection extends SketchResource {
     }
 
     /**
-     *
      * @return boolean
      */
     function commitTransaction() {
@@ -130,7 +120,6 @@ class SketchResourceConnection extends SketchResource {
     }
 
     /**
-     *
      * @return boolean
      */
     function rollbackTransaction() {
@@ -138,7 +127,6 @@ class SketchResourceConnection extends SketchResource {
     }
 
     /**
-     *
      * @param string $expression
      * @return SketchObjectIterator
      */
@@ -147,7 +135,6 @@ class SketchResourceConnection extends SketchResource {
     }
 
     /**
-     *
      * @param string $expression
      * @return array
      */
@@ -156,7 +143,6 @@ class SketchResourceConnection extends SketchResource {
     }
 
     /**
-     *
      * @param string $expression
      * @return string
      */
@@ -165,7 +151,6 @@ class SketchResourceConnection extends SketchResource {
     }
 
     /**
-     *
      * @param string $expression
      * @return array
      */
@@ -174,7 +159,6 @@ class SketchResourceConnection extends SketchResource {
     }
 
     /**
-     *
      * @param string $attribute
      * @return boolean
      */

@@ -25,7 +25,6 @@
 
 abstract class SketchObject {
     /**
-     *
      * @return SketchApplication
      */
     function getApplication() {
@@ -33,7 +32,6 @@ abstract class SketchObject {
     }
 
     /**
-     *
      * @return SketchResourceContext
      */
     function getContext() {
@@ -41,7 +39,6 @@ abstract class SketchObject {
     }
 
     /**
-     *
      * @return SketchLogger
      */
     function getLogger() {
@@ -49,7 +46,6 @@ abstract class SketchObject {
     }
 
     /**
-     *
      * @return SketchResourceConnection
      */
     function getConnection() {
@@ -57,7 +53,6 @@ abstract class SketchObject {
     }
 
     /**
-     *
      * @return SketchController
      */
     function getController() {
@@ -65,7 +60,6 @@ abstract class SketchObject {
     }
 
     /**
-     *
      * @return SketchRequest
      */
     function getRequest() {
@@ -73,7 +67,6 @@ abstract class SketchObject {
     }
 
     /**
-     *
      * @return SketchSession
      */
     function getSession() {
@@ -81,7 +74,6 @@ abstract class SketchObject {
     }
 
     /**
-     *
      * @return SketchLocale
      */
     function getLocale() {
@@ -89,7 +81,6 @@ abstract class SketchObject {
     }
 
     /**
-     *
      * @param string $reference
      * @return SketchLocaleTranslator
      */
@@ -98,7 +89,6 @@ abstract class SketchObject {
     }
 
     /**
-     *
      * @return SketchLocaleFormatter
      */
     function getFormatter() {
@@ -106,7 +96,6 @@ abstract class SketchObject {
     }
 
     /**
-     *
      * @return array
      */
     function extend() {
@@ -140,7 +129,6 @@ abstract class SketchObject {
     }
 
     /**
-     *
      * @return array
      */
     function expand() {

@@ -25,13 +25,11 @@
 
 class SketchLocaleTranslator extends SketchObject {
     /**
-     *
      * @var SketchLocaleTranslatorDriver
      */
     private $driver;
 
     /**
-     *
      * @param SketchLocaleTranslatorDriver $driver 
      */
     function  __construct(SketchLocaleTranslatorDriver $driver) {
@@ -39,7 +37,6 @@ class SketchLocaleTranslator extends SketchObject {
     }
 
     /**
-     *
      * @return SketchLocaleTranslatorDriver
      */
     function getDriver() {
@@ -47,7 +44,6 @@ class SketchLocaleTranslator extends SketchObject {
     }
 
     /**
-     *
      * @param SketchLocaleTranslatorDriver $driver
      */
     function setDriver(SketchLocaleTranslatorDriver $driver) {
@@ -55,7 +51,6 @@ class SketchLocaleTranslator extends SketchObject {
     }
 
     /**
-     *
      * @param string $text
      * @return string
      */
@@ -64,7 +59,6 @@ class SketchLocaleTranslator extends SketchObject {
     }
 
     /**
-     *
      * @param string $text
      * @return string
      */

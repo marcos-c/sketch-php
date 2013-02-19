@@ -25,7 +25,6 @@
 
 class FirebugResponseFilter extends SketchResponseFilter {
     /**
-     *
      * @param string $message
      * @return string
      */
@@ -35,27 +34,30 @@ class FirebugResponseFilter extends SketchResponseFilter {
     }
 
     /**
-     *
      * @param SketchResourceXML $resource
      */
     function apply(SketchResourceXML $resource) {
         $debug_level = $resource->queryCharacterData('//debug-level', 1);
         $script = "\tif (typeof window.console != 'undefined') { ";
         switch ($debug_level) {
+            /** @noinspection PhpMissingBreakStatementInspection */
             case 5:
                 // Session
                 $message = $this->formatMessage(print_r($this->getSession(), true));
                 $script .= "\t\tconsole.log('$message'); ";
+            /** @noinspection PhpMissingBreakStatementInspection */
             case 4:
                 // Request
                 $message = $this->formatMessage(print_r($this->getRequest(), true));
                 $script .= "\t\tconsole.log('$message'); ";
+            /** @noinspection PhpMissingBreakStatementInspection */
             case 3:
                 // Logged messages
                 foreach ($this->getLogger()->getMessages() as $message) {
                     $message = $this->formatMessage($message);
                     $script .= "\t\tconsole.log('$message'); ";
                 }
+            /** @noinspection PhpMissingBreakStatementInspection */
             case 2:
                 // Notices
                 foreach ($this->getApplication()->getNotices() as $notice) {

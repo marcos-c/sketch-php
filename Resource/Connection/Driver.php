@@ -25,14 +25,13 @@
 
 abstract class SketchConnectionDriver extends SketchResource {
     /**
-     *
      * @var string
      */
     private $tablePrefix;
 
     /**
-     *
-     * @param SketchResource $resource 
+     * @param SketchResource $resource
+     * @throws SketchResourceConnectionException
      */
     final function __construct(SketchResource $resource) {
         try {
@@ -53,19 +52,18 @@ abstract class SketchConnectionDriver extends SketchResource {
     }
 
     /**
-     *
      * @param string $host
      * @param string $user
      * @param string $password
      * @param string $database
-     * @param stirng $encoding
+     * @param string $encoding
      */
     abstract protected function connect($host, $user, $password, $database, $encoding);
 
     abstract protected function close();
 
     /**
-     *
+     * @param $default
      * @return string
      */
     function getTablePrefix($default) {
@@ -73,7 +71,6 @@ abstract class SketchConnectionDriver extends SketchResource {
     }
 
     /**
-     *
      * @param string $table_prefix
      */
     function setTablePrefix($table_prefix) {
@@ -81,60 +78,51 @@ abstract class SketchConnectionDriver extends SketchResource {
     }
     
     /**
-     *
      * @param mixed $do_not_show
      * @return array
      */
     abstract function getTables($do_not_show = null);
     
     /**
-     *
      * @param string $table_name
      * @return array
      */
     abstract function getTableDefinition($table_name);
 
     /**
-     *
      * @param string $string
      * @return string
      */
     abstract function escapeString($string);
     
     /**
-     *
      * @param string $expression
      * @return SketchObjectIterator
      */
     abstract function executeQuery($expression);
 
     /**
-     *
      * @param string $expression
      * @return boolean
      */
     abstract function executeUpdate($expression);
 
     /**
-     *
      * @return boolean
      */
     abstract function beginTransaction();
 
     /**
-     *
      * @return boolean
      */
     abstract function commitTransaction();
 
     /**
-     *
      * @return boolean
      */
     abstract function rollbackTransaction();
 
     /**
-     *
      * @param string $expression
      * @return SketchObjectIterator
      */
@@ -143,7 +131,6 @@ abstract class SketchConnectionDriver extends SketchResource {
     }
 
     /**
-     *
      * @param string $expression
      * @return array
      */
@@ -152,7 +139,6 @@ abstract class SketchConnectionDriver extends SketchResource {
     }
 
     /**
-     *
      * @param string $expression
      * @return mixed
      */
@@ -162,7 +148,6 @@ abstract class SketchConnectionDriver extends SketchResource {
     }
 
     /**
-     *
      * @param string $expression
      * @return array
      */
@@ -181,7 +166,6 @@ abstract class SketchConnectionDriver extends SketchResource {
     }
 
     /**
-     *
      * @param string $attribute
      * @return boolean
      */

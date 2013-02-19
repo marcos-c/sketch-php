@@ -25,7 +25,6 @@
 
 class LayoutResponseFilter extends SketchResponseFilter {
     /**
-     *
      * @param DOMDocument $layout
      * @param DOMElement $append
      * @param DOMElement $old
@@ -37,7 +36,6 @@ class LayoutResponseFilter extends SketchResponseFilter {
     }
 
     /**
-     *
      * @param DOMDocument $layout
      * @param DOMElement $replace
      * @param DOMElement $old
@@ -93,16 +91,15 @@ class LayoutResponseFilter extends SketchResponseFilter {
                 if (strpos($uri, $for) !== false) {
                     $context = $this->getContext();
                     $class = $layout->getAttribute('class');
-                    $source = $layout->getAttribute('source');
-                    if (SketchUtils::Readable($source)) {
-                        require_once $source;
-                        if (class_exists($class)) {
-                            eval('$instance = '.$class.'::getCurrentlySelectedLayout();');
-                            /** @var $instance SketchObjectView */
-                            $attributes = $instance->getAttributes();
-                            $layout_path = $instance->getPath();
-                        } else throw new Exception(sprintf($context->getTranslator()->_("Can't instantiate class %s"), $class));
-                    } else throw new Exception(sprintf($context->getTranslator()->_("File %s can't be found"), $source));
+                    if (class_exists($class)) {
+                        $reflection = new ReflectionMethod($class, 'getCurrentlySelectedLayout');
+                        $instance = $reflection->invoke(null);
+                        /** @var $instance SketchObjectView */
+                        $attributes = $instance->getAttributes();
+                        $layout_path = $instance->getPath();
+                    } else {
+                        throw new Exception(sprintf($context->getTranslator()->_("Can't instantiate class %s"), $class));
+                    }
                 }
             }
         }

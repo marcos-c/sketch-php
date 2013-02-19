@@ -44,7 +44,6 @@ abstract class SketchObjectIterator extends SketchObject implements Iterator {
     abstract function fetch($key);
 
     /**
-     *
      * @return mixed
      */
     final function current() {
@@ -54,8 +53,7 @@ abstract class SketchObjectIterator extends SketchObject implements Iterator {
     }
 
     /**
-     *
-     * @return scalar
+     * @return mixed
      */
     final function key() {
         return $this->key;
@@ -70,7 +68,6 @@ abstract class SketchObjectIterator extends SketchObject implements Iterator {
     }
 
     /**
-     *
      * @return boolean
      */
     final function valid() {
@@ -78,8 +75,7 @@ abstract class SketchObjectIterator extends SketchObject implements Iterator {
     }
 
     /**
-     *
-     * @param bool $full
+     * @param boolean $full
      * @return array
      */
     final function toArray($full = true) {

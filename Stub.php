@@ -23,9 +23,9 @@
  * following link: http://opensource.org/licenses/lgpl-2.1.php
  */
 
+// Initialize application and context
+$application = SketchApplication::getInstance();
 try {
-    // Initialize application and context
-    $application = SketchApplication::getInstance();
     header("Content-Type: text/html; charset=UTF-8");
     set_error_handler(array('SketchApplication', 'exceptionErrorHandler'));
     $application->setStartTime(microtime(true));
@@ -62,7 +62,7 @@ try {
     // Output response
     if ($application->getRequest()->isJSON()) {
         $application->getController()->setResponse(new SketchResponseJSON());
-        print SketchUtils::encodeJSON($application->getController()->getResponse());
+        print json_encode($application->getController()->getResponse());
     } else {
         $application->getController()->setResponse(new SketchResponse());
         $application->getController()->setResponseFilters($application->getContext());
@@ -76,7 +76,7 @@ try {
     if ($application->getContext()->getLayerName() != 'production') {
         print '<pre>';
         print "<b>You have an exception!</b>\n".trim($e->getMessage())."\n<i>Thrown on line ".$e->getLine()." ($file_name)</i>\n";
-        print "<b>Trace</b>\n";
+        print "<strong>Trace</strong>\n";
         foreach ($e->getTrace() as $r) {
             if (array_key_exists('class', $r) && $r['function'] != 'exceptionErrorHandler') {
                 print $r['class'].'.'.$r['function']."()\n";
@@ -84,7 +84,7 @@ try {
         }
         print '</pre>';
         if ($e instanceof SketchResponseException) {
-            print "<pre style=\"padding: 10px; background-color: #ccc; overflow: auto;\"><b>Source</b>";
+            print "<pre style=\"padding: 10px; background-color: #ccc; overflow: auto;\"><strong>Source</strong>";
             foreach ($e->getStack() as $r) {
                 $file_name = str_replace($server_document_root, '', $r->getFile());
                 print $r->getMessage()." on line ".$r->getLine()." (".$file_name.")\n";
@@ -95,7 +95,7 @@ try {
             print "</pre>";
         }
         if ($application->getRequest()->isJSON()) {
-            print SketchUtils::encodeJSON(array('html' => ob_get_clean()));
+            print json_encode(array('html' => ob_get_clean()));
         } else {
             print ob_get_clean();
         }
@@ -105,8 +105,8 @@ try {
         if ($parameters['send-exceptions-to']['email-address'] != null) {
             ob_start();
             print '<pre>';
-            print "<b>An exception was thrown in $name!</b>\n".trim($e->getMessage())."\n<i>Thrown on line ".$e->getLine()." ($file_name)</i>\n";
-            print "<b>Trace</b>\n";
+            print "<strong>An exception was thrown in $name!</strong>\n".trim($e->getMessage())."\n<i>Thrown on line ".$e->getLine()." ($file_name)</i>\n";
+            print "<strong>Trace</strong>\n";
             foreach ($e->getTrace() as $r) {
                 if (array_key_exists('class', $r) && $r['function'] != 'exceptionErrorHandler') {
                     print $r['class'].'.'.$r['function']."()\n";
@@ -114,7 +114,7 @@ try {
             }
             print '</pre>';
             if ($e instanceof SketchResponseException) {
-                print "<pre style=\"padding: 10px; background-color: #ccc; overflow: auto;\"><b>Source</b>";
+                print "<pre style=\"padding: 10px; background-color: #ccc; overflow: auto;\"><strong>Source</strong>";
                 foreach ($e->getStack() as $r) {
                     $file_name = str_replace($server_document_root, '', $r->getFile());
                     print $r->getMessage()." on line ".$r->getLine()." (".$file_name.")\n";
@@ -124,7 +124,7 @@ try {
                 }
                 print "</pre>";
             }
-            $message = new SketchMailMessage();
+            /* $message = new SketchMailMessage();
             $reply_to = new SketchMailAddress($parameters['send-exceptions-to']['email-address']);
             $message->setReplyTo($reply_to);
             $message->setFrom($reply_to);
@@ -143,10 +143,10 @@ try {
             }
             $message->setSubject("An exception was thrown in $name!");
             $message->setContent(ob_get_clean());
-            SketchMailTransport::sendMessage($message);
+            SketchMailTransport::sendMessage($message); */
         }
         if ($application->getRequest()->isJSON()) {
-            print SketchUtils::encodeJSON(array('html' => "An error has occurred, please try again later."));
+            print json_encode(array('html' => "An error has occurred, please try again later."));
         } else {
             print "An error has occurred, please try again later.";
         }

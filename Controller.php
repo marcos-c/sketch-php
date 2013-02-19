@@ -25,13 +25,16 @@
 
 class SketchController extends SketchObject {
     /**
-     *
      * @var SketchRouter
      */
     private $router;
 
     /**
-     *
+     * @var SketchResponse
+     */
+    private $response;
+
+    /**
      * @return SketchResponse
      */
     function getResponse() {
@@ -39,7 +42,6 @@ class SketchController extends SketchObject {
     }
 
     /**
-     *
      * @param SketchResponse $response
      */
     function setResponse(SketchResponse $response) {
@@ -48,28 +50,28 @@ class SketchController extends SketchObject {
     }
 
     /**
-     *
      * @param SketchResourceContext $context
+     * @throws Exception
      */
     function setResponseFilters(SketchResourceContext $context) {
         $extensions = $context->query("//extension[@type='SketchResponseFilter']");
         foreach ($extensions as $extension) {
             $class = $extension->getAttribute('class');
-            $source = $extension->getAttribute('source');
-            if (SketchUtils::Readable("Sketch/Response/Filter/$source")) {
-                require_once "Sketch/Response/Filter/$source";
-                if (class_exists($class)) {
-                    eval('$instance = new '.$class.'($this->getResponse());');
-                    if ($instance instanceof SketchResponseFilter) {
-                        $instance->apply($extension);
-                    } else throw new Exception(sprinf($this->getTranslator()->_("Filter %s does not extend or implement SketchResponseFilter"), $class));
-                } else throw new Exception(sprintf($this->getTranslator()->_("Can't instantiate class %s"), $class));
-            } else throw new Exception(sprintf($this->getTranslator()->_("File %s can't be found"), $source));
+            if (class_exists($class)) {
+                $reflection = new ReflectionClass($class);
+                $instance = $reflection->newInstance($this->getResponse());
+                if ($instance instanceof SketchResponseFilter) {
+                    $instance->apply($extension);
+                } else {
+                    throw new Exception(sprintf($this->getTranslator()->_("Filter %s does not extend or implement SketchResponseFilter"), $class));
+                }
+            } else {
+                throw new Exception(sprintf($this->getTranslator()->_("Can't instantiate class %s"), $class));
+            }
         }
     }
 
     /**
-     *
      * @return SketchRouter
      */
     function getRouter() {
@@ -77,7 +79,6 @@ class SketchController extends SketchObject {
     }
 
     /**
-     *
      * @param SketchRouter $router
      */
     function setRouter(SketchRouter $router) {
@@ -85,14 +86,15 @@ class SketchController extends SketchObject {
     }
 
     /**
-     *
      * @param string $location
+     * @param boolean $https
+     * @throws Exception
      */
     function forward($location = null, $https = false) {
         if ($this->getRequest()->isJSON()) {
             $response = new SketchResponseJSON();
             $response->forwardLocation = $location;
-            print SketchUtils::encodeJSON($response);
+            print json_encode($response);
             exit();
         } else {
             if (headers_sent()) {

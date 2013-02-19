@@ -58,7 +58,7 @@ class SketchFormCommand extends SketchObject {
     function setParameters($parameters) {
         if (is_array($parameters)) {
             for ($i = 0; $i < count($parameters); $i++) {
-                if ($parameters[$i] instanceof FormView) throw new Exception($this->getTranslator()->_("Can't pass form as parameters."));
+                if ($parameters[$i] instanceof SketchFormView) throw new Exception($this->getTranslator()->_("Can't pass form as parameters."));
             } $this->parameters = $parameters;
         }
     }

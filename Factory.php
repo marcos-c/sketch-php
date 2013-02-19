@@ -27,19 +27,18 @@ define('QUOTED_IDENTIFIERS', 1);
 
 class SketchFactory extends SketchObject {
     /**
-     *
      * @var string
      */
     static private $version = null;
 
     /**
-     *
      * @var array
      */
     static private $metadata = null;
 
     /**
-     *
+     * @param $table_name
+     * @param null $options
      * @return SketchObject
      */
     static function scaffold($table_name, $options = null) {
@@ -73,11 +72,15 @@ class SketchFactory extends SketchObject {
     }
 
     /**
-     *
+     * @param $version
      * @param string $class_name
      * @param string $table_name
+     * @param $prefix
      * @param string $primary_key
-     * @param array $definition
+     * @param $generate_iterator
+     * @param $table_definition
+     * @throws Exception
+     * @return string
      */
     private static function scaffoldFrom($version, $class_name, $table_name, $prefix, $primary_key, $generate_iterator, $table_definition) {
         $application = SketchApplication::getInstance();
@@ -189,7 +192,6 @@ class SketchFactory extends SketchObject {
                             $method_name = null; foreach (explode('_', $column) as $value) {
                                 $method_name .= ucfirst($value);
                             }
-                            $attribute_name = strtolower(substr($method_name, 0, 1)).substr($method_name, 1);
                             if (preg_match('/^int/', $definition['type']) || preg_match('/^smallint/', $definition['type']) || preg_match('/^tinyint/', $definition['type'])) {
                                 $contents[] = "\t\t\$${column} = \$this->get${method_name}(".($definition['null'] ? "'NULL'" : '').");\n";
                             } else if (preg_match('/^bool/', $definition['type']) || preg_match('/^enum\(\'f\',\'t\'|enum\(\'t\',\'f\'/', $definition['type'])) {

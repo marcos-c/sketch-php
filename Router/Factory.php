@@ -25,7 +25,6 @@
 
 class SketchRouterFactory extends SketchObject {
     /**
-     *
      * @param SketchRequest $request
      * @return SketchRouter
      */

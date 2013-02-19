@@ -25,7 +25,6 @@
 
 class SketchRouterDefault extends SketchRouter {
     /**
-     *
      * @param string $uri
      * @return string
      */
@@ -40,7 +39,6 @@ class SketchRouterDefault extends SketchRouter {
     }
 
     /**
-     *
      * @return string
      */
     function getView() {

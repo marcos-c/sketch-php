@@ -29,19 +29,16 @@ define('A_NOTICE', 4);
 
 class SketchApplicationNotice {
     /**
-     *
      * @var string
      */
     private $message;
 
     /**
-     *
      * @var integer
      */
     private $noticeType;
 
     /**
-     *
      * @param string $message
      * @param integer $type
      */
@@ -51,7 +48,6 @@ class SketchApplicationNotice {
     }
 
     /**
-     *
      * @return string
      */
     function __toString() {
@@ -59,7 +55,6 @@ class SketchApplicationNotice {
     }
 
     /**
-     *
      * @return string
      */
     function getMessage() {
@@ -67,7 +62,6 @@ class SketchApplicationNotice {
     }
 
     /**
-     *
      * @param string $message
      */
     function setMessage($message) {
@@ -75,7 +69,6 @@ class SketchApplicationNotice {
     }
 
     /**
-     *
      * @return string
      */
     function getNoticeType() {
@@ -83,7 +76,6 @@ class SketchApplicationNotice {
     }
 
     /**
-     *
      * @param string $type
      */
     function setNoticeType($type) {
