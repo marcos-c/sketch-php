@@ -33,6 +33,7 @@ class ResourceFactory {
 
     /**
      * @param ResourceContext $context
+     * @throws ResourceConnectionException
      * @throws \Exception
      * @return ResourceConnection
      */
@@ -53,7 +54,7 @@ class ResourceFactory {
                 throw new \Exception(sprintf($context->getTranslator()->_("Can't instantiate class %s"), $class));
             }
         } else {
-            throw new \Exception($context->getTranslator()->_("No driver configuration in context"));
+            throw new ResourceConnectionException($context->getTranslator()->_("No driver configuration in context"));
         }
     }
 

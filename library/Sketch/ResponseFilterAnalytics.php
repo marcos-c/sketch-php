@@ -25,7 +25,7 @@
 
 namespace Sketch;
 
-class AnalyticsResponseFilter extends ResponseFilter {
+class ResponseFilterAnalytics extends ResponseFilter {
     /**
      * @param ResourceXML $resource
      * @throws \Exception
@@ -59,24 +59,12 @@ class AnalyticsResponseFilter extends ResponseFilter {
         $script .= "\n(function() {\nvar ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;\nga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';\nvar s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);\n})();";
         $document = $this->getResponse()->getDocument();
         $context = new \DOMXPath($document);
-        if ($this->getResponse()->isXHTML()) {
-            $context->registerNamespace('h', 'http://www.w3.org/1999/xhtml');
-            $q = $context->query('//h:body');
-            if ($q instanceof \DOMNodeList) foreach ($q as $node) {
-                $element = $document->createElementNs('http://www.w3.org/1999/xhtml', 'script');
-                $element->setAttribute('type', 'text/javascript');
-                $element->appendChild($document->createTextNode("\n//"));
-                $element->appendChild($document->createCDATASection("\n".trim($script)."\n//"));
-                $node->appendChild($element);
-            }
-        } else {
-            $q = $context->query('//body');
-            if ($q instanceof \DOMNodeList) foreach ($q as $node) {
-                $element = $document->createElement('script');
-                $element->setAttribute('type', 'text/javascript');
-                $element->appendChild($document->createTextNode("\n".trim($script)."\n"));
-                $node->appendChild($element);
-            }
+        $q = $context->query('//body');
+        if ($q instanceof \DOMNodeList) foreach ($q as $node) {
+            $element = $document->createElement('script');
+            $element->setAttribute('type', 'text/javascript');
+            $element->appendChild($document->createTextNode("\n".trim($script)."\n"));
+            $node->appendChild($element);
         }
     }
 }

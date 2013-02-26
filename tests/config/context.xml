@@ -2,13 +2,13 @@
 <context name="tests" locale="es" layer="development">
     <layer name="development,production">
         <!-- Locale -->
-        <driver type="SketchLocaleTranslatorDriver" class="GetTextLocaleTranslatorDriver" source="GetText.php">
+        <driver type="SketchLocaleTranslatorDriver" class="GetTextLocaleTranslatorDriver">
             <folder>/locale</folder>
             <domain>default</domain>
         </driver>
         <!-- Sketch Response Filter Extension -->
-        <extension type="SketchResponseFilter" class="LayoutResponseFilter" source="Layout.php">
-            <layout for="/" class="\GBook\Layout" />
+        <extension type="SketchResponseFilter" class="Sketch\ResponseFilterLayout">
+            <layout for="C:">tests</layout>
         </extension>
         <parameters for="library" name="Application.php">
             <send-exceptions-to>
@@ -17,21 +17,21 @@
         </parameters>
     </layer>
     <layer name="development">
-        <driver type="ResourceConnectionDriver" class="Sketch\ResourceConnectionDriverMySQL">
+        <!-- <driver type="ResourceConnectionDriver" class="Sketch\ResourceConnectionDriverMySQL">
             <table-prefix>gbook</table-prefix>
-            <host>localhost</host>
+            <host>127.0.0.1</host>
             <database>gbook</database>
             <user>root</user>
             <password>570tnky1</password>
-        </driver>
-        <extension type="ResourceConnectionDriver" class="Sketch\FirebugResponseFilter">
+        </driver> -->
+        <extension type="SketchResponseFilter" class="Sketch\ResponseFilterFirebug">
             <debug-level>3</debug-level>
         </extension>
     </layer>
     <layer name="production">
         <driver type="ResourceConnectionDriver" class="Sketch\ResourceConnectionDriverMySQL">
             <table-prefix>gbook</table-prefix>
-            <host>localhost</host>
+            <host>127.0.0.1</host>
             <database>gbook</database>
             <user>root</user>
             <password>570tnky1</password>

@@ -27,16 +27,6 @@ namespace Sketch;
 
 class Response extends Object {
     /**
-     * @var boolean
-     */
-    private $isXHTML = false;
-
-    /**
-     * @var boolean
-     */
-    private $forceEncoding = false;
-
-    /**
      * @var \DOMDocument
      */
     protected $document;
@@ -45,46 +35,7 @@ class Response extends Object {
      * @return string
      */
     function  __toString() {
-        if ($this->isXHTML()) {
-            return $this->document->saveXML();
-        } else {
-            return $this->document->saveHTML();
-        }
-    }
-
-    /**
-     * @return boolean
-     */
-    function getIsXHTML() {
-        return $this->isXHTML;
-    }
-
-    /**
-     * @return boolean
-     */
-    function isXHTML() {
-        return $this->getIsXHTML();
-    }
-
-    /**
-     * @return boolean
-     */
-    function getForceEncoding() {
-        return $this->forceEncoding;
-    }
-
-    /**
-     * @param boolean $force_encoding
-     */
-    function setForceEncoding($force_encoding) {
-        $this->forceEncoding = $force_encoding;
-    }
-
-    /**
-     * @param boolean $is_xhtml
-     */
-    function setIsXHTML($is_xhtml) {
-        $this->isXHTML = $is_xhtml;
+        return $this->document->saveHTML();
     }
 
     /**

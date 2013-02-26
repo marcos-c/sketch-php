@@ -56,40 +56,20 @@ class ResponseJSON extends Response {
      */
     function setDocument(\DOMDocument $document) {
         $this->document = $document;
-        if ($this->isXHTML()) {
-            $context = new \DOMXPath($this->document);
-            $context->registerNamespace('j', 'http://kunyomi.com/sketch/json');
-            $q = $context->query('//j:response');
-            if ($q instanceof \DOMNodeList) foreach ($q as $json_response) {
-                /* @var $json_respone \DOMElement */
-                $document = new \DOMDocument();
-                $document->preserveWhiteSpace = false;
-                $document->resolveExternals = false;
-                if ($json_response->hasChildNodes()) foreach ($json_response->childNodes as $node) {
-                    $document->appendChild($document->importNode($node, true));
-                }
-                if ($id = $json_response->getAttribute('id')) {
-                    $this->fragment[$id] = $document->saveXML();
-                } else {
-                    $this->html = $document->saveXML();
-                }
+        $context = new \DOMXPath($this->document);
+        $q = $context->query('//response');
+        if ($q instanceof \DOMNodeList) foreach ($q as $json_response) {
+            /* @var $json_respone \DOMElement */
+            $document = new \DOMDocument();
+            $document->preserveWhiteSpace = false;
+            $document->resolveExternals = false;
+            if ($json_response->hasChildNodes()) foreach ($json_response->childNodes as $node) {
+                $document->appendChild($document->importNode($node, true));
             }
-        } else {
-            $context = new \DOMXPath($this->document);
-            $q = $context->query('//response');
-            if ($q instanceof \DOMNodeList) foreach ($q as $json_response) {
-                /* @var $json_respone \DOMElement */
-                $document = new \DOMDocument();
-                $document->preserveWhiteSpace = false;
-                $document->resolveExternals = false;
-                if ($json_response->hasChildNodes()) foreach ($json_response->childNodes as $node) {
-                    $document->appendChild($document->importNode($node, true));
-                }
-                if ($id = $json_response->getAttribute('id')) {
-                    $this->fragment[$id] = $document->saveHTML();
-                } else {
-                    $this->html = $document->saveHTML();
-                }
+            if ($id = $json_response->getAttribute('id')) {
+                $this->fragment[$id] = $document->saveHTML();
+            } else {
+                $this->html = $document->saveHTML();
             }
         }
         // Log with memory usage and response time

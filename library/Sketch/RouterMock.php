@@ -25,19 +25,19 @@
 
 namespace Sketch;
 
-class RouterFactory extends Object {
+class RouterMock extends Router {
     /**
-     * @param Request $request
-     * @param bool $test
-     * @return RouterDefault|RouterRewrite
+     * @param string $uri
+     * @return string
      */
-    static function getRouter(Request $request, $test = false) {
-        if ($test) {
-            return new RouterMock();
-        } elseif ($request->isRedirect()) {
-            return new RouterRewrite();
-        } else {
-            return new RouterDefault();
-        }
+    function resolve($uri) {
+        return $uri;
+    }
+
+    /**
+     * @return string
+     */
+    function getView() {
+        return dirname(dirname(dirname(__FILE__))).'\tests\index.php';
     }
 }

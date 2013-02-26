@@ -67,34 +67,6 @@ class ResponsePart extends Object {
     }
 
     /**
-     * Make sure that the encoding for the source file is UTF-8
-     *
-     * @param $source
-     * @return string
-     * @throws \Exception
-     */
-    private function encode($source) {
-        if (function_exists('mb_detect_encoding')) {
-            switch (mb_detect_encoding($source, 'UTF-8, ISO-8859-1')) {
-                case 'UTF-8': return $source;
-                case 'ISO-8859-1': return iconv('ISO-8859-1', 'UTF-8', $source);
-            }
-        } else {
-            $list = array('UTF-8', 'ISO-8859-1');
-            foreach ($list as $item) {
-                $sample = iconv($item, $item, $source);
-                if (md5($sample) == md5($source)) {
-                    switch ($item) {
-                        case 'UTF-8': return $source;
-                        case 'ISO-8859-1': return iconv('ISO-8859-1', 'UTF-8', $source);
-                    }
-                }
-            }
-        }
-        throw new \Exception($this->getTranslator()->_('Wrong ENCODING. Sketch recomends UTF-8 but it can sort of work around ISO-8859-1, please provide a valid ENCODING'));
-    }
-
-    /**
      * @param $file_name
      * @param $etag
      * @param $attributes
@@ -130,7 +102,7 @@ class ResponsePart extends Object {
             ob_start();
             require $file_name;
             // Trimming the source before feeding it to the XML parser helps bad formed documents
-            $source = $response->getForceEncoding() ? $this->encode(trim(ob_get_clean())) : trim(ob_get_clean());
+            $source = ob_get_clean();
             if ($source != '') {
                 // ETag
                 if ($etag && self::$etag == null) {
@@ -148,79 +120,33 @@ class ResponsePart extends Object {
                 $this->document = new \DOMDocument();
                 $this->document->preserveWhiteSpace = false;
                 $this->document->resolveExternals = false;
-                if ($response->isXHTML()) {
-                    $i = 0; do {
-                        $this->document->loadXML($source);
-                        $errors = libxml_get_errors();
-                        if (count($errors) > 0) {
-                            $source_lines = explode("\n", $source);
-                            foreach ($errors as $error) {
-                                // Ignore warnings and recoverable errors, throw an exception if anything else
-                                if (!in_array($error->level, array(LIBXML_ERR_WARNING, LIBXML_ERR_ERROR))) {
-                                    // Try and fix XML_ERR_ENTITYREF_SEMICOL_MISSING and XML_ERR_NAME_REQUIRED before giving up
-                                    if (in_array($error->code, array(XML_ERR_ENTITYREF_SEMICOL_MISSING, XML_ERR_NAME_REQUIRED))) {
-                                        $source_lines[$error->line - 1] = preg_replace('/&(?![A-Za-z0-9#]{1,7};)/', '&amp;', $source_lines[$error->line - 1]);
-                                    } else {
-                                        $exception = new ResponseException(trim($error->message).' ('.$error->level.'/'.$error->code.')');
-                                        $j = 1; foreach ($source_lines as $line) {
-                                            $lc = sprintf('%03d', $j);
-                                            $exception->addDebugInfo('<div '.(($j++ == $error->line) ? 'style="color: red;"' : '').'>'.$lc.' '.htmlentities($line).'</div>');
-                                        }
-                                        throw $exception;
-                                    }
-                                }
-                            }
-                            $source = implode("\n", $source_lines);
-                            libxml_clear_errors();
-                        } else break;
-                    } while ($i++ < 4);
-                    $context = new \DOMXPath($this->document);
-                    $context->registerNamespace('h', 'http://www.w3.org/1999/xhtml');
-                    $q = $context->query('//h:form');
-                    if ($q instanceof \DOMNodeList) foreach ($q as $node) {
-                        $components = Form::getComponents($node->getAttribute('name'));
-                        $class_stack = array();
-                        if (is_array($components)) foreach ($components as $component) {
-                            $class = get_class($component);
-                            if (method_exists($component, 'javascript') && !in_array($class, $class_stack)) {
-                                $script = $this->document->createElementNs('http://www.w3.org/1999/xhtml', 'script');
-                                $script->setAttribute('type', 'text/javascript');
-                                $script->appendChild($this->document->createTextNode("\n//"));
-                                $script->appendChild($this->document->createCDATASection("\n".trim($component->javascript())."\n//"));
-                                $node->parentNode->insertBefore($script, $node);
-                                $class_stack[] = $class;
-                            }
+                $this->document->loadHTML($source);
+                $errors = libxml_get_errors();
+                foreach ($errors as $error) {
+                    // Ignore warnings and recoverable errors, throw an exception if anything else
+                    if (!in_array($error->level, array(LIBXML_ERR_WARNING, LIBXML_ERR_ERROR))) {
+                        $exception = new ResponseException(trim($error->message).' ('.$error->level.'/'.$error->code.')');
+                        $i = 1; foreach (explode("\n", htmlspecialchars($source)) as $line) {
+                            $lc = sprintf('%03d', $i);
+                            $exception->addDebugInfo('<div '.(($i++ == $error->line) ? 'style="color: red;"' : '').'>'.$lc.' '.$line.'</div>');
                         }
+                        throw $exception;
                     }
-                } else {
-                    $this->document->loadHTML($source);
-                    $errors = libxml_get_errors();
-                    foreach ($errors as $error) {
-                        // Ignore warnings and recoverable errors, throw an exception if anything else
-                        if (!in_array($error->level, array(LIBXML_ERR_WARNING, LIBXML_ERR_ERROR))) {
-                            $exception = new ResponseException(trim($error->message).' ('.$error->level.'/'.$error->code.')');
-                            $i = 1; foreach (explode("\n", htmlspecialchars($source)) as $line) {
-                                $lc = sprintf('%03d', $i);
-                                $exception->addDebugInfo('<div '.(($i++ == $error->line) ? 'style="color: red;"' : '').'>'.$lc.' '.$line.'</div>');
-                            }
-                            throw $exception;
-                        }
-                    }
-                    libxml_clear_errors();
-                    $context = new \DOMXPath($this->document);
-                    $q = $context->query('//form');
-                    if ($q instanceof \DOMNodeList) foreach ($q as $node) {
-                        $components = Form::getComponents($node->getAttribute('name'));
-                        $class_stack = array();
-                        if (is_array($components)) foreach ($components as $component) {
-                            $class = get_class($component);
-                            if (method_exists($component, 'javascript') && !in_array($class, $class_stack)) {
-                                $script = $this->document->createElement('script');
-                                $script->setAttribute('type', 'text/javascript');
-                                $script->appendChild($this->document->createTextNode("\n".trim($component->javascript())."\n"));
-                                $node->parentNode->insertBefore($script, $node);
-                                $class_stack[] = $class;
-                            }
+                }
+                libxml_clear_errors();
+                $context = new \DOMXPath($this->document);
+                $q = $context->query('//form');
+                if ($q instanceof \DOMNodeList) foreach ($q as $node) {
+                    $components = Form::getComponents($node->getAttribute('name'));
+                    $class_stack = array();
+                    if (is_array($components)) foreach ($components as $component) {
+                        $class = get_class($component);
+                        if (method_exists($component, 'javascript') && !in_array($class, $class_stack)) {
+                            $script = $this->document->createElement('script');
+                            $script->setAttribute('type', 'text/javascript');
+                            $script->appendChild($this->document->createTextNode("\n".trim($component->javascript())."\n"));
+                            $node->parentNode->insertBefore($script, $node);
+                            $class_stack[] = $class;
                         }
                     }
                 }

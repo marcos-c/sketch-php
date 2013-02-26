@@ -64,7 +64,9 @@ class ResourceConnectionDriverMySQL extends ResourceConnectionDriver {
     }
 
     protected function close() {
-        @mysql_close($this->connection);
+        if ($this->connection != null) {
+            mysql_close($this->connection);
+        }
     }
 
     function getTables($do_not_show = null) {
@@ -122,7 +124,7 @@ class ResourceConnectionDriverMySQL extends ResourceConnectionDriver {
         if ($this->getContext()->getLayerName() == 'development') {
             $this->getLogger()->log(trim($expression).' ('.number_format(microtime(true) - $this->getApplication()->getStartTime(), 3).')', 4);
         }
-        $result = @mysql_query($expression, $this->connection);
+        $result = mysql_query($expression, $this->connection);
         $error = mysql_error($this->connection);
         if ($error) {
             throw new ResourceConnectionException($error.' '.$expression);
@@ -141,7 +143,7 @@ class ResourceConnectionDriverMySQL extends ResourceConnectionDriver {
         if ($this->getContext()->getLayerName() == 'development') {
             $this->getLogger()->log($expression, 3);
         }
-        @mysql_query($expression, $this->connection);
+        mysql_query($expression, $this->connection);
         $error = mysql_error($this->connection);
         if ($error) {
             throw new ResourceConnectionException($error.' '.$expression);

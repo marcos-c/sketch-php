@@ -25,7 +25,7 @@
 
 namespace Sketch;
 
-class LayoutResponseFilter extends ResponseFilter {
+class ResponseFilterLayout extends ResponseFilter {
     /**
      * @param \DOMDocument $layout
      * @param \DOMElement $append
@@ -119,85 +119,42 @@ class LayoutResponseFilter extends ResponseFilter {
         }
         $response = $this->getResponse();
         $context = new \DOMXPath($response->getDocument());
-        if ($response->isXHTML()) {
-            $context->registerNamespace('s', 'http://kunyomi.com/sketch/layout');
-            $q = $context->query('//s:template');
-            if ($q instanceof \DOMNodeList) foreach ($q as $template) {
-                if ($template->hasAttribute('layout')) {
-                    $layout = ResponsePart::evaluate($layout_path.DIRECTORY_SEPARATOR.$template->getAttribute('layout'), false, $attributes, true);
-                    $layout_context = new \DOMXPath($layout);
-                    $layout_context->registerNamespace('h', 'http://www.w3.org/1999/xhtml');
-                    $r = $context->query('//s:append[@tag]');
-                    if ($r instanceof \DOMNodeList) foreach ($r as $append) {
-                        $tag = $append->getAttribute('tag');
-                        foreach ($layout_context->query("//h:$tag") as $old) {
-                            $this->append($layout, $append, $old);
-                        }
+        $q = $context->query('//template');
+        if ($q instanceof \DOMNodeList) foreach ($q as $template) {
+            if ($template->hasAttribute('layout')) {
+                $layout = ResponsePart::evaluate($layout_path.DIRECTORY_SEPARATOR.$template->getAttribute('layout'), false, $attributes, true);
+                $layout_context = new \DOMXPath($layout);
+                $r = $context->query('//append[@tag]');
+                if ($r instanceof \DOMNodeList) foreach ($r as $append) {
+                    $tag = $append->getAttribute('tag');
+                    foreach ($layout_context->query("//$tag") as $old) {
+                        $this->append($layout, $append, $old);
                     }
-                    $r = $context->query('//s:append[@id]');
-                    if ($r instanceof \DOMNodeList) foreach ($r as $append) {
-                        $id = $append->getAttribute('id');
-                        foreach ($layout_context->query("//*[@id='$id']") as $old) {
-                            $this->append($layout, $append, $old);
-                        }
-                    }
-                    $r = $context->query('//s:replace[@tag]');
-                    if ($r instanceof \DOMNodeList) foreach ($r as $replace) {
-                        $tag = $replace->getAttribute('tag');
-                        $s = $layout_context->query("//h:$tag");
-                        if ($s instanceof \DOMNodeList) foreach ($s as $old) {
-                            $this->replaceElementNs($layout, $replace, $old);
-                        }
-                    }
-                    $r = $context->query('//s:replace[@id]');
-                    if ($r instanceof \DOMNodeList) foreach ($r as $replace) {
-                        $id = $replace->getAttribute('id');
-                        $s = $layout_context->query("//*[@id='$id']");
-                        if ($s instanceof \DOMNodeList) foreach ($s as $old) {
-                            $this->replaceElementNs($layout, $replace, $old);
-                        }
-                    }
-                    $response->setDocument($layout);
                 }
-            }
-        } else {
-            $q = $context->query('//template');
-            if ($q instanceof \DOMNodeList) foreach ($q as $template) {
-                if ($template->hasAttribute('layout')) {
-                    $layout = ResponsePart::evaluate($layout_path.DIRECTORY_SEPARATOR.$template->getAttribute('layout'), false, $attributes, true);
-                    $layout_context = new \DOMXPath($layout);
-                    $r = $context->query('//append[@tag]');
-                    if ($r instanceof \DOMNodeList) foreach ($r as $append) {
-                        $tag = $append->getAttribute('tag');
-                        foreach ($layout_context->query("//$tag") as $old) {
-                            $this->append($layout, $append, $old);
-                        }
+                $r = $context->query('//append[@id]');
+                if ($r instanceof \DOMNodeList) foreach ($r as $append) {
+                    $id = $append->getAttribute('id');
+                    foreach ($layout_context->query("//*[@id='$id']") as $old) {
+                        $this->append($layout, $append, $old);
                     }
-                    $r = $context->query('//append[@id]');
-                    if ($r instanceof \DOMNodeList) foreach ($r as $append) {
-                        $id = $append->getAttribute('id');
-                        foreach ($layout_context->query("//*[@id='$id']") as $old) {
-                            $this->append($layout, $append, $old);
-                        }
-                    }
-                    $r = $context->query('//replace[@tag]');
-                    if ($r instanceof \DOMNodeList) foreach ($r as $replace) {
-                        $tag = $replace->getAttribute('tag');
-                        $s = $layout_context->query("//$tag");
-                        if ($s instanceof \DOMNodeList) foreach ($s as $old) {
-                            $this->replaceElement($layout, $replace, $old);
-                        }
-                    }
-                    $r = $context->query('//replace[@id]');
-                    if ($r instanceof \DOMNodeList) foreach ($r as $replace) {
-                        $id = $replace->getAttribute('id');
-                        $s = $layout_context->query("//*[@id='$id']");
-                        if ($s instanceof \DOMNodeList) foreach ($s as $old) {
-                            $this->replaceElement($layout, $replace, $old);
-                        }
-                    }
-                    $response->setDocument($layout);
                 }
+                $r = $context->query('//replace[@tag]');
+                if ($r instanceof \DOMNodeList) foreach ($r as $replace) {
+                    $tag = $replace->getAttribute('tag');
+                    $s = $layout_context->query("//$tag");
+                    if ($s instanceof \DOMNodeList) foreach ($s as $old) {
+                        $this->replaceElement($layout, $replace, $old);
+                    }
+                }
+                $r = $context->query('//replace[@id]');
+                if ($r instanceof \DOMNodeList) foreach ($r as $replace) {
+                    $id = $replace->getAttribute('id');
+                    $s = $layout_context->query("//*[@id='$id']");
+                    if ($s instanceof \DOMNodeList) foreach ($s as $old) {
+                        $this->replaceElement($layout, $replace, $old);
+                    }
+                }
+                $response->setDocument($layout);
             }
         }
     }

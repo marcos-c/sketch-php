@@ -25,6 +25,6 @@
 
 namespace Sketch;
 
-interface AnalyticsResponseFilterTransactionHandlerInterface {
+interface ResponseFilterAnalyticsTransactionHandlerInterface {
     function execute();
 }

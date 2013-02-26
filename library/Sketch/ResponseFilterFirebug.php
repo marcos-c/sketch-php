@@ -25,7 +25,7 @@
 
 namespace Sketch;
 
-class FirebugResponseFilter extends ResponseFilter {
+class ResponseFilterFirebug extends ResponseFilter {
     /**
      * @param string $message
      * @return string
@@ -82,24 +82,12 @@ class FirebugResponseFilter extends ResponseFilter {
         $script .= "\t}";
         $document = $this->getResponse()->getDocument();
         $context = new \DOMXPath($document);
-        if ($this->getResponse()->isXHTML()) {
-            $context->registerNamespace('h', 'http://www.w3.org/1999/xhtml');
-            $q = $context->query('//h:head');
-            if ($q instanceof \DOMNodeList) foreach ($q as $node) {
-                $element = $document->createElementNs('http://www.w3.org/1999/xhtml', 'script');
-                $element->setAttribute('type', 'text/javascript');
-                $element->appendChild($document->createTextNode("\n//"));
-                $element->appendChild($document->createCDATASection("\n".trim($script)."\n//"));
-                $node->appendChild($element);
-            }
-        } else {
-            $q = $context->query('//head');
-            if ($q instanceof \DOMNodeList) foreach ($q as $node) {
-                $element = $document->createElement('script');
-                $element->setAttribute('type', 'text/javascript');
-                $element->appendChild($document->createTextNode("\n".trim($script)."\n"));
-                $node->appendChild($element);
-            }
+        $q = $context->query('//head');
+        if ($q instanceof \DOMNodeList) foreach ($q as $node) {
+            $element = $document->createElement('script');
+            $element->setAttribute('type', 'text/javascript');
+            $element->appendChild($document->createTextNode("\n".trim($script)."\n"));
+            $node->appendChild($element);
         }
     }
 }

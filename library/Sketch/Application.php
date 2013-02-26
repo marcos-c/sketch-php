@@ -153,13 +153,17 @@ class Application {
         // Initialize logger
         $this->setLogger(new LoggerSimple());
         // Initialize connection
-        $this->setConnection(
-            ResourceFactory::getConnection($this->getContext())
-        );
+        try {
+            $this->setConnection(
+                ResourceFactory::getConnection($this->getContext())
+            );
+        } catch (ResourceConnectionException $e) {
+
+        }
         // Initialize controller
         $this->setController(new Controller());
         $this->getController()->setRouter(
-            RouterFactory::getRouter($this->getRequest())
+            RouterFactory::getRouter($this->getRequest(), $test)
         );
          // Output response
         if ($this->getRequest()->isJSON()) {

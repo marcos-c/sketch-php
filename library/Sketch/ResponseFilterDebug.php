@@ -25,29 +25,18 @@
 
 namespace Sketch;
 
-class DebugResponseFilter extends ResponseFilter {
+class ResponseFilterDebug extends ResponseFilter {
     /**
      * @param ResourceXML $resource
      */
     function apply(ResourceXML $resource) {
         $document = $this->getResponse()->getDocument();
-        if ($this->getResponse()->isXHTML()) {
-            $context = new \DOMXPath($document);
-            $context->registerNamespace('d', 'http://kunyomi.com/sketch/debug');
-            $q = $context->query('//d:debug');
-            if ($q instanceof \DOMNodeList) foreach ($q as $node) {
-                $fragment = $document->createDocumentFragment();
-                $fragment->appendXML('<pre>'.str_replace('SketchApplication Object', 'SketchApplication Object('.ceil(memory_get_usage() / 1024).'kb)', print_r(Application::getInstance(), true)).'</pre>');
-                $node->parentNode->replaceChild($fragment, $node);
-            }
-        } else {
-            $context = new \DOMXPath($document);
-            $q = $context->query('//debug');
-            if ($q instanceof \DOMNodeList) foreach ($q as $node) {
-                $fragment = $document->createDocumentFragment();
-                $fragment->appendXML('<pre>'.str_replace('SketchApplication Object', 'SketchApplication Object('.ceil(memory_get_usage() / 1024).'kb)', print_r(Application::getInstance(), true)).'</pre>');
-                $node->parentNode->replaceChild($fragment, $node);
-            }
+        $context = new \DOMXPath($document);
+        $q = $context->query('//debug');
+        if ($q instanceof \DOMNodeList) foreach ($q as $node) {
+            $fragment = $document->createDocumentFragment();
+            $fragment->appendXML('<pre>'.str_replace('SketchApplication Object', 'SketchApplication Object('.ceil(memory_get_usage() / 1024).'kb)', print_r(Application::getInstance(), true)).'</pre>');
+            $node->parentNode->replaceChild($fragment, $node);
         }
     }
 }
