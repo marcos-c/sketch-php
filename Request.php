@@ -82,6 +82,12 @@ class SketchRequest extends SketchObject {
      *
      * @var string
      */
+    private $acceptLanguage;
+
+    /**
+     *
+     * @var string
+     */
     private $documentRoot;
 
     /**
@@ -111,6 +117,7 @@ class SketchRequest extends SketchObject {
         // Can't rely on $_SERVER['DOCUMENT_ROOT'] because it doesn't return what you would
         // expect on all situations (symbolic links, server configuration, etc.)
         $this->serverPort = $_SERVER['SERVER_PORT'];
+        $this->acceptLanguage = strtolower(substr($_SERVER['HTTP_ACCEPT_LANGUAGE'], 0, 2));
         $this->documentRoot = str_replace($_SERVER['SCRIPT_NAME'], '', realpath(basename($_SERVER['SCRIPT_NAME'])));
         $this->uri = $_SERVER['REQUEST_URI'];
         $this->resolvedURI = $_SERVER['PHP_SELF'].(($_SERVER['QUERY_STRING'] != null) ? '?'.$_SERVER['QUERY_STRING'] : '');
@@ -210,6 +217,22 @@ class SketchRequest extends SketchObject {
      */
     function getServerPort() {
         return $this->serverPort;
+    }
+
+    /**
+     *
+     * @return string
+     */
+    function getAcceptLanguage() {
+        return $this->acceptLanguage;
+    }
+
+    /**
+     *
+     * @param string $accept_language
+     */
+    function setAcceptLanguage($accept_language) {
+        $this->acceptLanguage = $accept_language;
     }
 
     /**

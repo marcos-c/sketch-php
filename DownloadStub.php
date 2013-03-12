@@ -60,10 +60,15 @@ if (!($application->getSession()->getACL() instanceof SketchSessionACL)) {
 }
 // Initialize default locale
 $context = $application->getContext()->queryFirst('//context');
-$locale_string = ($context) ? $context->getAttribute('locale') : false;
-$application->setDefaultLocale(
-    ($locale_string) ? SketchLocale::fromString($locale_string) : new SketchLocale('en')
-);
+$locale = SketchLocale::fromString('en');
+if (!defined('CONTEXT_PREFIX')) {
+    if (in_array($application->getRequest()->getAcceptLanguage(), $locale->getTranslator()->getDriver()->getAvailableLanguages())) {
+        $locale = SketchLocale::fromString($application->getRequest()->getAcceptLanguage());
+    }
+} elseif ($context) {
+    $locale = SketchLocale::fromString($context->getAttribute('locale'));
+}
+$application->setDefaultLocale($locale);
 // Initialize logger
 $application->setLogger(new SketchLoggerSimple());
 // Initialize connection
