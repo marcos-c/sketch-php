@@ -36,12 +36,6 @@ class ResourceContext extends ResourceXML {
      *
      * @var string
      */
-    private $version = '1.0';
-
-    /**
-     *
-     * @var string
-     */
     private $locale;
 
     /**
@@ -53,7 +47,7 @@ class ResourceContext extends ResourceXML {
     /**
      *
      * @param \DOMDocument $document
-     * @throws Exception
+     * @throws \Exception
      */
     function __construct(\DOMDocument $document) {
         $context = $document->getElementsByTagName('context')->item(0);
@@ -68,15 +62,12 @@ class ResourceContext extends ResourceXML {
                     foreach ($document->documentElement->attributes as $attribute) {
                         if ($attribute->name == 'name') {
                             $this->setName($attribute->value);
-                            $root->setAttribute($attribute->name, $attribute->value);
-                        } else if ($attribute->name == 'version') {
-                            $this->setVersion($attribute->value);
-                            $root->setAttribute($attribute->name, $attribute->value);
+                        } else if ($attribute->name == 'locale') {
+                            $this->setLocale($attribute->value);
                         } else if ($attribute->name == 'layer') {
                             $this->setLayerName($attribute->value);
-                        } else {
-                            $root->setAttribute($attribute->name, $attribute->value);
                         }
+                        $root->setAttribute($attribute->name, $attribute->value);
                     }
                 }
                 $xpath_context = new \DOMXPath($document);
@@ -112,26 +103,6 @@ class ResourceContext extends ResourceXML {
         $context = $this->document->getElementsByTagName('context')->item(0);
         if ($context instanceof \DOMElement) {
             $context->setAttribute('name', $name);
-        }
-    }
-
-    /**
-     *
-     * @return string
-     */
-    function getVersion() {
-        return $this->version;
-    }
-
-    /**
-     *
-     * @param string $version
-     */
-    function setVersion($version) {
-        $this->version = $version;
-        $context = $this->document->getElementsByTagName('context')->item(0);
-        if ($context instanceof \DOMElement) {
-            $context->setAttribute('version', $version);
         }
     }
 
