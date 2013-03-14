@@ -25,46 +25,27 @@
 
 namespace Sketch;
 
-class ResponseFilterLayout extends ResponseFilter {
+class ResponseFilterTemplate extends ResponseFilter {
     /**
-     * @param \DOMDocument $layout
+     *
+     * @param \DOMDocument $template
      * @param \DOMElement $append
      * @param \DOMElement $old
      */
-    private function append(\DOMDocument $layout, \DOMElement $append, \DOMElement $old) {
+    private function append(\DOMDocument $template, \DOMElement $append, \DOMElement $old) {
         if ($append->hasChildNodes()) foreach ($append->childNodes as $node) {
-            $old->appendChild($layout->importNode($node, true));
+            $old->appendChild($template->importNode($node, true));
         }
-    }
-
-    /**
-     * @param \DOMDocument $layout
-     * @param \DOMElement $replace
-     * @param \DOMElement $old
-     */
-    private function replaceElement(\DOMDocument $layout, \DOMElement $replace, \DOMElement $old) {
-        $new = $layout->createElement($old->tagName);
-        if ($old->hasAttributes()) foreach ($old->attributes as $attribute) {
-            $new->setAttribute($attribute->name, $attribute->value);
-        }
-        if ($replace->hasAttributes()) foreach ($replace->attributes as $attribute) {
-            if ($attribute->name == 'tag') continue;
-            $new->setAttribute($attribute->name, $attribute->value);
-        }
-        if ($replace->hasChildNodes()) foreach ($replace->childNodes as $node) {
-            $new->appendChild($layout->importNode($node, true));
-        }
-        $old->parentNode->replaceChild($new, $old);
     }
 
     /**
      *
-     * @param \DOMDocument $layout
+     * @param \DOMDocument $template
      * @param \DOMElement $replace
      * @param \DOMElement $old
      */
-    private function replaceElementNs(\DOMDocument $layout, \DOMElement $replace, \DOMElement $old) {
-        $new = $layout->createElementNs('http://www.w3.org/1999/xhtml', $old->tagName);
+    private function replaceElement(\DOMDocument $template, \DOMElement $replace, \DOMElement $old) {
+        $new = $template->createElement($old->tagName);
         if ($old->hasAttributes()) foreach ($old->attributes as $attribute) {
             $new->setAttribute($attribute->name, $attribute->value);
         }
@@ -73,7 +54,7 @@ class ResponseFilterLayout extends ResponseFilter {
             $new->setAttribute($attribute->name, $attribute->value);
         }
         if ($replace->hasChildNodes()) foreach ($replace->childNodes as $node) {
-            $new->appendChild($layout->importNode($node, true));
+            $new->appendChild($template->importNode($node, true));
         }
         $old->parentNode->replaceChild($new, $old);
     }
@@ -85,76 +66,76 @@ class ResponseFilterLayout extends ResponseFilter {
      * @throws \Exception
      */
     function applyForURI(ResourceXML $resource, $uri) {
-        $layout_path = null;
+        $template_path = null;
         $attributes = array();
         if ($this->getContext()->getLayerName() != 'installer') {
-            foreach ($resource->query("//layout[@for][@class][@source]") as $layout) {
-                $for = $layout->getAttribute('for');
+            foreach ($resource->query("//template[@for][@class][@source]") as $template) {
+                $for = $template->getAttribute('for');
                 if (strpos($uri, $for) !== false) {
                     $context = $this->getContext();
-                    $class = $layout->getAttribute('class');
+                    $class = $template->getAttribute('class');
                     if (class_exists($class)) {
-                        $reflection = new ReflectionMethod($class, 'getCurrentlySelectedLayout');
+                        $reflection = new ReflectionMethod($class, 'getCurrentlySelectedTemplate');
                         $instance = $reflection->invoke(null);
                         /** @var $instance ObjectView */
                         $attributes = $instance->getAttributes();
-                        $layout_path = $instance->getPath();
+                        $template_path = $instance->getPath();
                     } else {
                         throw new \Exception(sprintf($context->getTranslator()->_("Can't instantiate class %s"), $class));
                     }
                 }
             }
         }
-        foreach ($resource->query("//layout[@for][not(@class)]") as $layout) {
-            $for = $layout->getAttribute('for');
+        foreach ($resource->query("//template[@for][not(@class)]") as $template) {
+            $for = $template->getAttribute('for');
             if (strpos($uri, $for) !== false) {
-                $layout_path = $layout->getCharacterData();
+                $template_path = $template->getCharacterData();
             }
         }
-        if ($this->getSession()->getAttribute('layout_for') != '' && $this->getSession()->getAttribute('layout_path') != '') {
-            $for = $this->getSession()->getAttribute('layout_for');
+        if ($this->getSession()->getAttribute('template_for') != '' && $this->getSession()->getAttribute('template_path') != '') {
+            $for = $this->getSession()->getAttribute('template_for');
             if (strpos($uri, $for) !== false) {
-                $layout_path = $this->getSession()->getAttribute('layout_path');
+                $template_path = $this->getSession()->getAttribute('template_path');
             }
         }
         $response = $this->getResponse();
         $context = new \DOMXPath($response->getDocument());
         $q = $context->query('//template');
         if ($q instanceof \DOMNodeList) foreach ($q as $template) {
-            if ($template->hasAttribute('layout')) {
-                $layout = ResponsePart::evaluate($layout_path.DIRECTORY_SEPARATOR.$template->getAttribute('layout'), false, $attributes, true);
-                $layout_context = new \DOMXPath($layout);
+            if ($template->hasAttribute('src')) {
+                $template = ResponsePart::evaluate($template_path.DIRECTORY_SEPARATOR.$template->getAttribute('src'), false, $attributes, true);
+                $template_context = new \DOMXPath($template);
                 $r = $context->query('//append[@tag]');
                 if ($r instanceof \DOMNodeList) foreach ($r as $append) {
                     $tag = $append->getAttribute('tag');
-                    foreach ($layout_context->query("//$tag") as $old) {
-                        $this->append($layout, $append, $old);
+                    foreach ($template_context->query("//$tag") as $old) {
+                        $this->append($template, $append, $old);
                     }
                 }
                 $r = $context->query('//append[@id]');
                 if ($r instanceof \DOMNodeList) foreach ($r as $append) {
                     $id = $append->getAttribute('id');
-                    foreach ($layout_context->query("//*[@id='$id']") as $old) {
-                        $this->append($layout, $append, $old);
+                    foreach ($template_context->query("//*[@id='$id']") as $old) {
+                        $this->append($template, $append, $old);
                     }
                 }
                 $r = $context->query('//replace[@tag]');
                 if ($r instanceof \DOMNodeList) foreach ($r as $replace) {
                     $tag = $replace->getAttribute('tag');
-                    $s = $layout_context->query("//$tag");
+                    $s = $template_context->query("//$tag");
                     if ($s instanceof \DOMNodeList) foreach ($s as $old) {
-                        $this->replaceElement($layout, $replace, $old);
+                        $this->replaceElement($template, $replace, $old);
                     }
                 }
                 $r = $context->query('//replace[@id]');
                 if ($r instanceof \DOMNodeList) foreach ($r as $replace) {
                     $id = $replace->getAttribute('id');
-                    $s = $layout_context->query("//*[@id='$id']");
+                    $s = $template_context->query("//*[@id='$id']");
                     if ($s instanceof \DOMNodeList) foreach ($s as $old) {
-                        $this->replaceElement($layout, $replace, $old);
+                        $this->replaceElement($template, $replace, $old);
                     }
                 }
-                $response->setDocument($layout);
+                $response->setDocument($template);
             }
         }
     }

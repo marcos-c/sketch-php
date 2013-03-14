@@ -92,7 +92,7 @@ class ResponsePart extends Object {
             }
         }
         $this->relativePath = str_replace($document_root, '', realpath(dirname($file_name)));
-        // Add to the include path the path to the layout
+        // Add to the include path the path to the template
         if ($update_include_path && strpos($this->relativePath, get_include_path()) === false) {
             set_include_path(realpath(dirname($file_name)).PATH_SEPARATOR.get_include_path());
         }
