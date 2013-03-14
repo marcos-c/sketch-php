@@ -124,55 +124,59 @@ class Application {
         $this->setLogger(new LoggerDummy());
     }
 
-    function load($document_root, $test = false) {
-        // Initialize application and context
-        if (!$test) {
-            header("Content-Type: text/html; charset=UTF-8");
-        }
-        set_error_handler(array('\Sketch\Application', 'exceptionErrorHandler'));
-        $this->setStartTime(microtime(true));
-        $this->setDocumentRoot($document_root);
-        $this->setContext(
-            ResourceFactory::getContext(defined('CONTEXT_XML') ? CONTEXT_XML : $document_root.DIRECTORY_SEPARATOR.'config'.DIRECTORY_SEPARATOR.'context.xml')
-        );
-        // Initialize request
-        $this->setRequest(new Request());
-        // Initialize session and ACL
-        $this->setSession($test ? new SessionMock() : new Session());
-        if (!($this->getSession()->getACL() instanceof SessionACL)) {
-            $acl = new SessionACL();
-            $acl->addRule('guest');
-            $this->getSession()->setACL($acl);
-        }
-        // Initialize default locale
-        $context = $this->getContext()->queryFirst('//context');
-        $locale_string = ($context) ? $context->getAttribute('locale') : false;
-        $this->setDefaultLocale(
-            ($locale_string) ? Locale::fromString($locale_string) : new Locale('en')
-        );
-        // Initialize logger
-        $this->setLogger(new LoggerSimple());
-        // Initialize connection
-        try {
-            $this->setConnection(
-                ResourceFactory::getConnection($this->getContext())
-            );
-        } catch (ResourceConnectionException $e) {
+    private $isLoaded = true;
 
-        }
-        // Initialize controller
-        $this->setController(new Controller());
-        $this->getController()->setRouter(
-            RouterFactory::getRouter($this->getRequest(), $test)
-        );
-         // Output response
-        if ($this->getRequest()->isJSON()) {
-            $this->getController()->setResponse(new ResponseJSON());
-            print json_encode($this->getController()->getResponse());
-        } else {
-            $this->getController()->setResponse(new Response());
-            $this->getController()->setResponseFilters($this->getContext());
-            print $this->getController()->getResponse();
+    function load($document_root, $test = false) {
+        if ($this->isLoaded) {
+            $this->isLoaded = false;
+            // Initialize application and context
+            if (!$test) {
+                header("Content-Type: text/html; charset=UTF-8");
+            }
+            set_error_handler(array('\Sketch\Application', 'exceptionErrorHandler'));
+            $this->setStartTime(microtime(true));
+            $this->setDocumentRoot($document_root);
+            $this->setContext(
+                ResourceFactory::getContext(defined('CONTEXT_XML') ? CONTEXT_XML : dirname($document_root).DIRECTORY_SEPARATOR.'config'.DIRECTORY_SEPARATOR.'context.xml')
+            );
+            // Initialize request
+            $this->setRequest(new Request());
+            // Initialize session and ACL
+            $this->setSession($test ? new SessionMock() : new Session());
+            if (!($this->getSession()->getACL() instanceof SessionACL)) {
+                $acl = new SessionACL();
+                $acl->addRule('guest');
+                $this->getSession()->setACL($acl);
+            }
+            // Initialize default locale
+            $context = $this->getContext()->queryFirst('//context');
+            $locale_string = ($context) ? $context->getAttribute('locale') : false;
+            $this->setDefaultLocale(
+                ($locale_string) ? Locale::fromString($locale_string) : new Locale('en')
+            );
+            // Initialize logger
+            $this->setLogger(new LoggerSimple());
+            // Initialize connection
+            try {
+                $this->setConnection(
+                    ResourceFactory::getConnection($this->getContext())
+                );
+            } catch (ResourceConnectionException $e) {}
+            // Initialize controller
+            $this->setController(new Controller());
+            $this->getController()->setRouter(
+                RouterFactory::getRouter($this->getRequest(), $test)
+            );
+            // Output response
+            if ($this->getRequest()->isJSON()) {
+                $this->getController()->setResponse(new ResponseJSON());
+                print json_encode($this->getController()->getResponse());
+            } else {
+                $this->getController()->setResponse(new Response());
+                $this->getController()->setResponseFilters($this->getContext());
+                print $this->getController()->getResponse();
+            }
+            exit();
         }
     }
 
