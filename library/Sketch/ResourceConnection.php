@@ -27,25 +27,25 @@ namespace Sketch;
 
 class ResourceConnection extends Resource {
     /**
-     * @var ConnectionDriver
+     * @var ResourceConnectionDriver
      */
     private $driver;
 
-    function  __construct(ConnectionDriver $driver) {
+    function  __construct(ResourceConnectionDriver $driver) {
         $this->setDriver($driver);
     }
 
     /**
-     * @return ConnectionDriver
+     * @return ResourceConnectionDriver
      */
     function getDriver() {
         return $this->driver;
     }
 
     /**
-     * @param ConnectionDriver $driver
+     * @param ResourceConnectionDriver $driver
      */
-    function setDriver(ConnectionDriver $driver) {
+    function setDriver(ResourceConnectionDriver $driver) {
         $this->driver = $driver;
     }
 

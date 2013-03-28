@@ -40,12 +40,13 @@ class ResourceFactory {
     static function getConnection(ResourceContext $context) {
         $driver = $context->queryFirst("//driver[@type='ResourceConnectionDriver']");
         if ($driver) {
-            $type = $driver->getAttribute('type');
+            $type = "Sketch\\".$driver->getAttribute('type');
             $class = $driver->getAttribute('class');
             if (class_exists($class)) {
                 $reflection = new \ReflectionClass($class);
                 $instance = $reflection->newInstance($driver);
                 if ($instance instanceof $type) {
+                    /** @var $instance ResourceConnectionDriver */
                     return new ResourceConnection($instance);
                 } else {
                     throw new \Exception(sprintf($context->getTranslator()->_("Driver %s does not extend or implement %s"), $class, $type));

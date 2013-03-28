@@ -91,7 +91,7 @@ class Factory extends Object {
         $filename = $class_name.'_'.substr($signature, 0, 8).".php";
         $document_root = $application->getDocumentRoot();
         if ($document_root != null) {
-            $cache_path = $document_root.DIRECTORY_SEPARATOR.'cache';
+            $cache_path = dirname($document_root).DIRECTORY_SEPARATOR.'cache';
             $write_path = $cache_path.DIRECTORY_SEPARATOR.'library'.(($version != null) ? DIRECTORY_SEPARATOR.$version : '');
             if (is_readable($write_path.DIRECTORY_SEPARATOR.$filename)) {
                 return $write_path.DIRECTORY_SEPARATOR.$filename;
@@ -101,7 +101,8 @@ class Factory extends Object {
                     $contents = array();
                     $contents[] = "<?php\n";
                     $contents[] = "/**\n * WARNING! This file was automatically generated!\n */\n\n";
-                    $contents[] = "abstract class ${prefix}${class_name} extends SketchObjectView {\n";
+                    $contents[] = "namespace Common;\n\nuse Sketch\\DateTime;\nuse Sketch\\FormView;\nuse Sketch\\ObjectIterator;\nuse Sketch\\ObjectView;\n\n";
+                    $contents[] = "abstract class ${prefix}${class_name} extends \\Sketch\\ObjectView {\n";
                     // Attributes
                     $i = 0; foreach ($table_definition['fields'] as $column => $definition) {
                         if ($column != $primary_key) {
@@ -163,16 +164,16 @@ class Factory extends Object {
                                 $contents[] = "\t}\n\t\t\n";
                                 $contents[] = "\tfunction set${method_name}(\$${column}) {\n";
                             } else {
-                                $contents[] = "\t/**\n\t *\n\t * @return SketchDateTime\n\t **/\n\tfunction get${method_name}() {\n";
-                                $contents[] = "\t\tif (!(\$this->${attribute_name} instanceof SketchDateTime && \$this->${attribute_name}->isValid())) {\n";
+                                $contents[] = "\t/**\n\t *\n\t * @return DateTime\n\t **/\n\tfunction get${method_name}() {\n";
+                                $contents[] = "\t\tif (!(\$this->${attribute_name} instanceof DateTime && \$this->${attribute_name}->isValid())) {\n";
                                 if (preg_match('/^(date)/', $definition['type'])) {
-                                    $contents[] = "\t\t\t\$this->set${method_name}(SketchDateTime::Today());\n";
+                                    $contents[] = "\t\t\t\$this->set${method_name}(DateTime::Today());\n";
                                 } else {
-                                    $contents[] = "\t\t\t\$this->set${method_name}(SketchDateTime::Now());\n";
+                                    $contents[] = "\t\t\t\$this->set${method_name}(DateTime::Now());\n";
                                 }
                                 $contents[] = "\t\t} return \$this->${attribute_name};\n";
                                 $contents[] = "\t}\n\t\t\n";
-                                $contents[] = "\t/**\n\t *\n\t * @param SketchDateTime\n\t **/\n\tfunction set${method_name}(\$${column}) {\n";
+                                $contents[] = "\t/**\n\t *\n\t * @param DateTime\n\t **/\n\tfunction set${method_name}(\$${column}) {\n";
                             }
                             if (preg_match('/^int/', $definition['type']) || preg_match('/^smallint/', $definition['type']) || preg_match('/^tinyint/', $definition['type'])) {
                                 $contents[] = "\t\t\$this->${attribute_name} = intval(\$${column});\n";
@@ -181,7 +182,7 @@ class Factory extends Object {
                             } else if (preg_match('/^bool/', $definition['type']) || preg_match('/^enum\(\'f\',\'t\'|enum\(\'t\',\'f\'/', $definition['type'])) {
                                 $contents[] = "\t\t\$this->${attribute_name} = is_bool(\$${column}) ? \$${column} : (\$${column} == 't');\n";
                             } else if (preg_match('/^(date|time)/', $definition['type'])) {
-                                $contents[] = "\t\t\$this->${attribute_name} = new SketchDateTime(\$${column});\n";
+                                $contents[] = "\t\t\$this->${attribute_name} = new DateTime(\$${column});\n";
                             } else {
                                 $contents[] = "\t\t\$this->${attribute_name} = \$${column};\n";
                             } $contents[] = "\t}\n";
@@ -256,19 +257,19 @@ class Factory extends Object {
                     $contents[] = "\t\t} else return false;\n\t}\n";
                     // Generate Iterator
                     if ($generate_iterator) {
-                        $contents[] = "}\n\nclass ${class_name}Iterator extends SketchObjectIterator {\n";
+                        $contents[] = "}\n\nclass ${class_name}Iterator extends \\Sketch\\ObjectIterator {\n";
                         $contents[] = "\tfunction rows() {\n";
-                        $contents[] = "\t\tif (\$this->result instanceof SketchObjectIterator) {\n";
+                        $contents[] = "\t\tif (\$this->result instanceof \\Sketch\\ObjectIterator) {\n";
                         $contents[] = "\t\t\treturn \$this->result->rows();\n";
                         $contents[] = "\t\t} else return 0;\n";
                         $contents[] = "\t}\n\t\t\n";
                         $contents[] = "\tfunction fetch(\$key) {\n";
-                        $contents[] = "\t\tif (\$this->result instanceof SketchObjectIterator) {\n";
+                        $contents[] = "\t\tif (\$this->result instanceof \\Sketch\\ObjectIterator) {\n";
                         $contents[] = "\t\t\treturn new ${class_name}(\$this->result->fetch(\$key));\n";
                         $contents[] = "\t\t} else return false;\n";
                         $contents[] = "\t}\n\t\t\n";
                         $contents[] = "\tfunction free() {\n";
-                        $contents[] = "\t\tif (\$this->result instanceof SketchObjectIterator) {\n";
+                        $contents[] = "\t\tif (\$this->result instanceof \\Sketch\\ObjectIterator) {\n";
                         $contents[] = "\t\t\treturn \$this->result->free();\n";
                         $contents[] = "\t\t}\n";
                         $contents[] = "\t}\n";
@@ -286,7 +287,11 @@ class Factory extends Object {
                 } catch (\Exception $e) {
                     throw new \Exception(sprintf($translator->_("Can't write file %s"), $write_path.DIRECTORY_SEPARATOR.$filename));
                 }
-            } else throw new \Exception($translator->_("Cache folder not defined"));
-        } else throw new \Exception($translator->_("Application path not defined"));
+            } else {
+                throw new \Exception($translator->_("Cache folder not defined"));
+            }
+        } else {
+            throw new \Exception($translator->_("Application path not defined"));
+        }
     }
 }
