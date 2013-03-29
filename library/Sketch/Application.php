@@ -133,7 +133,7 @@ class Application {
             if (!$test) {
                 header("Content-Type: text/html; charset=UTF-8");
             }
-            set_error_handler(array('\Sketch\Application', 'exceptionErrorHandler'));
+            set_error_handler(array('Sketch\Application', 'exceptionErrorHandler'));
             $this->setStartTime(microtime(true));
             $this->setDocumentRoot($document_root);
             $this->setContext(

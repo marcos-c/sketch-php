@@ -81,7 +81,7 @@ class Form extends Object {
         for ($i = 0; $i < count($parameters); $i++) {
             $cp .= ', $parameters['.$i.']';
         }
-        return eval("return new SketchFormCommandPropagate($cp);");
+        return eval("return new Sketch\\FormCommandPropagate($cp);");
     }
 
     /**

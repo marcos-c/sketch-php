@@ -124,11 +124,11 @@ class LocaleFormatter extends Object {
      * @return string
      */
     function formatDateWithTimeZone(DateTime $date, $time_zone) {
-        $t = new DateTime($date->toString('Y-m-d'), new DateTimeZone('GMT'));
+        $t = new \DateTime($date->toString('Y-m-d'), new \DateTimeZone('GMT'));
         try {
-            $t->setTimeZone(new DateTimeZone($time_zone));
+            $t->setTimeZone(new \DateTimeZone($time_zone));
         } catch (\Exception $e) {
-            $t->setTimeZone(new DateTimeZone('GMT'));
+            $t->setTimeZone(new \DateTimeZone('GMT'));
         }
         return $t->format('d/m/Y');
     }
@@ -155,11 +155,11 @@ class LocaleFormatter extends Object {
      * @return string
      */
     function formatDateAndTimeWithTimeZone(DateTime $date, $time_zone) {
-        $t = new DateTime($date->toString('Y-m-d H:i'), new DateTimeZone('GMT'));
+        $t = new \DateTime($date->toString('Y-m-d H:i'), new \DateTimeZone('GMT'));
         try {
-            $t->setTimeZone(new DateTimeZone($time_zone));
+            $t->setTimeZone(new \DateTimeZone($time_zone));
         } catch (\Exception $e) {
-            $t->setTimeZone(new DateTimeZone('GMT'));
+            $t->setTimeZone(new \DateTimeZone('GMT'));
         }
         return $t->format('d/m/Y H:i');
     }

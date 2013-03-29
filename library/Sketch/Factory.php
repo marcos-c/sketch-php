@@ -102,7 +102,7 @@ class Factory extends Object {
                     $contents[] = "<?php\n";
                     $contents[] = "/**\n * WARNING! This file was automatically generated!\n */\n\n";
                     $contents[] = "namespace Common;\n\nuse Sketch\\DateTime;\nuse Sketch\\FormView;\nuse Sketch\\ObjectIterator;\nuse Sketch\\ObjectView;\n\n";
-                    $contents[] = "abstract class ${prefix}${class_name} extends \\Sketch\\ObjectView {\n";
+                    $contents[] = "abstract class ${prefix}${class_name} extends ObjectView {\n";
                     // Attributes
                     $i = 0; foreach ($table_definition['fields'] as $column => $definition) {
                         if ($column != $primary_key) {
@@ -251,25 +251,25 @@ class Factory extends Object {
                     $contents[] = sprintf($table_definition['templates']['insert'], $primary_key, implode(', ', $fields['insert']), implode(', ', $fields['values']));
                     $contents[] = "\t\t}\n";
                     $contents[] = "\t}\n";
-                    $contents[] = "\t\n\tfunction updateAction(SketchFormView \$form) {\n\t\t\$validate = method_exists(\$this, 'validate');\n\t\tif (!\$validate || (\$validate && \$this->validate(\$form))) {\n\t\t\treturn \$this->update();\n\t\t} else return false;\n\t}\n";
-                    $contents[] = "\t\n\tfunction removeAction(SketchFormView \$form) {\n\t\t\$connection = \$this->getConnection();\n\t\t\$id = \$this->getId();\n\t\tif (\$id) {\n";
+                    $contents[] = "\t\n\tfunction updateAction(FormView \$form) {\n\t\t\$validate = method_exists(\$this, 'validate');\n\t\tif (!\$validate || (\$validate && \$this->validate(\$form))) {\n\t\t\treturn \$this->update();\n\t\t} else return false;\n\t}\n";
+                    $contents[] = "\t\n\tfunction removeAction(FormView \$form) {\n\t\t\$connection = \$this->getConnection();\n\t\t\$id = \$this->getId();\n\t\tif (\$id) {\n";
                     $contents[] = sprintf($table_definition['templates']['delete'], $primary_key);
                     $contents[] = "\t\t} else return false;\n\t}\n";
                     // Generate Iterator
                     if ($generate_iterator) {
-                        $contents[] = "}\n\nclass ${class_name}Iterator extends \\Sketch\\ObjectIterator {\n";
+                        $contents[] = "}\n\nclass ${class_name}Iterator extends ObjectIterator {\n";
                         $contents[] = "\tfunction rows() {\n";
-                        $contents[] = "\t\tif (\$this->result instanceof \\Sketch\\ObjectIterator) {\n";
+                        $contents[] = "\t\tif (\$this->result instanceof ObjectIterator) {\n";
                         $contents[] = "\t\t\treturn \$this->result->rows();\n";
                         $contents[] = "\t\t} else return 0;\n";
                         $contents[] = "\t}\n\t\t\n";
                         $contents[] = "\tfunction fetch(\$key) {\n";
-                        $contents[] = "\t\tif (\$this->result instanceof \\Sketch\\ObjectIterator) {\n";
+                        $contents[] = "\t\tif (\$this->result instanceof ObjectIterator) {\n";
                         $contents[] = "\t\t\treturn new ${class_name}(\$this->result->fetch(\$key));\n";
                         $contents[] = "\t\t} else return false;\n";
                         $contents[] = "\t}\n\t\t\n";
                         $contents[] = "\tfunction free() {\n";
-                        $contents[] = "\t\tif (\$this->result instanceof \\Sketch\\ObjectIterator) {\n";
+                        $contents[] = "\t\tif (\$this->result instanceof ObjectIterator) {\n";
                         $contents[] = "\t\t\treturn \$this->result->free();\n";
                         $contents[] = "\t\t}\n";
                         $contents[] = "\t}\n";

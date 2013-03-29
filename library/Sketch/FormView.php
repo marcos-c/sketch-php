@@ -91,7 +91,7 @@ class FormView extends Object {
     /**
      * @param string $name
      * @param array $arguments
-     * @throws Exception
+     * @throws \Exception
      * @return string
      */
     function __call($name, $arguments) {
@@ -100,16 +100,17 @@ class FormView extends Object {
         foreach ($split as $key => $value) {
             $split[$key] = ucfirst(strtolower($value));
         }
-        if (class_exists('SketchFormComponent'.$name)) {
-            $reflection = new ReflectionClass("SketchFormComponent$name");
-            if ($reflection->isSubclassOf('SketchFormComponent')) {
+        $name = implode('', $split);
+        if (class_exists('Sketch\FormComponent'.$name)) {
+            $reflection = new \ReflectionClass('Sketch\FormComponent'.$name);
+            if ($reflection->isSubclassOf('Sketch\FormComponent')) {
                 /** @var $component FormComponent */
                 $component = $reflection->newInstance($this, $arguments);
                 Form::addComponent($form_name, $component);
                 return trim($component->saveHTML());
             }
         }
-        throw new Exception('Component not found');
+        throw new \Exception('Component not found');
     }
 
     /**
@@ -217,13 +218,15 @@ class FormView extends Object {
     /**
      * @param mixed $command
      * @param string $target
-     * @throws Exception
+     * @throws \Exception
      */
     function executeCommand(FormCommand $command, $target) {
         if ($command instanceof FormCommand && $command->getCommand() != null) {
             if (method_exists($this->instance, $command->getCommand())) {
-                $reflection = new ReflectionMethod('SketchFormCommand', $command->getCommand());
-                $result = $reflection->invoke($this->instance, $command->getParameters());
+                $reflection = new \ReflectionMethod(get_class($this->instance), $command->getCommand());
+                $parameters = $command->getParameters();
+                array_unshift($parameters, $this);
+                $result = $reflection->invokeArgs($this->instance, $parameters);
                 // Check result
                 if ($result === true || is_string($result)) {
                     $location = (is_array($target)) ? $target[$result] : (($result) ? trim($target) : null);
@@ -243,15 +246,15 @@ class FormView extends Object {
                             $this->requestForward($location, ($command instanceof FormCommandPropagate && is_array($this->form) && array_key_exists('attributes', $this->form)) ? $this->form['attributes'] : null);
                         }
                     } else {
-                        throw new Exception(sprintf($this->getTranslator()->_("Method %s returned a non valid location target."), $command->getCommand()));
+                        throw new \Exception(sprintf($this->getTranslator()->_("Method %s returned a non valid location target."), $command->getCommand()));
                     }
                 } else if ($result === false) {
                     $this->requestForward(null, is_array($this->form) && array_key_exists('attributes', $this->form) ? $this->form['attributes'] : null, ($command instanceof FormCommandPropagate) ? false : true);
                 } else {
-                    throw new Exception(sprintf($this->getTranslator()->_("Method %s returned a non valid location target."), $command->getCommand()));
+                    throw new \Exception(sprintf($this->getTranslator()->_("Method %s returned a non valid location target."), $command->getCommand()));
                 }
             } else {
-                throw new Exception(sprintf($this->getTranslator()->_("Method %s doesn't exist."), $command->getCommand()));
+                throw new \Exception(sprintf($this->getTranslator()->_("Method %s doesn't exist."), $command->getCommand()));
             }
         } else {
             $location = is_array($target) ? $target[true] : trim($target);
@@ -269,8 +272,8 @@ class FormView extends Object {
         if ($mixed != null) {
             $mixed = ($mixed instanceof FormCommand) ? $mixed : new FormCommand($mixed);
             switch (get_class($mixed)) {
-                case 'SketchFormCommandPropagate': $alias = 'sfcp'; break;
-                case 'SketchFormCommand': $alias = 'sfc'; break;
+                case 'Sketch\FormCommandPropagate': $alias = 'sfcp'; break;
+                case 'Sketch\FormCommand': $alias = 'sfc'; break;
             }
             return $alias.':'.$mixed->getCommand().':'.base64_encode(serialize($mixed->getParameters())).':'.($mixed->getTargetForError() ? $mixed->getTargetForError() : '0');
         } else {
@@ -351,11 +354,11 @@ class FormView extends Object {
                 $key = null;
             }
             if (method_exists($instance, "get${attribute}")) {
-                $reflection = new ReflectionMethod($instance, "get$attribute");
+                $reflection = new \ReflectionMethod($instance, "get$attribute");
                 $instance = $reflection->invoke($instance);
                 if ($key != null && is_array($instance)) $instance = (array_key_exists($key, $instance)) ? $instance[$key] : null;
             } else {
-                throw new Exception(sprintf($this->getTranslator()->_("Can't get %1\$s field for %2\$s"), $attribute, get_class($instance)));
+                throw new \Exception(sprintf($this->getTranslator()->_("Can't get %1\$s field for %2\$s"), $attribute, get_class($instance)));
             }
         } return $instance;
     }
@@ -376,12 +379,12 @@ class FormView extends Object {
             }
             if ($instance instanceof ObjectView || $instance instanceof ResourceFolderDescriptor) {
                 if (method_exists($instance, "set${set}")) {
-                    $reflection = new ReflectionMethod($instance, "set$set");
+                    $reflection = new \ReflectionMethod($instance, "set$set");
                     $reflection->invoke($instance, $value);
                     // Make sure that we have the same value inside form attributes
                     $this->form['attributes'][base64_encode($ape)] = $value;
                 } else {
-                    throw new Exception(sprintf("Can't set %1\$s field for %2\$s", $set, get_class($instance)));
+                    throw new \Exception(sprintf("Can't set %1\$s field for %2\$s", $set, get_class($instance)));
                 }
             }
         }
