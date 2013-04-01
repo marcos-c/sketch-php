@@ -42,7 +42,7 @@ class FormComponentInputSecret extends FormComponent {
             return '<span id="'.$span_ignore_field_name.'"><input type="text" name="'.$ignore_field_name.'" value="'.$default.'" '.$ignore_parameters.' onfocus="document.getElementById(\''.$span_ignore_field_name.'\').style.display = \'none\'; document.getElementById(\''.$span_field_name.'\').style.display = \'inline\'; document.getElementById(\''.$field_name.'\').focus();"  /></span><span id="'.$span_field_name.'" style="display: none"><input type="password" id="'.$field_name.'" name="'.$field_name.'" value="" '.$parameters.' /></span>';
         } else {
             $parameters = (($parameters != null && strpos(" $parameters", 'class="')) ? $parameters : implode(' ', array($parameters, 'class="input-secret"')));
-            return '<span><input type="password" name="'.$field_name.'" value="" '.$parameters.' /></span>';
+            return '<input type="password" name="'.$field_name.'" value="" '.$parameters.' />';
         }
     }
 }
