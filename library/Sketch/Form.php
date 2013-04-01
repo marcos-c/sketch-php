@@ -87,10 +87,11 @@ class Form extends Object {
     /**
      * @param ObjectView $data_object
      * @param null $view_id
+     * @param null $observers
      * @throws \Exception
      * @return mixed
      */
-    static function Factory(ObjectView $data_object, $view_id = null) {
+    static function Factory(ObjectView $data_object, $view_id = null, $observers = null) {
         $application = Application::getInstance();
         $translator = $application->getLocale()->getTranslator();
         // Check that the data object view has a valid id
@@ -101,10 +102,14 @@ class Form extends Object {
             $backtrace = debug_backtrace();
             $trace = array_shift($backtrace);
             if (array_key_exists('class', $trace)) {
-                if ($trace['class'] == 'SketchForm' && $trace['function'] == 'Factory') {
+                if ($trace['class'] == 'Sketch\Form' && $trace['function'] == 'Factory') {
                     $data_object->setViewId(md5(serialize($trace)));
-                } else throw new \Exception(sprintf($translator->_('Can\'t generate a valid view id for class %s'), get_class($data_object)));
-            } else throw new \Exception(sprintf($translator->_('Can\'t generate a valid view id for class %s'), get_class($data_object)));
+                } else {
+                    throw new \Exception(sprintf($translator->_('Can\'t generate a valid view id for class %s'), get_class($data_object)));
+                }
+            } else {
+                throw new \Exception(sprintf($translator->_('Can\'t generate a valid view id for class %s'), get_class($data_object)));
+            }
         }
         // Use a substr of the view name (md5) as form name
         $form_name = '__'.substr($data_object -> getViewName(), 0, 8);
@@ -112,9 +117,9 @@ class Form extends Object {
         $data_object->setUseSessionObject(true);
         // Factory a sketch form object
         if ($data_object instanceof ObjectList) {
-            return new FormList(clone($data_object), $form_name);
+            return new FormList(clone($data_object), $form_name, $observers);
         } else {
-            return new FormView(clone($data_object), $form_name);
+            return new FormView(clone($data_object), $form_name, $observers);
         }
     }
 }

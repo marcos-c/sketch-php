@@ -89,6 +89,11 @@ class FormView extends Object {
     protected $defaultCommand = null;
 
     /**
+     * @var array
+     */
+    protected $observers = array();
+
+    /**
      * @param string $name
      * @param array $arguments
      * @throws \Exception
@@ -116,11 +121,15 @@ class FormView extends Object {
     /**
      * @param ObjectView $data_view
      * @param string $form_name
+     * @param null $observers
      */
-    final function __construct(ObjectView $data_view, $form_name) {
+    final function __construct(ObjectView $data_view, $form_name, $observers = null) {
         $this->fromInstance = clone($data_view);
         $this->instance = $data_view;
         $this->formName = $form_name;
+        if (is_array($observers)) foreach ($observers as $observer) {
+            $this->addObserver($observer);
+        }
         $this->action = $this->getRequest()->getURI();
         // Update instance before calling action commands
         $this->form = $this->getRequest()->getAttribute($this->getFormName());
@@ -239,6 +248,10 @@ class FormView extends Object {
                                     $this->instance->addDescriptor($value);
                                 }
                             }
+                        }
+                        // Notify observers
+                        foreach ($this->observers as $observer) {
+                            $observer->notify($this, $command);
                         }
                         if ($result == $command->getTargetForError()) {
                             $this->requestForward($location, is_array($this->form) && array_key_exists('attributes', $this->form) ? $this->form['attributes'] : null, ($command instanceof FormCommandPropagate) ? false : true);
@@ -422,6 +435,13 @@ class FormView extends Object {
         $command = $this->encodeCommand($command);
         $location = $this->encodeLocation($location);
         $this->defaultCommand = "${form_name}Command('${command}', '${location}')";
+    }
+
+    /**
+     * @param FormObserver $observer
+     */
+    function addObserver(FormObserver $observer) {
+        $this->observers[] = $observer;
     }
 
     function command($command = null, $location = null) {
