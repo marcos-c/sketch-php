@@ -41,17 +41,17 @@ class FormComponentSelectMultiple extends FormComponent {
         $parameters = $this->extend(array(
             'show-sort-options' => false,
             'size' => 5,
-            'to' => array('id' => null, 'class' => 'select-multiple-to', 'style' => 'float: left;'),
-            'controls' => array('id' => null, 'class' => 'select-multiple-controls', 'style' => 'float: left; margin-right: 4px;'),
-            'left' => array('id' => null, 'class' => 'select-multiple-left', 'style' => null),
-            'left-label' => $this->getTranslator()->_('Left'),
-            'up' => array('id' => null, 'class' => 'select-multiple-up', 'style' => null),
-            'up-label' => $this->getTranslator()->_('Up'),
-            'down' => array('id' => null, 'class' => 'select-multiple-down', 'style' => null),
-            'down-label' => $this->getTranslator()->_('Down'),
-            'right' => array('id' => null, 'class' => 'select-multiple-right', 'style' => null),
-            'right-label' => $this->getTranslator()->_('Right'),
-            'from' => array('id' => null, 'class' => 'select-multiple-from', 'style' => 'float: left;'),
+            'to' => array('id' => null, 'class' => 'select-multiple-to', 'style' => ''),
+            'controls' => array('id' => null, 'class' => 'select-multiple-controls', 'style' => ''),
+            'left' => array('id' => null, 'class' => 'select-multiple-left btn btn-mini', 'style' => null),
+            'left-label' => $this->getTranslator()->_('<i class="icon-double-angle-up"></i>'),
+            'up' => array('id' => null, 'class' => 'select-multiple-up btn btn-mini', 'style' => null),
+            'up-label' => $this->getTranslator()->_('<i class="icon-angle-up"></i>'),
+            'down' => array('id' => null, 'class' => 'select-multiple-down btn btn-mini', 'style' => null),
+            'down-label' => $this->getTranslator()->_('<i class="icon-double-down"></i>'),
+            'right' => array('id' => null, 'class' => 'select-multiple-right btn btn-mini', 'style' => null),
+            'right-label' => $this->getTranslator()->_('<i class="icon-double-angle-down"></i>'),
+            'from' => array('id' => null, 'class' => 'select-multiple-from', 'style' => ''),
         ), array_shift($arguments));
         $form_name = $form->getFormName();
         $field_name = $form->getFieldName($attribute);
