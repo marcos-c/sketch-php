@@ -26,5 +26,5 @@
 namespace Sketch;
 
 abstract class FormObserver extends Object {
-    abstract function notify(FormView $form, $command);
+    abstract function notify(FormView $form, FormCommand $command, $result);
 }

@@ -251,7 +251,7 @@ class FormView extends Object {
                         }
                         // Notify observers
                         foreach ($this->observers as $observer) {
-                            $observer->notify($this, $command);
+                            $observer->notify($this, $command, $result);
                         }
                         if ($result == $command->getTargetForError()) {
                             $this->requestForward($location, is_array($this->form) && array_key_exists('attributes', $this->form) ? $this->form['attributes'] : null, ($command instanceof FormCommandPropagate) ? false : true);
