@@ -258,13 +258,14 @@ class FormComponentInputDate extends FormComponent {
             'inverse' => false,
             'month_count' => 35,
             'from_current_date' => false,
-            'calendar' => true,
+            'from_date' => new SketchDateTime('2010-01-01'),
+            'to_date' => SketchDateTime::Today()->addInterval('24 months'),
+            'calendar' => false,
             'input-date-day' => array('id' => null, 'class' => 'input-date-day', 'style' => null),
             'input-date-month' => array('id' => null, 'class' => 'input-date-month', 'style' => null),
             'input-date-year' => array('id' => null, 'class' => 'input-date-year', 'style' => null),
             'input-date-year-month' => array('id' => null, 'class' => 'input-date-year-month', 'style' => null),
-            'input-date-calendar' => array('id' => null, 'class' => 'input-date-calendar', 'style' => null),
-            'onchange' => null
+            'input-date-calendar' => array('id' => null, 'class' => 'input-date-calendar', 'style' => null)
         ), array_shift($arguments));
         // Field names
         $field_name = $form->getFieldName($attribute);
@@ -313,7 +314,7 @@ class FormComponentInputDate extends FormComponent {
             $days = array(); $months = array(); $years = array(); $year_months = array();
         }
         $year_month_days = array();
-        $date = new DateTime($parameters['from_date']->toString('Y-m-1'));
+        $date = $parameters['from_date'];
         $month_names = LocaleISO::getMonthNames();
         do {
             $years[$date->getYear()] = $date->getYear();
