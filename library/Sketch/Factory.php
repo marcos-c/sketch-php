@@ -70,12 +70,18 @@ class Factory extends Object {
                 $class_name .= ucfirst($value);
             }
         }
-        return self::scaffoldFrom(self::$version, $class_name, $table_name, $options['prefix'], $options['primary_key'], $options['generate_iterator'], $connection->getTableDefinition($table_name));
+        if (array_key_exists('namespace', $options)) {
+            $namespace = $options['namespace'];
+        } else {
+            $namespace = 'Common';
+        }
+        return self::scaffoldFrom(self::$version, $class_name, $namespace, $table_name, $options['prefix'], $options['primary_key'], $options['generate_iterator'], $connection->getTableDefinition($table_name));
     }
 
     /**
      * @param $version
      * @param string $class_name
+     * @param string $namespace
      * @param string $table_name
      * @param $prefix
      * @param string $primary_key
@@ -84,7 +90,7 @@ class Factory extends Object {
      * @throws \Exception
      * @return string
      */
-    private static function scaffoldFrom($version, $class_name, $table_name, $prefix, $primary_key, $generate_iterator, $table_definition) {
+    private static function scaffoldFrom($version, $class_name, $namespace, $table_name, $prefix, $primary_key, $generate_iterator, $table_definition) {
         $application = Application::getInstance();
         $translator = $application->getLocale()->getTranslator();
         $signature = md5(serialize(array($version, $class_name, $table_definition['fields'])));
@@ -101,7 +107,7 @@ class Factory extends Object {
                     $contents = array();
                     $contents[] = "<?php\n";
                     $contents[] = "/**\n * WARNING! This file was automatically generated!\n */\n\n";
-                    $contents[] = "namespace Common;\n\nuse Sketch\\DateTime;\nuse Sketch\\FormView;\nuse Sketch\\ObjectIterator;\nuse Sketch\\ObjectView;\n\n";
+                    $contents[] = "namespace ${namespace};\n\nuse Sketch\\DateTime;\nuse Sketch\\FormView;\nuse Sketch\\ObjectIterator;\nuse Sketch\\ObjectView;\n\n";
                     $contents[] = "abstract class ${prefix}${class_name} extends ObjectView {\n";
                     // Attributes
                     $i = 0; foreach ($table_definition['fields'] as $column => $definition) {
