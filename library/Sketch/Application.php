@@ -126,7 +126,7 @@ class Application {
 
     private $isLoaded = true;
 
-    function load($document_root, $test = false) {
+    function load($document_root, $controller = true, $test = false) {
         if ($this->isLoaded) {
             $this->isLoaded = false;
             // Initialize application and context
@@ -162,21 +162,23 @@ class Application {
                     ResourceFactory::getConnection($this->getContext())
                 );
             } catch (ResourceConnectionException $e) {}
-            // Initialize controller
-            $this->setController(new Controller());
-            $this->getController()->setRouter(
-                RouterFactory::getRouter($this->getRequest(), $test)
-            );
-            // Output response
-            if ($this->getRequest()->isJSON()) {
-                $this->getController()->setResponse(new ResponseJSON());
-                print json_encode($this->getController()->getResponse());
-            } else {
-                $this->getController()->setResponse(new Response());
-                $this->getController()->setResponseFilters($this->getContext());
-                print $this->getController()->getResponse();
+            if ($controller) {
+                // Initialize controller
+                $this->setController(new Controller());
+                $this->getController()->setRouter(
+                    RouterFactory::getRouter($this->getRequest(), $test)
+                );
+                // Output response
+                if ($this->getRequest()->isJSON()) {
+                    $this->getController()->setResponse(new ResponseJSON());
+                    print json_encode($this->getController()->getResponse());
+                } else {
+                    $this->getController()->setResponse(new Response());
+                    $this->getController()->setResponseFilters($this->getContext());
+                    print $this->getController()->getResponse();
+                }
+                exit();
             }
-            exit();
         }
     }
 
