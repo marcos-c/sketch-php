@@ -31,49 +31,34 @@ class FormComponentSelectOneRadio extends FormComponent {
         $arguments = $this->getArguments();
         $options = array_shift($arguments);
         $attribute = array_shift($arguments);
-        $parameters = $this->extend(array(
-            'wrapper' => true,
-            'columns' => 3,
-            'input' => array('id' => null, 'class' => null, 'style' => null),
-            'left-div' => array('id' => null, 'class' => null, 'style' => null),
-            'div' => array('id' => null, 'class' => null, 'style' => null),
-            'right-div' => array('id' => null, 'class' => null, 'style' => null),
-            'end-div' => array('id' => null, 'class' => null, 'style' => null),
-            'left-label' => array('id' => null, 'class' => null, 'style' => null),
-            'label' => array('id' => null, 'class' => null, 'style' => null),
-            'right-label' => array('id' => null, 'class' => null, 'style' => null),
-            'end-label' => array('id' => null, 'class' => null, 'style' => null),
-        ), array_shift($arguments));
         $field_name = $form->getFieldName($attribute);
         $field_value = $form->getFieldValue($attribute);
+        $parameters = $this->extend(array(
+            'ul' => array('id' => null, 'class' => 'select-one-radio', 'style' => null),
+            'li' => array('id' => null, 'class' => 'select-one-radio-li', 'style' => null),
+            'label' => array('id' => null, 'class' => 'select-one-radio-li', 'style' => null, 'for' => null),
+            'input' => array('id' => null, 'class' => 'select-one-radio-input', 'style' => null)
+        ), array_shift($arguments));
         ob_start(); ?>
-        <? if (is_array($options)):
-            $i = 1; ?>
-            <? if ($parameters['wrapper']): ?>
-                <? foreach ($options as $key => $value): ?>
-                    <? if ($i  == count($options) || !($i++ % $parameters['columns'])): ?>
-                        <div<?=$parameters['right-div'] != null ? $parameters['right-div'] : $parameters['div']?>>
-                            <label<?=$parameters['right-label'] != null ? $parameters['right-label'] : $parameters['label']?>><?=$value?></label>
-                            <p><input type="radio" name="<?=$field_name?>" value="<?=$key?>" <?=(($field_value == $key) ? 'checked="checked"' : '')?><?=$parameters['input']?> /></p>
-                        </div>
-                    <? elseif (!($i % $parameters['columns'])): ?>
-                        <div<?=$parameters['div']?>>
-                            <label<?=$parameters['label']?>><?=$value?></label>
-                            <p><input type="radio" name="<?=$field_name?>" value="<?=$key?>" <?=(($field_value == $key) ? 'checked="checked"' : '')?><?=$parameters['input']?> /></p>
-                        </div>
-                    <? else: ?>
-                        <div<?=$parameters['left-div'] != null ? $parameters['left-div'] : $parameters['div']?>>
-                            <label<?=$parameters['left-label'] != null ? $parameters['left-label'] : $parameters['div']?>><?=$value?></label>
-                            <p><input type="radio" name="<?=$field_name?>" value="<?=$key?>" <?=(($field_value == $key) ? 'checked="checked"' : '')?><?=$parameters['input']?> /></p>
-                        </div>
+        <? if (is_array($options)): ?>
+            <ul <?=$parameters['ul']?>>
+                <? foreach ($options as $key => $value):
+                    if ($arguments['label']['for'] != null && $arguments['input']['id'] != null): ?>
+                        <li <?=$parameters['li']?>><label <?=$parameters['label']?>><input type="radio" name="<?=$field_name?>" value="<?=$key?>" <?=(($field_value == $key) ? 'checked="checked"' : '')?><?=$parameters['input']?> /> <?=$value?></label></li>
+                    <? elseif ($arguments['label']['for'] != null):
+                        $id = sprintf(' id="%s"', $arguments['input']['label']); ?>
+                        <li <?=$parameters['li']?>><label <?=$parameters['label']?>><input<?=$id?> type="radio" name="<?=$field_name?>" value="<?=$key?>" <?=(($field_value == $key) ? 'checked="checked"' : '')?><?=$parameters['input']?> /> <?=$value?></label></li>
+                    <? elseif ($arguments['label']['id'] != null):
+                        $for = sprintf(' for="%s"', $arguments['input']['id']); ?>
+                        <li <?=$parameters['li']?>><label<?=$for?> <?=$parameters['label']?>><input type="radio" name="<?=$field_name?>" value="<?=$key?>" <?=(($field_value == $key) ? 'checked="checked"' : '')?><?=$parameters['input']?> /> <?=$value?></label></li>
+                    <? else:
+                        $md5 = substr(md5($field_name.$key), 8);
+                        $id = sprintf(' id="%s"', $md5);
+                        $for = sprintf(' for="%s"', $md5); ?>
+                        <li <?=$parameters['li']?>><label<?=$for?> <?=$parameters['label']?>><input<?=$id?> type="radio" name="<?=$field_name?>" value="<?=$key?>" <?=(($field_value == $key) ? 'checked="checked"' : '')?><?=$parameters['input']?> /> <?=$value?></label></li>
                     <? endif; ?>
                 <? endforeach; ?>
-            <? else: ?>
-                <? foreach ($options as $key => $value): ?>
-                    <span style="display:inline-block; margin-bottom: 4px;"><input type="radio" name="<?=$field_name?>" value="<?=$key?>" <?=(($field_value == $key) ? 'checked="checked"' : '')?><?=$parameters['input']?> />
-                    <?=$value?></span><br />
-                <? endforeach; ?>
-            <? endif; ?>
+            </ul>
         <? endif; ?>
         <?php return ob_get_clean();
     }
