@@ -126,7 +126,7 @@ class Application {
 
     private $isLoaded = true;
 
-    function load($document_root, $controller = true, $test = false) {
+    function load($document_root, $controller = true, $test = false, $context = null) {
         if ($this->isLoaded) {
             $this->isLoaded = false;
             // Initialize application and context
@@ -137,7 +137,7 @@ class Application {
             $this->setStartTime(microtime(true));
             $this->setDocumentRoot($document_root);
             $this->setContext(
-                ResourceFactory::getContext(defined('CONTEXT_XML') ? CONTEXT_XML : dirname($document_root).DIRECTORY_SEPARATOR.'config'.DIRECTORY_SEPARATOR.'context.xml')
+                ResourceFactory::getContext($context ? $context : dirname($document_root).DIRECTORY_SEPARATOR.'config'.DIRECTORY_SEPARATOR.'context.xml')
             );
             // Initialize request
             $this->setRequest(new Request());
