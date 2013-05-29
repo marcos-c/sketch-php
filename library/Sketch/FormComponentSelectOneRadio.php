@@ -33,6 +33,9 @@ class FormComponentSelectOneRadio extends FormComponent {
         $attribute = array_shift($arguments);
         $field_name = $form->getFieldName($attribute);
         $field_value = $form->getFieldValue($attribute);
+        if (is_bool($field_value) || !$field_value) {
+            $field_value = $field_value ? 't' : 'f';
+        }
         $parameters = $this->extend(array(
             'ul' => array('id' => null, 'class' => 'select-one-radio', 'style' => null),
             'li' => array('id' => null, 'class' => 'select-one-radio-li', 'style' => null),
