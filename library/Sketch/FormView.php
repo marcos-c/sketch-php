@@ -393,6 +393,19 @@ class FormView extends Object {
             if ($instance instanceof ObjectView || $instance instanceof ResourceFolderDescriptor) {
                 if (method_exists($instance, "set${set}")) {
                     $reflection = new \ReflectionMethod($instance, "set$set");
+                    if (method_exists($instance, "getTypeInformation")) {
+                        $type_information = $instance->getTypeInformation();
+                        if (array_key_exists($set, $type_information)) {
+                            switch ($type_information[$set]) {
+                                case 'number':
+                                    $value = $this->getFormatter()->parseFormattedNumber($value);
+                                    break;
+                                case 'date':
+                                    $value = $this->getFormatter()->parseFormattedDate($value);
+                                    break;
+                            }
+                        }
+                    }
                     $reflection->invoke($instance, $value);
                     // Make sure that we have the same value inside form attributes
                     $this->form['attributes'][base64_encode($ape)] = $value;

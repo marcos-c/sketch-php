@@ -103,10 +103,23 @@ class LocaleFormatter extends Object {
      * @return string
      */
     function formatNumber($number) {
-        if ($this->localeString == 'es_ES') {
-            return number_format($number, 2, ',', '.');
+        if ($this->localeString == 'es') {
+            return str_replace(',00', '', number_format($number, 2, ',', ''));
         } else {
             return number_format($number, 2, '.', ',');
+        }
+    }
+
+    /**
+     *
+     * @param $number
+     * @return mixed
+     */
+    function parseFormattedNumber($number) {
+        if ($this->localeString == 'es') {
+            return floatval(str_replace(',', '.', $number));
+        } else {
+            return $number;
         }
     }
 
@@ -116,6 +129,16 @@ class LocaleFormatter extends Object {
      */
     function formatDate(DateTime $date) {
         return $date->toString('d/m/Y');
+    }
+
+
+    /**
+     * @param $date
+     * @return DateTime
+     */
+    function parseFormattedDate($date) {
+        list($day, $month, $year) = explode('/', $date);
+        return $year.'-'.$month.'-'.$day;
     }
 
     /**
