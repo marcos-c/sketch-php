@@ -81,7 +81,7 @@ class ResponseFilterTemplate extends ResponseFilter {
                         $attributes = $instance->getAttributes();
                         $template_path = $instance->getPath();
                     } else {
-                        throw new \Exception(sprintf($context->getTranslator()->_("Can't instantiate class %s"), $class));
+                        throw new \Exception(sprintf($context->getTranslator()->_s("Can't instantiate class %s"), $class));
                     }
                 }
             }

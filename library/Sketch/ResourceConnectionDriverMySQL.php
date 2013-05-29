@@ -56,10 +56,10 @@ class ResourceConnectionDriverMySQL extends ResourceConnectionDriver {
                 $this->connection = $connection;
                 $this->executeUpdate("set names '$encoding'");
             } else {
-                throw new ResourceConnectionException($this->getTranslator()->_("Couldn't connect to database $database"));
+                throw new ResourceConnectionException($this->getTranslator()->_s("Couldn't connect to database $database"));
             }
         } else {
-            throw new ResourceConnectionException($this->getTranslator()->_("Couldn't open a connection to $host"));
+            throw new ResourceConnectionException($this->getTranslator()->_s("Couldn't open a connection to $host"));
         }
     }
 

@@ -50,10 +50,10 @@ class ResponseFilterAnalytics extends ResponseFilter {
                 if ($reflection->implementsInterface('AnalyticsResponseFilterTransactionHandlerInterface')) {
                     $script .= $reflection->newInstance()->execute();
                 } else {
-                    throw new \Exception(sprintf($this->getTranslator()->_("Handler %s does not implement AnalyticsResponseFilterTransactionHandlerInterface"), $class));
+                    throw new \Exception(sprintf($this->getTranslator()->_s("Handler %s does not implement AnalyticsResponseFilterTransactionHandlerInterface"), $class));
                 }
             } else {
-                throw new \Exception(sprintf($this->getTranslator()->_("Can't instantiate class %s"), $class));
+                throw new \Exception(sprintf($this->getTranslator()->_s("Can't instantiate class %s"), $class));
             }
         }
         $script .= "\n(function() {\nvar ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;\nga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';\nvar s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);\n})();";

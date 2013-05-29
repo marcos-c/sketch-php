@@ -234,7 +234,7 @@ class DateTime extends Object {
         } else if (preg_match('/^last month$/', $interval)) {
             return new DateTime(strtotime($interval, $this->dateTime));
         } else {
-            throw new \Exception($this->getTranslator()->_("Wrong interval format"));
+            throw new \Exception($this->getTranslator()->_s("Wrong interval format"));
         }
     }
 

@@ -37,7 +37,7 @@ class FormComponentInputFile extends FormComponent {
             $folder = $this->getForm()->getInstance()->getFolder();
             $descriptor = $folder->getDescriptor($attribute);
             $info = null; if ($descriptor instanceof ResourceFolderDescriptor) {
-                $info = $this->getForm()->commandLink(new FormCommand('removeDescriptor', $attribute), null, $this->getTranslator()->_('Remove')).' '.htmlspecialchars($descriptor->getSourceFileName()).', '.$descriptor->getFormattedFileSize().', '.$descriptor->getFileType().'<br />';
+                $info = $this->getForm()->commandLink(new FormCommand('removeDescriptor', $attribute), null, $this->getTranslator()->_s('Remove')).' '.htmlspecialchars($descriptor->getSourceFileName()).', '.$descriptor->getFormattedFileSize().', '.$descriptor->getFileType().'<br />';
             } return $info.'<input type="file" name="'.$field_name.'" '.$parameters.' />';
         } else {
             return '<input type="file" name="'.$field_name.'" '.$parameters.' />';

@@ -53,18 +53,122 @@ class LocaleTranslator extends Object {
     }
 
     /**
-     * @param string $text
+     *
+     * @param $text
      * @return string
      */
-    function translate($text) {
-        return $this->driver->translate($text);
+    function _a($text) {
+        return $this->driver->translate($text, 'default');
     }
 
     /**
-     * @param string $text
+     *
+     * @param $singular
+     * @param $plural
+     * @param $number
      * @return string
      */
-    function _($text) {
-        return $this->translate($text);
+    function _na($singular, $plural, $number) {
+        return $this->driver->translate_plural($singular, $plural, $number, 'default');
+    }
+
+    /**
+     *
+     * @param $text
+     * @param $context
+     * @return string
+     */
+    function _xa($text, $context) {
+        return $this->driver->translate_with_context($text, $context, 'default');
+    }
+
+    /**
+     *
+     * @param $text
+     * @return string
+     */
+    function _b($text) {
+        return $this->driver->translate($text, 'support');
+    }
+
+    /**
+     *
+     * @param $singular
+     * @param $plural
+     * @param $number
+     * @return string
+     */
+    function _nb($singular, $plural, $number) {
+        return $this->driver->translate_plural($singular, $plural, $number, 'support');
+    }
+
+    /**
+     *
+     * @param $text
+     * @param $context
+     * @return string
+     */
+    function _xb($text, $context) {
+        return $this->driver->translate_with_context($text, $context, 'support');
+    }
+
+    /**
+     *
+     * @param $text
+     * @return string
+     */
+    function _c($text) {
+        return $this->driver->translate($text, 'extra');
+    }
+
+    /**
+     *
+     * @param $singular
+     * @param $plural
+     * @param $number
+     * @return string
+     */
+    function _nc($singular, $plural, $number) {
+        return $this->driver->translate_plural($singular, $plural, $number, 'extra');
+    }
+
+    /**
+     *
+     * @param $text
+     * @param $context
+     * @return string
+     */
+    function _xc($text, $context) {
+        return $this->driver->translate_with_context($text, $context, 'extra');
+    }
+
+    /**
+     *
+     * @param $text
+     * @return string
+     */
+    function _s($text) {
+        return $this->driver->translate($text, 'system');
+    }
+
+    /**
+     *
+     * @param $singular
+     * @param $plural
+     * @param $number
+     * @return string
+     */
+    function _ns($singular, $plural, $number) {
+        return $this->driver->translate_plural($singular, $plural, $number, 'system');
+    }
+
+    /**
+     *
+     * @param $text
+     * @param $context
+     * @return string
+     */
+    function _xs($text, $context) {
+        return $this->driver->translate_with_context($text, $context, 'system');
     }
 }

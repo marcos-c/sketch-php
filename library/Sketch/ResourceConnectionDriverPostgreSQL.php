@@ -51,13 +51,13 @@ class PostgreSQLConnectionDriver extends ConnectionDriver {
             if ($connection) {
                 $this->connection = $connection;
                 if (pg_set_client_encoding($this->connection, $encoding) === -1) {
-                    throw new ResourceConnectionException($this->getTranslator()->_("Unsupported encoding to $host and $database"));
+                    throw new ResourceConnectionException($this->getTranslator()->_s("Unsupported encoding to $host and $database"));
                 }
             } else {
-                throw new ResourceConnectionException($this->getTranslator()->_("Couldn't open a connection to $host and $database"));
+                throw new ResourceConnectionException($this->getTranslator()->_s("Couldn't open a connection to $host and $database"));
             }
         } else {
-            throw new ResourceConnectionException($this->getTranslator()->_("PostgreSQL functions are not available"));
+            throw new ResourceConnectionException($this->getTranslator()->_s("PostgreSQL functions are not available"));
         }
     }
 

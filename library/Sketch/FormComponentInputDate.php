@@ -81,7 +81,7 @@ class FormComponentInputDate extends FormComponent {
                                 var months = <?=json_encode($months)?>;
                                 var year_month_days = <?=json_encode($year_month_days)?>;
                                 var calendar = $('#<?=$calendar_field_id?>');
-                                calendar.datepicker({firstDay: 1, minDate: new Date(<?=$from_year?>, <?=$from_month - 1?>, <?=$from_day?>), maxDate: new Date(<?=$to_year?>, <?=$to_month - 1?>, <?=$to_day?>), dayNamesMin: ['<?=$this->getTranslator()->_('Sun')?>', '<?=$this->getTranslator()->_('Mon')?>', '<?=$this->getTranslator()->_('Tue')?>', '<?=$this->getTranslator()->_('Wed')?>', '<?=$this->getTranslator()->_('Thu')?>', '<?=$this->getTranslator()->_('Fri')?>', '<?=$this->getTranslator()->_('Sat')?>'], monthNames: ['<?=$this->getTranslator()->_('January')?>', '<?=$this->getTranslator()->_('February')?>', '<?=$this->getTranslator()->_('March')?>', '<?=$this->getTranslator()->_('April')?>', '<?=$this->getTranslator()->_('May')?>', '<?=$this->getTranslator()->_('June')?>', '<?=$this->getTranslator()->_('July')?>', '<?=$this->getTranslator()->_('August')?>', '<?=$this->getTranslator()->_('September')?>', '<?=$this->getTranslator()->_('October')?>', '<?=$this->getTranslator()->_('November')?>', '<?=$this->getTranslator()->_('December')?>'], dateFormat: 'yy-mm-dd', showOn: 'button', buttonText: '<?=$this->getTranslator()->_('Calendar')?>'});
+                                calendar.datepicker({firstDay: 1, minDate: new Date(<?=$from_year?>, <?=$from_month - 1?>, <?=$from_day?>), maxDate: new Date(<?=$to_year?>, <?=$to_month - 1?>, <?=$to_day?>), dayNamesMin: ['<?=$this->getTranslator()->_s('Sun')?>', '<?=$this->getTranslator()->_s('Mon')?>', '<?=$this->getTranslator()->_s('Tue')?>', '<?=$this->getTranslator()->_s('Wed')?>', '<?=$this->getTranslator()->_s('Thu')?>', '<?=$this->getTranslator()->_s('Fri')?>', '<?=$this->getTranslator()->_s('Sat')?>'], monthNames: ['<?=$this->getTranslator()->_s('January')?>', '<?=$this->getTranslator()->_s('February')?>', '<?=$this->getTranslator()->_s('March')?>', '<?=$this->getTranslator()->_s('April')?>', '<?=$this->getTranslator()->_s('May')?>', '<?=$this->getTranslator()->_s('June')?>', '<?=$this->getTranslator()->_s('July')?>', '<?=$this->getTranslator()->_s('August')?>', '<?=$this->getTranslator()->_s('September')?>', '<?=$this->getTranslator()->_s('October')?>', '<?=$this->getTranslator()->_s('November')?>', '<?=$this->getTranslator()->_s('December')?>'], dateFormat: 'yy-mm-dd', showOn: 'button', buttonText: '<?=$this->getTranslator()->_s('Calendar')?>'});
                                 var day = $(':input[name="<?=$field_name?>[day]"]');
                                 <? if (in_array($parameters['format'], array('mY', 'd-mY'))): ?>
                                     var year_month = $(':input[name="<?=$field_name?>[year_month]"]');
@@ -354,7 +354,7 @@ class FormComponentInputDate extends FormComponent {
                 return $month_selector.'<input type="hidden" name="'.$field_name.'[day]" value="1" />'.$year_selector.$calendar;
             }
         } else {
-            throw new \Exception(sprintf($this->getTranslator()->_('%s is not a supported format for SketchFormComponentInputDate'), $parameters['format']));
+            throw new \Exception(sprintf($this->getTranslator()->_s('%s is not a supported format for SketchFormComponentInputDate'), $parameters['format']));
         }
     }
 }

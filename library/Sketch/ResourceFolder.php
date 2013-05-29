@@ -234,7 +234,7 @@ class ResourceFolder extends Resource {
                 if (array_key_exists($descriptor->getReference(), $this->descriptors)) {
                     $test = $connection->executeUpdate("UPDATE $table_name SET file_name = '$file_name', source_file_name = '$source_file_name', file_type = '$file_type', file_size = $file_size, image_width = $image_width, image_height = $image_height WHERE parent_id = $parent_id AND reference = '$reference'");
                     if ($test) {
-                        $application->addNotice(new ApplicationNotice(sprintf($this->getTranslator()->_("Descriptor <strong>%s</strong> (%s) has been updated"), $reference, $file_type)));
+                        $application->addNotice(new ApplicationNotice(sprintf($this->getTranslator()->_s("Descriptor <strong>%s</strong> (%s) has been updated"), $reference, $file_type)));
                     }
                 } else {
                     if ($connection->supports('nextval')) {
@@ -247,7 +247,7 @@ class ResourceFolder extends Resource {
                         }
                     }
                     if ($test) {
-                        $application->addNotice(new ApplicationNotice(sprintf($this->getTranslator()->_("Descriptor <strong>%s</strong> (%s) was added to folder"), $reference, $file_type)));
+                        $application->addNotice(new ApplicationNotice(sprintf($this->getTranslator()->_s("Descriptor <strong>%s</strong> (%s) was added to folder"), $reference, $file_type)));
                     }
                 }
             }
@@ -255,7 +255,7 @@ class ResourceFolder extends Resource {
                 $this->descriptors[$reference] = $descriptor;
                 $this->clean();
             } else {
-                $application->addNotice(new ApplicationNotice(sprintf($this->getTranslator()->_("Descriptor <strong>%s</strong> (%s) couldn't be added to folder"), $descriptor->getReference(), $descriptor->getFileType())));
+                $application->addNotice(new ApplicationNotice(sprintf($this->getTranslator()->_s("Descriptor <strong>%s</strong> (%s) couldn't be added to folder"), $descriptor->getReference(), $descriptor->getFileType())));
             }
         }
     }

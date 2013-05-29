@@ -105,10 +105,10 @@ class Form extends Object {
                 if ($trace['class'] == 'Sketch\Form' && $trace['function'] == 'Factory') {
                     $data_object->setViewId(md5(serialize($trace)));
                 } else {
-                    throw new \Exception(sprintf($translator->_('Can\'t generate a valid view id for class %s'), get_class($data_object)));
+                    throw new \Exception(sprintf($translator->_s('Can\'t generate a valid view id for class %s'), get_class($data_object)));
                 }
             } else {
-                throw new \Exception(sprintf($translator->_('Can\'t generate a valid view id for class %s'), get_class($data_object)));
+                throw new \Exception(sprintf($translator->_s('Can\'t generate a valid view id for class %s'), get_class($data_object)));
             }
         }
         // Use a substr of the view name (md5) as form name

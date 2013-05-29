@@ -49,13 +49,13 @@ class ResourceFactory {
                     /** @var $instance ResourceConnectionDriver */
                     return new ResourceConnection($instance);
                 } else {
-                    throw new \Exception(sprintf($context->getTranslator()->_("Driver %s does not extend or implement %s"), $class, $type));
+                    throw new \Exception(sprintf($context->getTranslator()->_s("Driver %s does not extend or implement %s"), $class, $type));
                 }
             } else {
-                throw new \Exception(sprintf($context->getTranslator()->_("Can't instantiate class %s"), $class));
+                throw new \Exception(sprintf($context->getTranslator()->_s("Can't instantiate class %s"), $class));
             }
         } else {
-            throw new ResourceConnectionException($context->getTranslator()->_("No driver configuration in context"));
+            throw new ResourceConnectionException($context->getTranslator()->_s("No driver configuration in context"));
         }
     }
 

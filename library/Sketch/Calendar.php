@@ -67,18 +67,18 @@ class Calendar extends Object {
      */
     function __construct($month, $year) {
         $translator = $this->getLocale()->getTranslator();
-        $this->monthDescriptions = array(1 => $translator->_('January'), $translator->_('February'), $translator->_('March'),
-        $translator->_('April'), $translator->_('May'), $translator->_('June'), $translator->_('July'), $translator->_('August'),
-        $translator->_('September'), $translator->_('October'), $translator->_('November'), $translator->_('December'));
-        $this->monthShortDescriptions = array(1 => $translator->_('Jan'), $translator->_('Feb'), $translator->_('Mar'),
-        $translator->_('Apr'), $translator->_('May'), $translator->_('Jun'), $translator->_('Jul'), $translator->_('Aug'),
-        $translator->_('Sep'), $translator->_('Oct'), $translator->_('Nov'), $translator->_('Dec'));
-        $this->dayDescriptions = array(1 => $translator->_('Monday'), $translator->_('Tuesday'), $translator->_('Wednesday'),
-        $translator->_('Thursday'), $translator->_('Friday'), $translator->_('Saturday'), $translator->_('Sunday'));
-        $this->dayShortDescriptions = array(1 => $translator->_('Mon'), $translator->_('Tue'), $translator->_('Wed'),
-        $translator->_('Thu'), $translator->_('Fri'), $translator->_('Sat'), $translator->_('Sun'));
-        $this->dayOneLetterDescriptions = array(1 => $translator->_('M'), $translator->_('T'), $translator->_('W'),
-        $translator->_('T'), $translator->_('F'), $translator->_('S'), $translator->_('S'));
+        $this->monthDescriptions = array(1 => $translator->_s('January'), $translator->_s('February'), $translator->_s('March'),
+        $translator->_s('April'), $translator->_s('May'), $translator->_s('June'), $translator->_s('July'), $translator->_s('August'),
+        $translator->_s('September'), $translator->_s('October'), $translator->_s('November'), $translator->_s('December'));
+        $this->monthShortDescriptions = array(1 => $translator->_s('Jan'), $translator->_s('Feb'), $translator->_s('Mar'),
+        $translator->_s('Apr'), $translator->_s('May'), $translator->_s('Jun'), $translator->_s('Jul'), $translator->_s('Aug'),
+        $translator->_s('Sep'), $translator->_s('Oct'), $translator->_s('Nov'), $translator->_s('Dec'));
+        $this->dayDescriptions = array(1 => $translator->_s('Monday'), $translator->_s('Tuesday'), $translator->_s('Wednesday'),
+        $translator->_s('Thursday'), $translator->_s('Friday'), $translator->_s('Saturday'), $translator->_s('Sunday'));
+        $this->dayShortDescriptions = array(1 => $translator->_s('Mon'), $translator->_s('Tue'), $translator->_s('Wed'),
+        $translator->_s('Thu'), $translator->_s('Fri'), $translator->_s('Sat'), $translator->_s('Sun'));
+        $this->dayOneLetterDescriptions = array(1 => $translator->_s('M'), $translator->_s('T'), $translator->_s('W'),
+        $translator->_s('T'), $translator->_s('F'), $translator->_s('S'), $translator->_s('S'));
         $this->month = intval($month);
         $this->year = intval($year);
     }

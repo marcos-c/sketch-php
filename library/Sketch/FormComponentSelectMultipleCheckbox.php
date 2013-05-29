@@ -81,7 +81,7 @@ class FormComponentSelectMultipleCheckbox extends FormComponent {
         ob_start(); ?>
         <div style="margin-bottom: 10px;">
             <div id="<?=$field_id?>" data-field-name="<?=$field_name?>" style="border: 1px solid #D4D0C8; background-color: white; padding: 4px; width:390px; overflow: auto;">
-                <? /* <?=$form->selectCheckbox($attribute)?> <?=$this->getTranslator()->_('Check, uncheck all')?> */ ?>
+                <? /* <?=$form->selectCheckbox($attribute)?> <?=$this->getTranslator()->_s('Check, uncheck all')?> */ ?>
                 <?=implode('', $selected)?>
                 <?=implode('', $remaining)?>
             </div>

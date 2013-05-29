@@ -181,11 +181,111 @@ class ResponsePart extends Object {
     }
 
     /**
-     * @param string $text
+     * @param $text
      * @return string
      */
-    function _($text) {
-        return $this->getTranslator()->_($text);
+    function _a($text) {
+        return $this->getTranslator()->_a($text);
+    }
+
+    /**
+     * @param $singular
+     * @param $plural
+     * @param $number
+     * @return string
+     */
+    function _na($singular, $plural, $number) {
+        return $this->getTranslator()->_na($singular, $plural, $number);
+    }
+
+    /**
+     * @param $text
+     * @param $context
+     * @return string
+     */
+    function _xa($text, $context) {
+        return $this->getTranslator()->_xa($text, $context);
+    }
+
+    /**
+     * @param $text
+     * @return string
+     */
+    function _b($text) {
+        return $this->getTranslator()->_b($text);
+    }
+
+    /**
+     * @param $singular
+     * @param $plural
+     * @param $number
+     * @return string
+     */
+    function _nb($singular, $plural, $number) {
+        return $this->getTranslator()->_nb($singular, $plural, $number);
+    }
+
+    /**
+     * @param $text
+     * @param $context
+     * @return string
+     */
+    function _xb($text, $context) {
+        return $this->getTranslator()->_xb($text, $context);
+    }
+
+    /**
+     * @param $text
+     * @return string
+     */
+    function _c($text) {
+        return $this->getTranslator()->_c($text);
+    }
+
+    /**
+     * @param $singular
+     * @param $plural
+     * @param $number
+     * @return string
+     */
+    function _nc($singular, $plural, $number) {
+        return $this->getTranslator()->_nc($singular, $plural, $number);
+    }
+
+    /**
+     * @param $text
+     * @param $context
+     * @return string
+     */
+    function _xc($text, $context) {
+        return $this->getTranslator()->_xc($text, $context);
+    }
+
+    /**
+     * @param $text
+     * @return string
+     */
+    function _s($text) {
+        return $this->getTranslator()->_s($text);
+    }
+
+    /**
+     * @param $singular
+     * @param $plural
+     * @param $number
+     * @return string
+     */
+    function _ns($singular, $plural, $number) {
+        return $this->getTranslator()->_ns($singular, $plural, $number);
+    }
+
+    /**
+     * @param $text
+     * @param $context
+     * @return string
+     */
+    function _xs($text, $context) {
+        return $this->getTranslator()->_xs($text, $context);
     }
 
     /**

@@ -65,10 +65,10 @@ class Controller extends Object {
                 if ($instance instanceof ResponseFilter) {
                     $instance->apply($extension);
                 } else {
-                    throw new \Exception(sprintf($this->getTranslator()->_("Filter %s does not extend or implement SketchResponseFilter"), $class));
+                    throw new \Exception(sprintf($this->getTranslator()->_s("Filter %s does not extend or implement SketchResponseFilter"), $class));
                 }
             } else {
-                throw new \Exception(sprintf($this->getTranslator()->_("Can't instantiate class %s"), $class));
+                throw new \Exception(sprintf($this->getTranslator()->_s("Can't instantiate class %s"), $class));
             }
         }
     }
@@ -100,7 +100,7 @@ class Controller extends Object {
             exit();
         } else {
             if (headers_sent()) {
-                throw new \Exception($this->getTranslator()->_("Headers already sent"));
+                throw new \Exception($this->getTranslator()->_s("Headers already sent"));
             } else {
                 $request = $this->getRequest();
                 if ($request->getOnForwardReturn()) {

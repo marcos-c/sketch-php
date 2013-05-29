@@ -41,7 +41,7 @@ class FormComponentInputFileWithPreview extends FormComponent {
             $file_name = $folder->getResourcePath().$descriptor->getFileName();
             $width = $descriptor->getImageWidth();
             $height = $descriptor->getImageHeight();
-            $preview = '<img src="'.$file_name.'" width="'.$width.'" height="'.$height.'" border="0" /><br />'.$this->getForm()->commandLink(new FormCommand('removeDescriptor', $attribute), null, $this->getTranslator()->_('Remove')).' '.htmlspecialchars($descriptor->getSourceFileName()).', '.$descriptor->getFormattedFileSize().', '.$descriptor->getFileType().'<br />';
+            $preview = '<img src="'.$file_name.'" width="'.$width.'" height="'.$height.'" border="0" /><br />'.$this->getForm()->commandLink(new FormCommand('removeDescriptor', $attribute), null, $this->getTranslator()->_s('Remove')).' '.htmlspecialchars($descriptor->getSourceFileName()).', '.$descriptor->getFormattedFileSize().', '.$descriptor->getFileType().'<br />';
         }
         return $preview.'<input type="file" name="'.$field_name.'" '.$parameters.' />';
     }

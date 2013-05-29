@@ -259,15 +259,15 @@ class FormView extends Object {
                             $this->requestForward($location, ($command instanceof FormCommandPropagate && is_array($this->form) && array_key_exists('attributes', $this->form)) ? $this->form['attributes'] : null);
                         }
                     } else {
-                        throw new \Exception(sprintf($this->getTranslator()->_("Method %s returned a non valid location target."), $command->getCommand()));
+                        throw new \Exception(sprintf($this->getTranslator()->_s("Method %s returned a non valid location target."), $command->getCommand()));
                     }
                 } else if ($result === false) {
                     $this->requestForward(null, is_array($this->form) && array_key_exists('attributes', $this->form) ? $this->form['attributes'] : null, ($command instanceof FormCommandPropagate) ? false : true);
                 } else {
-                    throw new \Exception(sprintf($this->getTranslator()->_("Method %s returned a non valid location target."), $command->getCommand()));
+                    throw new \Exception(sprintf($this->getTranslator()->_s("Method %s returned a non valid location target."), $command->getCommand()));
                 }
             } else {
-                throw new \Exception(sprintf($this->getTranslator()->_("Method %s doesn't exist."), $command->getCommand()));
+                throw new \Exception(sprintf($this->getTranslator()->_s("Method %s doesn't exist."), $command->getCommand()));
             }
         } else {
             $location = is_array($target) ? $target[true] : trim($target);
@@ -371,7 +371,7 @@ class FormView extends Object {
                 $instance = $reflection->invoke($instance);
                 if ($key != null && is_array($instance)) $instance = (array_key_exists($key, $instance)) ? $instance[$key] : null;
             } else {
-                throw new \Exception(sprintf($this->getTranslator()->_("Can't get %1\$s field for %2\$s"), $attribute, get_class($instance)));
+                throw new \Exception(sprintf($this->getTranslator()->_s("Can't get %1\$s field for %2\$s"), $attribute, get_class($instance)));
             }
         } return $instance;
     }

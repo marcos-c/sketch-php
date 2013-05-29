@@ -291,13 +291,13 @@ class Factory extends Object {
                     }
                     return $write_path.DIRECTORY_SEPARATOR.$filename;
                 } catch (\Exception $e) {
-                    throw new \Exception(sprintf($translator->_("Can't write file %s"), $write_path.DIRECTORY_SEPARATOR.$filename));
+                    throw new \Exception(sprintf($translator->_s("Can't write file %s"), $write_path.DIRECTORY_SEPARATOR.$filename));
                 }
             } else {
-                throw new \Exception($translator->_("Cache folder not defined"));
+                throw new \Exception($translator->_s("Cache folder not defined"));
             }
         } else {
-            throw new \Exception($translator->_("Application path not defined"));
+            throw new \Exception($translator->_s("Application path not defined"));
         }
     }
 }

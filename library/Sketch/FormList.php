@@ -54,11 +54,11 @@ class FormList extends FormView {
         $translator = $this->getTranslator();
         $parameters = $this->extend(array(
             'show' => 'first,previous,pages,of_pages,next,last,page_size',
-            'page_size_label' => $translator->_('showing %s per page'),
-            'first-label' => $translator->_('First'),
-            'previous-label' => $translator->_('Previous'),
-            'next-label' => $translator->_('Next'),
-            'last-label' => $translator->_('Next'),
+            'page_size_label' => $translator->_s('showing %s per page'),
+            'first-label' => $translator->_s('First'),
+            'previous-label' => $translator->_s('Previous'),
+            'next-label' => $translator->_s('Next'),
+            'last-label' => $translator->_s('Next'),
             'selected' => array('id' => null, 'class' => 'selected', 'style' => null),
             'pager' => array('id' => null, 'class' => 'pager', 'style' => null),
             'first' => array('id' => null, 'class' => 'first', 'style' => null),
@@ -69,7 +69,7 @@ class FormList extends FormView {
         ), $parameters);
         $show = array_map('trim', explode(',', $parameters['show']));
         $current = in_array('current', $show) ? '<li>'.intval($current_offset + 1).' - '.(($current_page == $last_page) ? $size : intval($current_offset + $limit)).'</li>' : '';
-        $of_rows = in_array('of_rows', $show) ? '<li'.$parameters['rows'].'>'.sprintf($translator->_('of %s'), $size).'</li>' : '';
+        $of_rows = in_array('of_rows', $show) ? '<li'.$parameters['rows'].'>'.sprintf($translator->_s('of %s'), $size).'</li>' : '';
         $pages = array();
         for ($i = $from; $i <= $to; $i++) {
             $pages[] = (($offset = ($i - 1) * $limit) == $current_offset) ? '<li'.$parameters['selected'].'>'.$i.'</li>' : '<li>'.$this->commandLink(new FormCommand('offset', $offset), null, '<span>'.$i.'</span>').'</li>';
@@ -158,7 +158,7 @@ class FormList extends FormView {
             $from = (($from = $to - 9) > 1) ? $from : 1;
         }
         $translator = $this->getTranslator();
-        return sprintf($translator->_('Página %d de %d'), $current_page, $last_page);
+        return sprintf($translator->_s('Página %d de %d'), $current_page, $last_page);
     }
 
     function getBootstrapPager($size, $parameters = null) {
@@ -184,11 +184,11 @@ class FormList extends FormView {
         $translator = $this->getTranslator();
         $parameters = $this->extend(array(
             'show' => 'first,previous,pages,next,last',
-            'page_size_label' => $translator->_('showing %s per page'),
-            'first-label' => $translator->_('First'),
-            'previous-label' => $translator->_('Previous'),
-            'next-label' => $translator->_('Next'),
-            'last-label' => $translator->_('Next'),
+            'page_size_label' => $translator->_s('showing %s per page'),
+            'first-label' => $translator->_s('First'),
+            'previous-label' => $translator->_s('Previous'),
+            'next-label' => $translator->_s('Next'),
+            'last-label' => $translator->_s('Next'),
             'selected' => array('id' => null, 'class' => 'active', 'style' => null),
             'pager' => array('id' => null, 'class' => 'pager', 'style' => null),
             'first' => array('id' => null, 'class' => 'first', 'style' => null),
@@ -199,7 +199,7 @@ class FormList extends FormView {
         ), $parameters);
         $show = array_map('trim', explode(',', $parameters['show']));
         $current = in_array('current', $show) ? '<li>'.intval($current_offset + 1).' - '.(($current_page == $last_page) ? $size : intval($current_offset + $limit)).'</li>' : '';
-        $of_rows = in_array('of_rows', $show) ? '<li'.$parameters['rows'].'>'.sprintf($translator->_('of %s'), $size).'</li>' : '';
+        $of_rows = in_array('of_rows', $show) ? '<li'.$parameters['rows'].'>'.sprintf($translator->_s('of %s'), $size).'</li>' : '';
         $pages = array();
         for ($i = $from; $i <= $to; $i++) {
             $pages[] = (($offset = ($i - 1) * $limit) == $current_offset) ? '<li'.$parameters['selected'].'><span>'.$i.'</span></li>' : '<li>'.$this->commandLink(new FormCommand('offset', $offset), null, $i).'</li>';
