@@ -44,13 +44,13 @@ class FormComponentSelectMultiple extends FormComponent {
             'to' => array('id' => null, 'class' => 'select-multiple-to', 'style' => ''),
             'controls' => array('id' => null, 'class' => 'select-multiple-controls', 'style' => ''),
             'left' => array('id' => null, 'class' => 'select-multiple-left btn btn-mini', 'style' => null),
-            'left-label' => $this->getTranslator()->_s('<i class="icon-double-angle-up"></i>'),
+            'left-label' => '<i class="icon-double-angle-up"></i>',
             'up' => array('id' => null, 'class' => 'select-multiple-up btn btn-mini', 'style' => null),
-            'up-label' => $this->getTranslator()->_s('<i class="icon-angle-up"></i>'),
+            'up-label' => '<i class="icon-angle-up"></i>',
             'down' => array('id' => null, 'class' => 'select-multiple-down btn btn-mini', 'style' => null),
-            'down-label' => $this->getTranslator()->_s('<i class="icon-double-down"></i>'),
+            'down-label' => '<i class="icon-double-down"></i>',
             'right' => array('id' => null, 'class' => 'select-multiple-right btn btn-mini', 'style' => null),
-            'right-label' => $this->getTranslator()->_s('<i class="icon-double-angle-down"></i>'),
+            'right-label' => '<i class="icon-double-angle-down"></i>',
             'from' => array('id' => null, 'class' => 'select-multiple-from', 'style' => ''),
         ), array_shift($arguments));
         $form_name = $form->getFormName();
