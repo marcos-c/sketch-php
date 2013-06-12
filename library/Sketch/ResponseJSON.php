@@ -67,9 +67,9 @@ class ResponseJSON extends Response {
                 $document->appendChild($document->importNode($node, true));
             }
             if ($id = $json_response->getAttribute('id')) {
-                $this->fragment[$id] = $document->saveHTML();
+                $this->fragment[$id] = ($this->forward == "") ? $document->saveHTML() : "";
             } else {
-                $this->html = $document->saveHTML();
+                $this->html = ($this->forward == "") ? $document->saveHTML() : "";
             }
         }
         // Log with memory usage and response time
