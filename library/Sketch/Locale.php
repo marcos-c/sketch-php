@@ -121,20 +121,20 @@ class Locale extends Object {
     function getTranslator($reference = 'default') {
         if ($this->translator == null) {
             $this->translator = array();
-            $drivers = $this->getContext()->query("//driver[@type='SketchLocaleTranslatorDriver']");
+            $drivers = $this->getContext()->query("//driver[@type='LocaleTranslatorDriver']");
             foreach ($drivers as $driver) {
                 $ref = $driver->getAttribute('reference');
                 $ref = $ref != null ? $ref : 'default';
-                $type = $driver->getAttribute('type');
                 $class = $driver->getAttribute('class');
                 try {
                     if (class_exists($class)) {
                         $reflection = new \ReflectionClass($class);
-                        $instance = $reflection->newInstance($this->toString(), $driver);
-                        if ($instance instanceof $type) {
+                        if ($reflection->isSubclassOf('Sketch\LocaleTranslatorDriver')) {
+                            /** @var LocaleTranslatorDriver $instance */
+                            $instance = $reflection->newInstance($this->toString(), $driver);
                             $this->translator[$ref] = new LocaleTranslator($instance);
                         } else {
-                            throw new \Exception(sprintf("Driver %s does not extend or implement %s", $class, $type));
+                            throw new \Exception(sprintf("Driver %s does not extend or implement LocaleTranslatorDriver", $class));
                         }
                     } else {
                         throw new \Exception(sprintf("Can't instantiate class %s", $class));

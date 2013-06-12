@@ -25,7 +25,7 @@
 
 namespace Sketch;
 
-class MySQLLocaleTranslatorDriver extends LocaleTranslatorDriver {
+class LocaleTranslatorDriverMySQL extends LocaleTranslatorDriver {
     /**
      * @var array
      */
@@ -59,20 +59,43 @@ class MySQLLocaleTranslatorDriver extends LocaleTranslatorDriver {
         $this->setLocaleString($locale_string);
         $this->readData();
     }
-    
-    /**
-     * @param string $text
-     * @return string
-     */
-    function translate($text) {
-        $md5 = md5($text);
-        return (array_key_exists($md5, $this->data[$this->domain])) ? $this->data[$this->domain][$md5] : $text;
-    }
 
     /**
      * @return array
      */
     function getAvailableLanguages() {
         return array('es', 'en', 'de');
+    }
+
+    /**
+     * @param $text
+     * @param $in_domain
+     * @return mixed
+     */
+    function translate($text, $in_domain) {
+        $md5 = md5($text);
+        $domain = ($in_domain == null) ? $this->domain : $in_domain;
+        return (array_key_exists($domain, $this->data) && array_key_exists($md5, $this->data[$domain])) ? $this->data[$domain][$md5] : $text;
+    }
+
+    /**
+     * @param $singular
+     * @param $plural
+     * @param $number
+     * @param null $in_domain
+     * @return mixed
+     */
+    function translate_plural($singular, $plural, $number, $in_domain) {
+        return sprintf(($number > 1) ? $plural : $singular, $number);
+    }
+
+    /**
+     * @param $text
+     * @param $context
+     * @param $in_domain
+     * @return mixed
+     */
+    function translate_with_context($text, $context, $in_domain) {
+        return $this->translate($text, $in_domain);
     }
 }

@@ -46,14 +46,32 @@ abstract class LocaleTranslatorDriver extends Object {
     }
 
     /**
-     * @param string $text
-     * @return string
-     */
-    abstract function translate($text);
-
-    /**
      * @abstract
      * @return array
      */
     abstract function getAvailableLanguages();
+
+    /**
+     * @param $text
+     * @param $in_domain
+     * @return mixed
+     */
+    abstract function translate($text, $in_domain);
+
+    /**
+     * @param $singular
+     * @param $plural
+     * @param $number
+     * @param null $in_domain
+     * @return mixed
+     */
+    abstract function translate_plural($singular, $plural, $number, $in_domain);
+
+    /**
+     * @param $text
+     * @param $context
+     * @param $in_domain
+     * @return mixed
+     */
+    abstract function translate_with_context($text, $context, $in_domain);
 }

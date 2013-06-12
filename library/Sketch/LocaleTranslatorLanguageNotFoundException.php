@@ -25,45 +25,6 @@
 
 namespace Sketch;
 
-class LocaleTranslatorDriverMock extends LocaleTranslatorDriver {
-    function  __construct() {
-        $this->setLocaleString('en');
-    }
+class LocaleTranslatorLanguageNotFoundException extends \Exception {
 
-    /**
-     * @return array
-     */
-    function getAvailableLanguages() {
-        return array('es', 'en', 'de');
-    }
-
-    /**
-     * @param $text
-     * @param $in_domain
-     * @return mixed
-     */
-    function translate($text, $in_domain) {
-        return $text;
-    }
-
-    /**
-     * @param $singular
-     * @param $plural
-     * @param $number
-     * @param null $in_domain
-     * @return mixed
-     */
-    function translate_plural($singular, $plural, $number, $in_domain) {
-        return sprintf(($number > 1) ? $plural : $singular, $number);
-    }
-
-    /**
-     * @param $text
-     * @param $context
-     * @param $in_domain
-     * @return mixed
-     */
-    function translate_with_context($text, $context, $in_domain) {
-        return $text;
-    }
 }

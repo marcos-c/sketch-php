@@ -25,7 +25,7 @@
 
 namespace Sketch;
 
-class GetTextLocaleTranslatorDriver extends LocaleTranslatorDriver {
+class LocaleTranslatorDriverGetText extends LocaleTranslatorDriver {
     /**
      * @var array
      */
@@ -47,7 +47,7 @@ class GetTextLocaleTranslatorDriver extends LocaleTranslatorDriver {
      * @throws \Exception
      */
     private function readData($folder, $domain) {
-        $filename = $this->getApplication()->getDocumentRoot().$folder.'/'.$this->getLocaleString().'/LC_MESSAGES/'.$domain.'.mo';
+        $filename = dirname($this->getApplication()->getDocumentRoot()).$folder.'/'.$this->getLocaleString().'/LC_MESSAGES/'.$domain.'.mo';
         $file = fopen($filename, 'rb');
         if (!$file) throw new \Exception();
         if (filesize($filename) < 10) throw new \Exception();
@@ -107,7 +107,9 @@ class GetTextLocaleTranslatorDriver extends LocaleTranslatorDriver {
                 $this->setLocaleString($locale_string);
                 $this->readData($folder, $domain);
             }
-            $this->setAvailableLanguages($folder);
+            if ($domain == 'default') {
+                $this->setAvailableLanguages($folder);
+            }
         }
     }
 
@@ -116,10 +118,11 @@ class GetTextLocaleTranslatorDriver extends LocaleTranslatorDriver {
      */
     private function setAvailableLanguages($folder) {
         $this->availableLanguages = array();
-        if (is_dir($this->getApplication()->getDocumentRoot().$folder)) {
-            if ($r = opendir($this->getApplication()->getDocumentRoot().$folder)) {
+        $path = dirname($this->getApplication()->getDocumentRoot()).$folder;
+        if (is_dir($path)) {
+            if ($r = opendir($path)) {
                 while (($s = readdir($r)) !== false) {
-                    if (is_dir($this->getApplication()->getDocumentRoot().$folder.'/'.$s) && !in_array($s, array('.', '..'))) {
+                    if (is_dir($path.'/'.$s) && !in_array($s, array('.', '..'))) {
                         list($language) = explode('_', $s);
                         $this->availableLanguages[$language] = $language;
                     }
