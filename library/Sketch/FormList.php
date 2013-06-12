@@ -158,7 +158,7 @@ class FormList extends FormView {
             $from = (($from = $to - 9) > 1) ? $from : 1;
         }
         $translator = $this->getTranslator();
-        return sprintf($translator->_s('Página %d de %d'), $current_page, $last_page);
+        return sprintf($translator->_s('Page %d of %d'), $current_page, $last_page);
     }
 
     function getBootstrapPager($size, $parameters = null) {
