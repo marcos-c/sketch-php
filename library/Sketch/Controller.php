@@ -56,16 +56,15 @@ class Controller extends Object {
      * @throws \Exception
      */
     function setResponseFilters(ResourceContext $context) {
-        $extensions = $context->query("//extension[@type='SketchResponseFilter']");
+        $extensions = $context->query("//extension[@type='ResponseFilter']");
         foreach ($extensions as $extension) {
             $class = $extension->getAttribute('class');
             if (class_exists($class)) {
                 $reflection = new \ReflectionClass($class);
-                $instance = $reflection->newInstance($this->getResponse());
-                if ($instance instanceof ResponseFilter) {
-                    $instance->apply($extension);
+                if ($reflection->isSubclassOf('Sketch\ResponseFilter')) {
+                    $reflection->newInstance($this->getResponse())->apply($extension);
                 } else {
-                    throw new \Exception(sprintf($this->getTranslator()->_s("Filter %s does not extend or implement SketchResponseFilter"), $class));
+                    throw new \Exception(sprintf($this->getTranslator()->_s("Filter %s does not extend or implement ResponseFilter"), $class));
                 }
             } else {
                 throw new \Exception(sprintf($this->getTranslator()->_s("Can't instantiate class %s"), $class));

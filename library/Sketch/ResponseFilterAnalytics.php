@@ -47,7 +47,7 @@ class ResponseFilterAnalytics extends ResponseFilter {
             $class = $transaction_handler->getAttribute('class');
             if (class_exists($class)) {
                 $reflection = new \ReflectionClass($class);
-                if ($reflection->implementsInterface('AnalyticsResponseFilterTransactionHandlerInterface')) {
+                if ($reflection->implementsInterface('Sketch\AnalyticsResponseFilterTransactionHandlerInterface')) {
                     $script .= $reflection->newInstance()->execute();
                 } else {
                     throw new \Exception(sprintf($this->getTranslator()->_s("Handler %s does not implement AnalyticsResponseFilterTransactionHandlerInterface"), $class));

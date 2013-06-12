@@ -40,16 +40,15 @@ class ResourceFactory {
     static function getConnection(ResourceContext $context) {
         $driver = $context->queryFirst("//driver[@type='ResourceConnectionDriver']");
         if ($driver) {
-            $type = "Sketch\\".$driver->getAttribute('type');
             $class = $driver->getAttribute('class');
             if (class_exists($class)) {
                 $reflection = new \ReflectionClass($class);
-                $instance = $reflection->newInstance($driver);
-                if ($instance instanceof $type) {
-                    /** @var $instance ResourceConnectionDriver */
+                if ($reflection->isSubclassOf('Sketch\ResourceConnectionDriver')) {
+                    /** @var ResourceConnectionDriver $instance */
+                    $instance = $reflection->newInstance($driver);
                     return new ResourceConnection($instance);
                 } else {
-                    throw new \Exception(sprintf($context->getTranslator()->_s("Driver %s does not extend or implement %s"), $class, $type));
+                    throw new \Exception(sprintf($context->getTranslator()->_s("Driver %s does not extend or implement ResourceConnectionDriver"), $class));
                 }
             } else {
                 throw new \Exception(sprintf($context->getTranslator()->_s("Can't instantiate class %s"), $class));
