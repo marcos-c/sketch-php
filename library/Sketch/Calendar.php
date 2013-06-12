@@ -77,8 +77,8 @@ class Calendar extends Object {
         $translator->_s('Thursday'), $translator->_s('Friday'), $translator->_s('Saturday'), $translator->_s('Sunday'));
         $this->dayShortDescriptions = array(1 => $translator->_s('Mon'), $translator->_s('Tue'), $translator->_s('Wed'),
         $translator->_s('Thu'), $translator->_s('Fri'), $translator->_s('Sat'), $translator->_s('Sun'));
-        $this->dayOneLetterDescriptions = array(1 => $translator->_s('M'), $translator->_s('T'), $translator->_s('W'),
-        $translator->_s('T'), $translator->_s('F'), $translator->_s('S'), $translator->_s('S'));
+        $this->dayOneLetterDescriptions = array(1 => $translator->_xs('M', 'Monday'), $translator->_xs('T', 'Tuesday'), $translator->_xs('W', 'Wednesday'),
+        $translator->_xs('T', 'Thursday'), $translator->_xs('F', 'Friday'), $translator->_xs('S', 'Saturday'), $translator->_xs('S', 'Sunday'));
         $this->month = intval($month);
         $this->year = intval($year);
     }
