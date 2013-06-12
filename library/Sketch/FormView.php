@@ -109,10 +109,10 @@ class FormView extends Object {
         if (class_exists('Sketch\FormComponent'.$name)) {
             $reflection = new \ReflectionClass('Sketch\FormComponent'.$name);
             if ($reflection->isSubclassOf('Sketch\FormComponent')) {
-                /** @var $component FormComponent */
-                $component = $reflection->newInstance($this, $arguments);
-                Form::addComponent($form_name, $component);
-                return trim($component->saveHTML());
+                /** @var FormComponent $instance */
+                $instance = $reflection->newInstance($this, $arguments);
+                Form::addComponent($form_name, $instance);
+                return trim($instance->saveHTML());
             }
         }
         throw new \Exception('Component not found');
@@ -371,9 +371,11 @@ class FormView extends Object {
                 $instance = $reflection->invoke($instance);
                 if ($key != null && is_array($instance)) $instance = (array_key_exists($key, $instance)) ? $instance[$key] : null;
             } else {
-                throw new \Exception(sprintf($this->getTranslator()->_s("Can't get %1\$s field for %2\$s"), $attribute, get_class($instance)));
+                $this->getLogger()->log(sprintf($this->getTranslator()->_s("Can't get %1\$s field for %2\$s"), $attribute, get_class($instance)));
+                return null;
             }
-        } return $instance;
+        }
+        return $instance;
     }
 
     function setFieldValue($ape, $value) {
@@ -410,7 +412,7 @@ class FormView extends Object {
                     // Make sure that we have the same value inside form attributes
                     $this->form['attributes'][base64_encode($ape)] = $value;
                 } else {
-                    throw new \Exception(sprintf("Can't set %1\$s field for %2\$s", $set, get_class($instance)));
+                    $this->getLogger()->log(sprintf("Can't set %1\$s field for %2\$s", $set, get_class($instance)));
                 }
             }
         }
@@ -467,6 +469,11 @@ class FormView extends Object {
     function commandButton($command, $location = null, $label = null, $parameters = null) {
         $label = ($label != null) ? $label : $command;
         return '<button type="button" onclick="return '.$this->command($command, $location).'" '.trim(!strpos(" $parameters", 'class="') ? "$parameters class=\"command-button\"" : $parameters).'>'.$label.'</button>';
+    }
+
+    function commandSubmit($command, $location = null, $label = null, $parameters = null) {
+        $label = ($label != null) ? $label : $command;
+        return '<button type="submit" onclick="return '.$this->command($command, $location).'" '.trim(!strpos(" $parameters", 'class="') ? "$parameters class=\"command-button\"" : $parameters).'>'.$label.'</button>';
     }
 
     function commandLink($command, $location = null, $label = null, $parameters = null) {
