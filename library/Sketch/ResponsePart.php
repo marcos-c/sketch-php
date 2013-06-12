@@ -98,8 +98,8 @@ class ResponsePart extends Object {
         }
         $this->attributes = $attributes;
         try {
-            $response = $this->getController()->getResponse();
             ob_start();
+            /** @noinspection PhpIncludeInspection */
             require $file_name;
             // Trimming the source before feeding it to the XML parser helps bad formed documents
             $source = ob_get_clean();
