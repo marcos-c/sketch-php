@@ -30,13 +30,14 @@ class FormComponentSelectRadio extends FormComponent {
         $arguments = $this->getArguments();
         $attribute = array_shift($arguments);
         $reference = array_shift($arguments);
-        $compare = is_bool($reference) ? $reference : ($reference == 't');
         $parameters = array_shift($arguments);
         $field_name = $this->getForm()->getFieldName($attribute);
         $field_value = $this->getForm()->getFieldValue($attribute);
-        $field_value = is_bool($field_value) ? $field_value : ($field_value == 't');
+        if (is_bool($field_value) || !$field_value) {
+            $field_value = $field_value ? 't' : 'f';
+        }
         $parameters = (($parameters != null && strpos(" $parameters", 'class="')) ? $parameters : implode(' ', array($parameters, 'class="select-radio"')));
-        $checked = ($compare == $field_value) ? ' checked="checked"' : '';
+        $checked = ($reference == $field_value) ? ' checked="checked"' : '';
         return '<input type="radio" name="'.$field_name.'" value="'.$reference.'" '.$parameters.$checked.' />';
     }
 }
