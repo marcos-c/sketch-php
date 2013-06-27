@@ -44,38 +44,42 @@ class Factory extends Object {
      * @return Object
      */
     static function scaffold($table_name, $options = null) {
-        $metadata_table_name = 'metadata';
-        if (is_array($options)) {
-            if (!array_key_exists('prefix', $options)) $options['prefix'] = 'Abstract';
-            if (!array_key_exists('primary_key', $options)) $options['primary_key'] = 'id';
-            if (!array_key_exists('generate_iterator', $options)) $options['generate_iterator'] = true;
-        } else {
-            $options = array('prefix' => 'Abstract', 'primary_key' => 'id', 'generate_iterator' => true);
-        }
-        $application = Application::getInstance();
-        $connection = $application->getConnection();
-        $prefix = $connection->getTablePrefix();
-        if ($prefix != null) {
-            $table_name = "${prefix}_${table_name}";
-            $metadata_table_name = "${prefix}_${metadata_table_name}";
-        }
-        if (!is_array(self::$metadata)) {
-            self::$metadata = $connection->getTableDefinition($metadata_table_name);
-            self::$version = (self::$metadata['fields']['key'] != null) ? $connection->queryFirst("SELECT value FROM $metadata_table_name WHERE `key` = 'version'") : self::$version;
-        }
-        if (array_key_exists('class_name', $options)) {
-            $class_name = $options['class_name'];
-        } else {
-            $class_name = null; foreach (explode('[._]', $table_name) as $value) {
-                $class_name .= ucfirst($value);
+        try {
+            $metadata_table_name = 'metadata';
+            if (is_array($options)) {
+                if (!array_key_exists('prefix', $options)) $options['prefix'] = 'Abstract';
+                if (!array_key_exists('primary_key', $options)) $options['primary_key'] = 'id';
+                if (!array_key_exists('generate_iterator', $options)) $options['generate_iterator'] = true;
+            } else {
+                $options = array('prefix' => 'Abstract', 'primary_key' => 'id', 'generate_iterator' => true);
             }
+            $application = Application::getInstance();
+            $connection = $application->getConnection();
+            $prefix = $connection->getTablePrefix();
+            if ($prefix != null) {
+                $table_name = "${prefix}_${table_name}";
+                $metadata_table_name = "${prefix}_${metadata_table_name}";
+            }
+            if (!is_array(self::$metadata)) {
+                self::$metadata = $connection->getTableDefinition($metadata_table_name);
+                self::$version = (self::$metadata['fields']['key'] != null) ? $connection->queryFirst("SELECT value FROM $metadata_table_name WHERE `key` = 'version'") : self::$version;
+            }
+            if (array_key_exists('class_name', $options)) {
+                $class_name = $options['class_name'];
+            } else {
+                $class_name = null; foreach (explode('[._]', $table_name) as $value) {
+                    $class_name .= ucfirst($value);
+                }
+            }
+            if (array_key_exists('namespace', $options)) {
+                $namespace = $options['namespace'];
+            } else {
+                $namespace = 'Common';
+            }
+            return self::scaffoldFrom(self::$version, $class_name, $namespace, $table_name, $options['prefix'], $options['primary_key'], $options['generate_iterator'], $connection->getTableDefinition($table_name));
+        } catch (\Exception $e) {
+            exit($e);
         }
-        if (array_key_exists('namespace', $options)) {
-            $namespace = $options['namespace'];
-        } else {
-            $namespace = 'Common';
-        }
-        return self::scaffoldFrom(self::$version, $class_name, $namespace, $table_name, $options['prefix'], $options['primary_key'], $options['generate_iterator'], $connection->getTableDefinition($table_name));
     }
 
     /**
