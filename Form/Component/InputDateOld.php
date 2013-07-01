@@ -22,21 +22,19 @@
  * @package Sketch
  */
 
-require_once 'Sketch/Form/Component.php';
+require_once 'Sketch/Form/Component/InputDateAbstract.php';
 
 /**
  * SketchFormComponentInputDateOld
  *
  * @package Components
  */
-class SketchFormComponentInputDateOld extends SketchFormComponent {
+class SketchFormComponentInputDateOld extends SketchFormComponentInputDateAbstract {
     /**
      *
      * @return string
      */
     function javascript() {
-        $arguments = $this->getArguments();
-        $attribute = array_shift($arguments);
         $form_name = $this->getForm()->getFormName();
         ob_start(); ?>
         function <?=$form_name?>UpdateDays(input) {
@@ -160,13 +158,16 @@ class SketchFormComponentInputDateOld extends SketchFormComponent {
             'null' => false,
             'show_day_selector' => true,
             'from_current_date' => false,
+            'to_current_date' => false,
+            'from_date' => null,
+            'to_date' => null,
+            'month_count' => 24,
             'from_attribute' => null,
             'to_attribute' => null,
             'nights_attribute' => null,
             'calendar' => false,
             'span' => array('id' => null, 'class' => 'input-date', 'style' => null),
             'input-date-day' => array('id' => null, 'class' => 'input-date-day', 'style' => null),
-            'input-date-year-month-count' => 252,
             'input-date-year-month' => array('id' => null, 'class' => 'input-date-year-month', 'style' => null),
             'input-date-calendar' => array('id' => null, 'class' => 'input-date-calendar', 'style' => null),
             'onchange' => null
@@ -186,43 +187,8 @@ class SketchFormComponentInputDateOld extends SketchFormComponent {
             $to_field_name = 'null';
         }
         $nights_field_name = ($parameters['nights_attribute'] != null) ? "'".$form->getFieldName($parameters['nights_attribute'])."'" : 'null';
-        $field_value = $form->getFieldValue($attribute);
-        if ($field_value instanceof SketchDateTime) list($year, $month, $day) = $field_value->toArray();
-        elseif (!$parameters['null']) list($year, $month, $day) = SketchDateTime::Today()->toArray();
-        $year_month = sprintf('%04d%02d', $year, $month);
+        list($parameters, $year, $month, $day, $year_month, $from_year, $from_month, $from_day, $to_year, $to_month, $to_day, $days, $months, $years, $year_months, $year_month_days) = $this->resolve($parameters, $form, $attribute);
         $disabled = ($parameters['disabled'] !== false) ? ' disabled="disabled"' : '';
-        if ($parameters['from_current_date']) {
-            $from_year = intval(date('Y'));
-            $from_month = intval(date('m', mktime(0, 0, 0, date('m'), date('d'), date('Y'))));
-            $from_year_month = sprintf('%04d%02d', $from_year, $from_month);
-            $from_day = ($from_year_month == $year_month) ? intval(date('d')) : 1;
-            if ($from_day > date('t')) $from_day = 1;
-            $count = 12;
-        } else {
-            $from_year = intval(date('Y')) - floor($parameters['input-date-year-month-count'] / 24);
-            $from_month = $from_day = 1;
-            $count = $parameters['input-date-year-month-count'];
-        }
-        $stamp = mktime(12, 0, 0, $from_month + $count, 15, $from_year);
-        $last_year = date('Y', $stamp);
-        $last_month = date('m', $stamp);
-        $last_day = date('t', $stamp);
-        if ($parameters['null']) {
-            $months = array('...'); $month_days = array('000000' => 0);
-        } else {
-            $months = array(); $month_days = array();
-        }
-        for ($i = $from_month; $i <= $from_month + $count; $i++) {
-            $stamp = mktime(12, 0, 0, $i, 15, $from_year);
-            $syear = date('Y', $stamp);
-            $month_days[$syear.date('m', $stamp)] = date('t', $stamp);
-            $months[$syear.date('m', $stamp)] = date('m', $stamp).' - '.$syear;
-        }
-        if ($month_days[$year_month] > 0) {
-            for ($i = $from_day; $i <= $month_days[$year_month]; $i++) $days[$i] = sprintf('%02d', $i);
-        } else {
-            $days[$i] = '...';
-        }
         ob_start(); ?>
     <select id="<?=$field_name?>[day]" name="<?=$field_name?>[day]" onchange="<? if ($parameters['onchange'] != null): ?><?=$parameters['onchange']?><? else: ?><?=$form_name?>OnDayChange('<?=$field_name?>', <?=$from_field_name?>, <?=$to_field_name?>, <?=$nights_field_name?>)<? endif; ?>"<?=$parameters['input-date-day'].$disabled?>>
         <? foreach ($days as $key => $value): ?>
@@ -235,7 +201,7 @@ class SketchFormComponentInputDateOld extends SketchFormComponent {
     <?php $day_hidden = ob_get_clean();
         ob_start(); ?>
     <select name="<?=$field_name?>[year_month]" onchange="<? if ($parameters['onchange'] != null): ?><?=$parameters['onchange']?><? else: ?><?=$form_name?>OnMonthChange('<?=$field_name?>', <?=$from_field_name?>, <?=$to_field_name?>, <?=$nights_field_name?>)<? endif; ?>"<?=$parameters['input-date-year-month'].$disabled?>>
-        <? foreach ($months as $key => $value): ?>
+        <? foreach ($year_months as $key => $value): ?>
             <option value="<?=htmlspecialchars($key)?>" <?=(($year_month == $key) ? 'selected="selected" class="select-option selected"' : 'class="select-option"')?>><?=htmlspecialchars($value)?></option>
         <? endforeach; ?>
     </select>
@@ -262,7 +228,7 @@ class SketchFormComponentInputDateOld extends SketchFormComponent {
                             $(':input[name=\'<?=$field_name?>[day]\']').change();
                         }
                     });
-                    $('#<?=$ignore_field_id?>').datepicker({firstDay: 1, minDate: new Date(<?=$from_year?>, <?=$from_month - 1?>, <?=$from_day?>), maxDate: new Date(<?=$last_year?>, <?=$last_month - 1?>, <?=$last_day?>), dayNamesMin: ['<?=$this->getTranslator()->_('Sun')?>', '<?=$this->getTranslator()->_('Mon')?>', '<?=$this->getTranslator()->_('Tue')?>', '<?=$this->getTranslator()->_('Wed')?>', '<?=$this->getTranslator()->_('Thu')?>', '<?=$this->getTranslator()->_('Fri')?>', '<?=$this->getTranslator()->_('Sat')?>'], monthNames: ['<?=$this->getTranslator()->_('January')?>', '<?=$this->getTranslator()->_('February')?>', '<?=$this->getTranslator()->_('March')?>', '<?=$this->getTranslator()->_('April')?>', '<?=$this->getTranslator()->_('May')?>', '<?=$this->getTranslator()->_('June')?>', '<?=$this->getTranslator()->_('July')?>', '<?=$this->getTranslator()->_('August')?>', '<?=$this->getTranslator()->_('September')?>', '<?=$this->getTranslator()->_('October')?>', '<?=$this->getTranslator()->_('November')?>', '<?=$this->getTranslator()->_('December')?>'], dateFormat: 'yy-mm-dd', showOn: 'button', buttonText: '<?=$this->getTranslator()->_('Calendar')?>'});
+                    $('#<?=$ignore_field_id?>').datepicker({firstDay: 1, minDate: new Date(<?=$from_year?>, <?=$from_month - 1?>, <?=$from_day?>), maxDate: new Date(<?=$to_year?>, <?=$to_month - 1?>, <?=$to_day?>), dayNamesMin: ['<?=$this->getTranslator()->_('Sun')?>', '<?=$this->getTranslator()->_('Mon')?>', '<?=$this->getTranslator()->_('Tue')?>', '<?=$this->getTranslator()->_('Wed')?>', '<?=$this->getTranslator()->_('Thu')?>', '<?=$this->getTranslator()->_('Fri')?>', '<?=$this->getTranslator()->_('Sat')?>'], monthNames: ['<?=$this->getTranslator()->_('January')?>', '<?=$this->getTranslator()->_('February')?>', '<?=$this->getTranslator()->_('March')?>', '<?=$this->getTranslator()->_('April')?>', '<?=$this->getTranslator()->_('May')?>', '<?=$this->getTranslator()->_('June')?>', '<?=$this->getTranslator()->_('July')?>', '<?=$this->getTranslator()->_('August')?>', '<?=$this->getTranslator()->_('September')?>', '<?=$this->getTranslator()->_('October')?>', '<?=$this->getTranslator()->_('November')?>', '<?=$this->getTranslator()->_('December')?>'], dateFormat: 'yy-mm-dd', showOn: 'button', buttonText: '<?=$this->getTranslator()->_('Calendar')?>'});
                 });
             </script>
             <? if ($parameters['input-date-calendar']): ?></span><? endif; ?>
