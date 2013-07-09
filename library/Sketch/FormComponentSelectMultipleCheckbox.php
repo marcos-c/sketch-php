@@ -41,9 +41,13 @@ class FormComponentSelectMultipleCheckbox extends FormComponent {
         $field_name = $form->getFieldName($attribute);
         $field_value = $form->getFieldValue($attribute);
         $parameters = $this->extend(array(
-            'field-id' => null
+            'container' => array('id' => $field_name, 'class' => 'select-multiple-checkbox-container', 'style' => null),
+            'container-selected' => array('id' => $field_name, 'class' => 'select-multiple-checkbox-container-selected', 'style' => null),
+            'optgroup' => array('id' => null, 'class' => 'select-multiple-checkbox-optgroup', 'style' => null),
+            'optgroup-selected' => array('id' => null, 'class' => 'select-multiple-checkbox-optgroup selected', 'style' => null),
+            'option' => array('id' => null, 'class' => 'select-multiple-checkbox-option', 'style' => null),
+            'option-selected' => array('id' => null, 'class' => 'select-multiple-checkbox-option selected', 'style' => null)
         ), array_shift($arguments));
-        $field_id = ($parameters['field-id'] !== null) ? $parameters['field-id'] : $field_name;
         $selected = array();
         $remaining = array();
         if ($options instanceof ObjectIterator) {
@@ -51,9 +55,9 @@ class FormComponentSelectMultipleCheckbox extends FormComponent {
                 $key = $object->getId();
                 $value = method_exists($object, '__toString') ? $object->__toString() : (method_exists($object, 'getDefaultDescription') ? $object->getDefaultDescription() : $object->getDescription());
                 if (is_array($field_value) && in_array($key, $field_value)) {
-                    $selected[] = '<p style="margin: 0px; line-height: 18px; background-color: #FFFFCC;">'.$form->selectCheckbox($attribute, $key).' '.htmlspecialchars($value).'</p>';
+                    $selected[] = '<label '.$parameters['options-selected'].'>'.$form->selectCheckbox($attribute, $key).' '.htmlspecialchars($value).'</label>';
                 } else {
-                    $remaining[] = '<p style="margin: 0px; line-height: 18px;">'.$form->selectCheckbox($attribute, $key).' '.htmlspecialchars($value).'</p>';
+                    $remaining[] = '<label '.$parameters['option'].'>'.$form->selectCheckbox($attribute, $key).' '.htmlspecialchars($value).'</label>';
                 }
             }
         } elseif (is_array($options)) {
@@ -62,30 +66,33 @@ class FormComponentSelectMultipleCheckbox extends FormComponent {
                     $t1 = true; $t2 = true;
                     foreach ($v1 as $k2 => $v2) {
                         if (is_array($field_value) && in_array($k2, $field_value)) {
-                            if ($t1) { $t1 = false; $selected[] = '<p style="font-weight: bold; margin: 0px; background-color: #FFFFCC;">'.htmlspecialchars($k1).'</p>'; }
-                            $selected[] = '<p style="margin: 0px; line-height: 18px; background-color: #FFFFCC;">'.$form->selectCheckbox($attribute, $k2).' '.htmlspecialchars($v2).'</p>';
+                            if ($t1) { $t1 = false; $selected[] = '<label '.$parameters['optgroup-selected'].'>'.htmlspecialchars($k1).'</label>'; }
+                            $selected[] = '<label '.$parameters['option-selected'].'>'.$form->selectCheckbox($attribute, $k2).' '.htmlspecialchars($v2).'</label>';
                         } else {
-                            if ($t2) { $t2 = false; $remaining[] = '<p style="font-weight: bold; margin: 0px;">'.htmlspecialchars($k1).'</p>'; }
-                            $remaining[] = '<p style="margin: 0px; line-height: 18px;">'.$form->selectCheckbox($attribute, $k2).' '.htmlspecialchars($v2).'</p>';
+                            if ($t2) { $t2 = false; $remaining[] = '<label '.$parameters['optgroup'].'>'.htmlspecialchars($k1).'</label>'; }
+                            $remaining[] = '<label '.$parameters['option'].'>'.$form->selectCheckbox($attribute, $k2).' '.htmlspecialchars($v2).'</label>';
                         }
                     }
                 } else {
                     if (is_array($field_value) && in_array($k1, $field_value)) {
-                        $selected[] = '<p style="margin: 0px; line-height: 18px; background-color: #FFFFCC;">'.$form->selectCheckbox($attribute, $k1).' '.htmlspecialchars($v1).'</p>';
+                        $selected[] = '<label '.$parameters['option-selected'].'>'.$form->selectCheckbox($attribute, $k1).' '.htmlspecialchars($v1).'</label>';
                     } else {
-                        $remaining[] = '<p style="margin: 0px; line-height: 18px;">'.$form->selectCheckbox($attribute, $k1).' '.htmlspecialchars($v1).'</p>';
+                        $remaining[] = '<label '.$parameters['option'].'>'.$form->selectCheckbox($attribute, $k1).' '.htmlspecialchars($v1).'</label>';
                     }
                 }
             }
         }
         ob_start(); ?>
-        <div id="<?=$field_id?>" data-field-name="<?=$field_name?>" style="border: 1px solid #D4D0C8; background-color: white; padding: 4px; width:390px; overflow: auto;">
-            <? /* <?=$form->selectCheckbox($attribute)?> <?=$this->getTranslator()->_s('Check, uncheck all')?> */ ?>
-            <?=implode('', $selected)?>
+        <div <?=$parameters['container']?>">
+            <? if (count($selected) > 0): ?>
+                <div <?=$parameters['container-selected']?>">
+                    <?=implode('', $selected)?>
+                </div>
+            <? endif; ?>
             <?=implode('', $remaining)?>
         </div>
         <? $notice = $form->getFieldNotices($attribute); if ($notice): ?>
-            <span class="error"><?=$notice->getMessage()?></span>
+            <span class="help-block"><?=$notice->getMessage()?></span>
         <? endif; ?>
         <?php return ob_get_clean();
     }

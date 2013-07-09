@@ -25,13 +25,17 @@
 
 namespace Sketch;
 
-class FormComponentInputDateText extends FormComponent {
+class FormComponentInputDatetime extends FormComponent {
     function saveHTML() {
         $arguments = $this->getArguments();
         $attribute = array_shift($arguments);
         $parameters = array_shift($arguments);
         $field_name = $this->getForm()->getFieldName($attribute);
-        $field_value = $this->getLocale()->getFormatter()->formatDate($this->getForm()->getFieldValue($attribute));
+        $formatter = $this->getLocale()->getFormatter();
+        $field_value = $this->getForm()->getFieldValue($attribute);
+        if ($field_value instanceof DateTime) {
+            $field_value = $formatter->formatDateAndTime($field_value);
+        }
         $parameters = (($parameters != null && strpos(" $parameters", 'class="')) ? $parameters : implode(' ', array($parameters, 'class="input-text"')));
         $parameters = (($parameters != null && strpos(" $parameters", 'id="'))) ? $parameters : implode(' ', array($parameters, 'id="'.$field_name.'"'));
         return '<input type="text" name="'.$field_name.'" value="'.$field_value.'" '.$parameters.' />';

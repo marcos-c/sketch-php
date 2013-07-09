@@ -131,7 +131,6 @@ class LocaleFormatter extends Object {
         return $date->toString('d/m/Y');
     }
 
-
     /**
      * @param $date
      * @return DateTime
@@ -170,6 +169,16 @@ class LocaleFormatter extends Object {
      */
     function formatDateAndTime(DateTime $date) {
         return $date->toString('d/m/Y H:i');
+    }
+
+    /**
+     * @param $date
+     * @return DateTime
+     */
+    function parseFormattedDateAndTime($date) {
+        list($date, $time) = explode(' ', $date);
+        list($day, $month, $year) = explode('/', $date);
+        return $year.'-'.$month.'-'.$day.' '.$time;
     }
 
     /**

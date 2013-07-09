@@ -28,14 +28,13 @@ namespace Sketch;
 /**
  * @method inputCheckbox
  * @method inputDate
- * @method inputDateExtended
- * @method inputDateOld
- * @method inputDateSimple
+ * @method inputDatetime
  * @method inputFile
  * @method inputFileWithPreview
  * @method inputFileWithUploadify
  * @method inputHidden
  * @method inputNights
+ * @method inputNumber
  * @method inputRichText
  * @method inputSecret
  * @method inputTextArea
@@ -404,6 +403,9 @@ class FormView extends Object {
                                     break;
                                 case 'date':
                                     $value = $this->getFormatter()->parseFormattedDate($value);
+                                    break;
+                                case 'datetime':
+                                    $value = $this->getFormatter()->parseFormattedDateAndTime($value);
                                     break;
                             }
                         }
