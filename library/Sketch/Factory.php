@@ -28,7 +28,7 @@ namespace Sketch;
 class Factory extends Object {
     const QUOTED_IDENTIFIERS = 1;
 
-    const AFFIX = "_14";
+    const AFFIX = "_15";
 
     /**
      * @var string
@@ -236,9 +236,11 @@ class Factory extends Object {
                                 $contents[] = "\t\treturn new DateTime(\$t->format('Y-m-d H:i'));\n";
                                 $contents[] = "\t}\n\t\t\n";
                                 $contents[] = "\t/**\n\t *\n\t * @param DateTime\n\t **/\n\tfunction set${method_name}TZ(\$${column}) {\n";
-                                $contents[] = "\t\t\$t = new \\DateTime(\$${column}, new \\DateTimeZone(\$this->getSession()->getACL()->getAttribute('time_zone')));\n";
-                                $contents[] = "\t\t\$t->setTimeZone(new \\DateTimeZone('GMT'));\n";
-                                $contents[] = "\t\t\$this->set${method_name}(\$t->format('Y-m-d H:i'));\n";
+                                $contents[] = "\t\ttry {\n";
+                                $contents[] = "\t\t\t\$t = new \\DateTime(\$${column}, new \\DateTimeZone(\$this->getSession()->getACL()->getAttribute('time_zone')));\n";
+                                $contents[] = "\t\t\t\$t->setTimeZone(new \\DateTimeZone('GMT'));\n";
+                                $contents[] = "\t\t\t\$this->set${method_name}(\$t->format('Y-m-d H:i'));\n";
+                                $contents[] = "\t\t} catch (\\Exception \$e) {}\n";
                                 $contents[] = "\t}\n";
                             }
                         }
