@@ -28,7 +28,7 @@ namespace Sketch;
 class Factory extends Object {
     const QUOTED_IDENTIFIERS = 1;
 
-    const AFFIX = "_12";
+    const AFFIX = "_14";
 
     /**
      * @var string
@@ -166,7 +166,7 @@ class Factory extends Object {
                                 $contents[] = "'$method_name' => 'boolean'";
                             } elseif (preg_match('/^datetime/', $definition['type'])) {
                                 $contents[] = "'$method_name' => 'datetime',\n\t\t\t";
-                                $contents[] = "'${method_name}TZ' => 'datetime'";
+                                $contents[] = "'${method_name}tz' => 'datetime'";
                             } elseif (preg_match('/^date/', $definition['type'])) {
                                 $contents[] = "'$method_name' => 'date'";
                             } elseif (preg_match('/^time/', $definition['type'])) {
@@ -236,7 +236,7 @@ class Factory extends Object {
                                 $contents[] = "\t\treturn new DateTime(\$t->format('Y-m-d H:i'));\n";
                                 $contents[] = "\t}\n\t\t\n";
                                 $contents[] = "\t/**\n\t *\n\t * @param DateTime\n\t **/\n\tfunction set${method_name}TZ(\$${column}) {\n";
-                                $contents[] = "\t\t\$t = new \\DateTime(\$date_time, new \\DateTimeZone(\$this->getSession()->getACL()->getAttribute('time_zone')));\n";
+                                $contents[] = "\t\t\$t = new \\DateTime(\$${column}, new \\DateTimeZone(\$this->getSession()->getACL()->getAttribute('time_zone')));\n";
                                 $contents[] = "\t\t\$t->setTimeZone(new \\DateTimeZone('GMT'));\n";
                                 $contents[] = "\t\t\$this->set${method_name}(\$t->format('Y-m-d H:i'));\n";
                                 $contents[] = "\t}\n";

@@ -28,13 +28,15 @@ namespace Sketch;
 /**
  * @method inputCheckbox
  * @method inputDate
- * @method inputDatetime
+ * @method inputDateExtended
+ * @method inputDateOld
+ * @method inputDateSimple
+ * @method inputDateText
  * @method inputFile
  * @method inputFileWithPreview
  * @method inputFileWithUploadify
  * @method inputHidden
  * @method inputNights
- * @method inputNumber
  * @method inputRichText
  * @method inputSecret
  * @method inputTextArea
