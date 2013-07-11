@@ -28,6 +28,8 @@ namespace Sketch;
 class Factory extends Object {
     const QUOTED_IDENTIFIERS = 1;
 
+    const AFFIX = "_12";
+
     /**
      * @var string
      */
@@ -62,7 +64,7 @@ class Factory extends Object {
             }
             if (!is_array(self::$metadata)) {
                 self::$metadata = $connection->getTableDefinition($metadata_table_name);
-                self::$version = (self::$metadata['fields']['key'] != null) ? $connection->queryFirst("SELECT value FROM $metadata_table_name WHERE `key` = 'version'") : self::$version;
+                self::$version = ((self::$metadata['fields']['key'] != null) ? $connection->queryFirst("SELECT value FROM $metadata_table_name WHERE `key` = 'version'") : 'default').self::AFFIX;
             }
             if (array_key_exists('class_name', $options)) {
                 $class_name = $options['class_name'];
@@ -146,6 +148,36 @@ class Factory extends Object {
                             }
                         }
                         $contents[] = "\t}\n";
+                        // Type information
+                        $contents[] = "\t\n";
+                        $contents[] = "\tfunction getTypeInformation(\$mixed = null) {\n";
+                        $contents[] = "\t\treturn array(\n\t\t\t";
+                        $i = 0; foreach ($table_definition['fields'] as $column => $definition) {
+                            $method_name = null;
+                            foreach (explode('_', $column) as $value) {
+                                $method_name .= $value;
+                            }
+                            if ($i++ > 0) {
+                                $contents[] = ",\n\t\t\t";
+                            }
+                            if (preg_match('/^int/', $definition['type']) || preg_match('/^smallint/', $definition['type']) || preg_match('/^tinyint/', $definition['type']) || preg_match('/^decimal/', $definition['type'])) {
+                                $contents[] = "'$method_name' => 'number'";
+                            } elseif (preg_match('/^bool/', $definition['type']) || preg_match('/^enum\(\'f\',\'t\'|enum\(\'t\',\'f\'/', $definition['type'])) {
+                                $contents[] = "'$method_name' => 'boolean'";
+                            } elseif (preg_match('/^datetime/', $definition['type'])) {
+                                $contents[] = "'$method_name' => 'datetime',\n\t\t\t";
+                                $contents[] = "'${method_name}TZ' => 'datetime'";
+                            } elseif (preg_match('/^date/', $definition['type'])) {
+                                $contents[] = "'$method_name' => 'date'";
+                            } elseif (preg_match('/^time/', $definition['type'])) {
+                                $contents[] = "'$method_name' => 'time'";
+                            } else {
+                                $contents[] = "'$method_name' => 'mixed'";
+                            }
+                        }
+                        $contents[] = "\n\t\t);\n";
+                        $contents[] = "\t}\n";
+
                     }
                     // Getters and Setters
                     foreach ($table_definition['fields'] as $column => $definition) {
@@ -195,7 +227,20 @@ class Factory extends Object {
                                 $contents[] = "\t\t\$this->${attribute_name} = new DateTime(\$${column});\n";
                             } else {
                                 $contents[] = "\t\t\$this->${attribute_name} = \$${column};\n";
-                            } $contents[] = "\t}\n";
+                            }
+                            $contents[] = "\t}\n";
+                            if (preg_match('/^(date|time)/', $definition['type'])) {
+                                $contents[] = "\t/**\n\t *\n\t * @return string\n\t **/\n\tfunction get${method_name}TZ() {\n";
+                                $contents[] = "\t\t\$t = \$this->get${method_name}()->toPHPDateTime();\n";
+                                $contents[] = "\t\t\$t->setTimeZone(new \\DateTimeZone(\$this->getSession()->getACL()->getAttribute('time_zone')));\n";
+                                $contents[] = "\t\treturn new DateTime(\$t->format('Y-m-d H:i'));\n";
+                                $contents[] = "\t}\n\t\t\n";
+                                $contents[] = "\t/**\n\t *\n\t * @param DateTime\n\t **/\n\tfunction set${method_name}TZ(\$${column}) {\n";
+                                $contents[] = "\t\t\$t = new \\DateTime(\$date_time, new \\DateTimeZone(\$this->getSession()->getACL()->getAttribute('time_zone')));\n";
+                                $contents[] = "\t\t\$t->setTimeZone(new \\DateTimeZone('GMT'));\n";
+                                $contents[] = "\t\t\$this->set${method_name}(\$t->format('Y-m-d H:i'));\n";
+                                $contents[] = "\t}\n";
+                            }
                         }
                     }
                     // Update and remove action methods
