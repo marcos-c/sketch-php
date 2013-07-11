@@ -27,9 +27,14 @@ namespace Sketch;
 
 class DateTime extends Object {
     /**
-     * @var integer
+     * @var \DateTime
      */
     private $dateTime = null;
+
+    /**
+     * @var string
+     */
+    private $dateTimeString = null;
 
     /**
      * @var array
@@ -37,6 +42,9 @@ class DateTime extends Object {
     private $dateTimeArray = null;
 
     /**
+     * Return the current date and time
+     *
+     * @static
      * @return DateTime
      */
     static function Now() {
@@ -44,6 +52,9 @@ class DateTime extends Object {
     }
 
     /**
+     * Return the current date
+     *
+     * @static
      * @return DateTime
      */
     static function Today() {
@@ -51,6 +62,9 @@ class DateTime extends Object {
     }
 
     /**
+     * Get available time zone identifiers
+     *
+     * @static
      * @return array
      */
     static function getTimeZoneIdentifiers() {
@@ -66,8 +80,9 @@ class DateTime extends Object {
     }
 
     /**
-     * @param mixed $date_time
-     * @throws DateTimeException
+     * Constructor
+     *
+     * @param null $date_time
      */
     function __construct($date_time = null) {
         if ($date_time instanceof DateTime) {
@@ -85,8 +100,6 @@ class DateTime extends Object {
                     $date_time = sprintf('%04d-%02d-%02d 00:00:00', intval(substr($date_time['year_month'], 0, 4)), intval(substr($date_time['year_month'], 4)), $date_time['day']);
                 } else if (array_key_exists('hour', $date_time) && array_key_exists('minute', $date_time)) {
                     $date_time = sprintf('1970-01-01 %02d:%02d', $date_time['hour'], $date_time['minute']);
-                } else {
-                    throw new DateTimeException(print_r($date_time, true));
                 }
             } else if (preg_match('/^\d+$/', $date_time)) {
                 $date_time = date('Y-m-d H:i:s', $date_time);
@@ -96,18 +109,23 @@ class DateTime extends Object {
             }
             if (preg_match('/^((?:19|20)\d{2})-(\d{1,2})-(\d{1,2})(?: (\d{2}):(\d{2}))?(?::(\d{2}))?/', $date_time, $matches)) {
                 if (checkdate($matches[2], $matches[3], $matches[1])) {
-                    $this->dateTime = strtotime("$date_time GMT");
-                    $this->dateTimeArray = array(0, 0, 0, 0, 0, 0);
-                    $count = count($matches) - 1;
-                    for ($i = 0; $i < $count; $i++) {
-                        $this->dateTimeArray[$i] = intval($matches[$i + 1]);
-                    }
+                    $this->dateTime = new \DateTime($date_time, new \DateTimeZone('GMT'));
+                    $this->dateTimeArray = array(
+                        $this->dateTime->format('Y'),
+                        $this->dateTime->format('n'),
+                        $this->dateTime->format('j'),
+                        $this->dateTime->format('G'),
+                        intval($this->dateTime->format('i')),
+                        intval($this->dateTime->format('s')),
+                    );
                 }
             }
         }
     }
 
     /**
+     * Return the instance as a string
+     *
      * @return string
      */
     function __toString() {
@@ -115,7 +133,32 @@ class DateTime extends Object {
     }
 
     /**
-     * @return boolean
+     * Serialize
+     *
+     * @return array
+     */
+    public function __sleep(){
+        if ($this->dateTime instanceof \DateTime) {
+            $this->dateTimeString = $this->dateTime->format('c');
+        }
+        return array('dateTimeString', 'dateTimeArray');
+    }
+
+    /**
+     * Unserialize
+     *
+     * @return void
+     */
+    public function __wakeup() {
+        if ($this->dateTimeString != null) {
+            $this->dateTime = new \DateTime($this->dateTimeString);
+        }
+    }
+
+    /**
+     * Check if the instance is null
+     *
+     * @return bool
      */
     function isNull() {
         $test = true; if (is_array($this->dateTimeArray)) {
@@ -126,49 +169,50 @@ class DateTime extends Object {
     }
 
     /**
-     * @return boolean
+     * Check if the instance is valid
+     *
+     * @return bool
      */
     function isValid() {
         return (!$this->isNull() && $this->dateTime != null);
     }
 
     /**
+     * Check if the instance is greater than another date
+     *
      * @param DateTime $date_time
-     * @return boolean
+     * @return bool
      */
     function greater(DateTime $date_time) {
         if ($date_time instanceof DateTime) {
-            return $this->dateTime > $date_time->dateTime;
+            return $this->toUnixTimestamp() > $date_time->toUnixTimestamp();
         } else return false;
     }
 
     /**
-     * @param DateTime $from_date_time
-     * @param DateTime $to_date_time
-     * @return boolean
-     */
-    function between(DateTime $from_date_time, DateTime $to_date_time) {
-        return $this->dateTime >= $from_date_time->dateTime && $this->dateTime <= $to_date_time->dateTime;
-    }
-
-    /**
+     * Returned the formatted date
+     *
      * @param string $format
-     * @return string
+     * @return null|string
      */
     function toString($format = 'Y-m-d H:i:s T') {
         if ($this->dateTime != null) {
-            return gmdate($format, $this->dateTime);
+            return $this->dateTime->format($format);
         } else return null;
     }
 
     /**
-     * @return array
+     * Return the instance as an array
+     *
+     * @return array|null
      */
     function toArray() {
         return $this->dateTimeArray;
     }
 
     /**
+     * Get the instance year
+     *
      * @return integer
      */
     function getYear() {
@@ -176,6 +220,8 @@ class DateTime extends Object {
     }
 
     /**
+     * Return the instance month
+     *
      * @return integer
      */
     function getMonth() {
@@ -183,6 +229,8 @@ class DateTime extends Object {
     }
 
     /**
+     * Return the instance day
+     *
      * @return integer
      */
     function getDay() {
@@ -190,57 +238,91 @@ class DateTime extends Object {
     }
 
     /**
+     * Return the instance day
+     *
      * @return integer
+     */
+    function getHour() {
+        return $this->dateTimeArray[3];
+    }
+
+    /**
+     * Return the instance day
+     *
+     * @return integer
+     */
+    function getMinute() {
+        return $this->dateTimeArray[4];
+    }
+
+    /**
+     * Return the instance day
+     *
+     * @return integer
+     */
+    function getSecond() {
+        return $this->dateTimeArray[5];
+    }
+
+    /**
+     * Return the instances last day of the month
+     *
+     * @return null|string
      */
     function getLastDay() {
-        return date('t', $this->dateTime);
+        return $this->toString('t');
     }
 
     /**
-     * @return integer
-     */
-    function getDayOfTheWeek() {
-        $day_of_the_week = date('w', $this->dateTime);
-        return $day_of_the_week == 0 ? 7 : $day_of_the_week;
-    }
-
-    /**
-     * @return integer
+     * Return the instance as a unix timestamp
+     *
+     * @return null|string
      */
     function toUnixTimestamp() {
+        return $this->toString('U');
+    }
+
+    /**
+     * Return the instance as a PHP date time
+     *
+     * @return DateTime|null
+     */
+    function toPHPDateTime() {
         return $this->dateTime;
     }
 
     /**
-     * @param string $interval
-     * @throws \Exception
+     * Add an interval to the instance
+     *
+     * @param $interval
      * @return DateTime
      */
     function addInterval($interval) {
-        if (preg_match('/^-?\d+ second(s)?$/', $interval)) {
-            return new DateTime(strtotime($interval, $this->dateTime));
-        } else if (preg_match('/^-?\d+ minute(s)?$/', $interval)) {
-            return new DateTime(strtotime($interval, $this->dateTime));
-        } else if (preg_match('/^-?\d+ hour(s)?$/', $interval)) {
-            return new DateTime(strtotime($interval, $this->dateTime));
-        } else if (preg_match('/^-?\d+ day(s)?$/', $interval)) {
-            return new DateTime(strtotime($interval, $this->dateTime));
-        } else if (preg_match('/^-?\d+ month(s)?$/', $interval)) {
-            return new DateTime(strtotime($interval, $this->dateTime));
-        } else if (preg_match('/^-?\d+ week(s)?$/', $interval)) {
-            return new DateTime(strtotime($interval, $this->dateTime));
-        } else if (preg_match('/^next month$/', $interval)) {
-            return new DateTime(strtotime($interval, $this->dateTime));
-        } else if (preg_match('/^last month$/', $interval)) {
-            return new DateTime(strtotime($interval, $this->dateTime));
+        if ($this->dateTime instanceof \DateTime) {
+            $clone = clone $this->dateTime;
+            if ($this->dateTime != null) {
+                if (preg_match('/^-?\d+ second(s)?$/', $interval) ||
+                    preg_match('/^-?\d+ minute(s)?$/', $interval) ||
+                    preg_match('/^-?\d+ hour(s)?$/', $interval) ||
+                    preg_match('/^-?\d+ day(s)?$/', $interval) ||
+                    preg_match('/^-?\d+ month(s)?$/', $interval) ||
+                    preg_match('/^-?\d+ week(s)?$/', $interval) ||
+                    preg_match('/^next month$/', $interval) ||
+                    preg_match('/^last month$/', $interval)) {
+                    $clone->modify($interval);
+                }
+            }
+            return new DateTime($clone->format('Y-m-d H:i:s'));
         } else {
-            throw new \Exception($this->getTranslator()->_s("Wrong interval format"));
+            return new DateTime();
         }
     }
 
     /**
+     * Substract from the instance another date
+     *
      * @param DateTime $date_time
-     * @return integer
+     * @return float
      */
     function substract(DateTime $date_time) {
         $from = new DateTime($this->toString('Y-m-d'));
@@ -249,8 +331,20 @@ class DateTime extends Object {
     }
 
     /**
+     * Return a PHP interval with the difference between the dates
+     *
      * @param DateTime $date_time
-     * @return boolean
+     * @return DateInterval
+     */
+    function getDifference(DateTime $date_time) {
+        return $this->dateTime->diff($date_time->toPHPDateTime());
+    }
+
+    /**
+     * Check if the instance is equal to another date
+     *
+     * @param DateTime $date_time
+     * @return bool
      */
     function equals(DateTime $date_time) {
         return ($this->toUnixTimestamp() == $date_time->toUnixTimestamp());
