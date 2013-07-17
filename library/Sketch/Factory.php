@@ -28,7 +28,7 @@ namespace Sketch;
 class Factory extends Object {
     const QUOTED_IDENTIFIERS = 1;
 
-    const AFFIX = "_15";
+    const AFFIX = "_17";
 
     /**
      * @var string
@@ -189,7 +189,7 @@ class Factory extends Object {
                             if (preg_match('/^int/', $definition['type']) || preg_match('/^smallint/', $definition['type']) || preg_match('/^tinyint/', $definition['type'])) {
                                 $contents[] = "\tfunction get${method_name}(\$default = false) {\n";
                                 $contents[] = "\t\treturn (\$this->${attribute_name} > 0) ? \$this->${attribute_name} : \$default;\n";
-                                $contents[] = "\t}\n\t\t\n";
+                                $contents[] = "\t}\n\n";
                                 $contents[] = "\tfunction set${method_name}(\$${column}) {\n";
                             } else if (!preg_match('/^(date|time)/', $definition['type']) || $definition['null']) {
                                 if (preg_match('/^bool/', $definition['type']) || preg_match('/^enum\(\'f\',\'t\'|enum\(\'t\',\'f\'/', $definition['type'])) {
@@ -199,11 +199,11 @@ class Factory extends Object {
                                         $contents[] = "\tfunction is${method_name}() {\n";
                                     }
                                     $contents[] = "\t\treturn \$this->${attribute_name};\n";
-                                    $contents[] = "\t}\n\t\t\n";
+                                    $contents[] = "\t}\n\n";
                                 }
                                 $contents[] = "\tfunction get${method_name}(\$default = null) {\n";
                                 $contents[] = "\t\treturn (\$this->${attribute_name} != null) ? \$this->${attribute_name} : \$default;\n";
-                                $contents[] = "\t}\n\t\t\n";
+                                $contents[] = "\t}\n\n";
                                 $contents[] = "\tfunction set${method_name}(\$${column}) {\n";
                             } else {
                                 $contents[] = "\t/**\n\t *\n\t * @return DateTime\n\t **/\n\tfunction get${method_name}() {\n";
@@ -214,7 +214,7 @@ class Factory extends Object {
                                     $contents[] = "\t\t\t\$this->set${method_name}(DateTime::Now());\n";
                                 }
                                 $contents[] = "\t\t} return \$this->${attribute_name};\n";
-                                $contents[] = "\t}\n\t\t\n";
+                                $contents[] = "\t}\n\n";
                                 $contents[] = "\t/**\n\t *\n\t * @param DateTime\n\t **/\n\tfunction set${method_name}(\$${column}) {\n";
                             }
                             if (preg_match('/^int/', $definition['type']) || preg_match('/^smallint/', $definition['type']) || preg_match('/^tinyint/', $definition['type'])) {
@@ -231,10 +231,14 @@ class Factory extends Object {
                             $contents[] = "\t}\n";
                             if (preg_match('/^(date|time)/', $definition['type'])) {
                                 $contents[] = "\t/**\n\t *\n\t * @return string\n\t **/\n\tfunction get${method_name}TZ() {\n";
-                                $contents[] = "\t\t\$t = \$this->get${method_name}()->toPHPDateTime();\n";
-                                $contents[] = "\t\t\$t->setTimeZone(new \\DateTimeZone(\$this->getSession()->getACL()->getAttribute('time_zone')));\n";
-                                $contents[] = "\t\treturn new DateTime(\$t->format('Y-m-d H:i'));\n";
-                                $contents[] = "\t}\n\t\t\n";
+                                $contents[] = "\t\t\$t = \$this->${attribute_name}->toPHPDateTime();\n";
+                                $contents[] = "\t\tif (\$t instanceof \\DateTime) {\n";
+                                $contents[] = "\t\t\t\$t->setTimeZone(new \\DateTimeZone(\$this->getSession()->getACL()->getAttribute('time_zone')));\n";
+                                $contents[] = "\t\t\treturn new DateTime(\$t->format('Y-m-d H:i'));\n";
+                                $contents[] = "\t\t} else {\n";
+                                $contents[] = "\t\t\treturn \$this->${attribute_name};\n";
+                                $contents[] = "\t\t}\n";
+                                $contents[] = "\t}\n\n";
                                 $contents[] = "\t/**\n\t *\n\t * @param DateTime\n\t **/\n\tfunction set${method_name}TZ(\$${column}) {\n";
                                 $contents[] = "\t\ttry {\n";
                                 $contents[] = "\t\t\t\$t = new \\DateTime(\$${column}, new \\DateTimeZone(\$this->getSession()->getACL()->getAttribute('time_zone')));\n";
@@ -319,12 +323,12 @@ class Factory extends Object {
                         $contents[] = "\t\tif (\$this->result instanceof ObjectIterator) {\n";
                         $contents[] = "\t\t\treturn \$this->result->rows();\n";
                         $contents[] = "\t\t} else return 0;\n";
-                        $contents[] = "\t}\n\t\t\n";
+                        $contents[] = "\t}\n\n";
                         $contents[] = "\tfunction fetch(\$key) {\n";
                         $contents[] = "\t\tif (\$this->result instanceof ObjectIterator) {\n";
                         $contents[] = "\t\t\treturn new ${class_name}(\$this->result->fetch(\$key));\n";
                         $contents[] = "\t\t} else return false;\n";
-                        $contents[] = "\t}\n\t\t\n";
+                        $contents[] = "\t}\n\n";
                         $contents[] = "\tfunction free() {\n";
                         $contents[] = "\t\tif (\$this->result instanceof ObjectIterator) {\n";
                         $contents[] = "\t\t\treturn \$this->result->free();\n";
