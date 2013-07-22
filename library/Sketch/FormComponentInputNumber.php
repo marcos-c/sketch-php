@@ -31,7 +31,7 @@ class FormComponentInputNumber extends FormComponent {
         $attribute = array_shift($arguments);
         $parameters = array_shift($arguments);
         $field_name = $this->getForm()->getFieldName($attribute);
-        $field_value = $this->getLocale()->getFormatter()->formatNumber($this->getForm()->getFieldValue($attribute));
+        $field_value = $this->getLocale()->getFormatter()->formatInputNumber($this->getForm()->getFieldValue($attribute));
         $parameters = (($parameters != null && strpos(" $parameters", 'class="')) ? $parameters : implode(' ', array($parameters, 'class="input-text"')));
         $parameters = (($parameters != null && strpos(" $parameters", 'id="'))) ? $parameters : implode(' ', array($parameters, 'id="'.$field_name.'"'));
         return '<input type="text" name="'.$field_name.'" value="'.$field_value.'" '.$parameters.' />';

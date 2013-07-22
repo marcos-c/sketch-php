@@ -111,6 +111,22 @@ class LocaleFormatter extends Object {
     }
 
     /**
+     * @param float $number
+     * @return string
+     */
+    function formatInputNumber($number) {
+        if ($number != 0) {
+            if ($this->localeString == 'es') {
+                return str_replace(',00', '', number_format($number, 2, ',', ''));
+            } else {
+                return number_format($number, 2, '.', ',');
+            }
+        } else {
+            return '';
+        }
+    }
+
+    /**
      *
      * @param $number
      * @return mixed
