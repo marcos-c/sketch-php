@@ -145,7 +145,7 @@ class Application {
             $this->setSession($test ? new SessionMock() : new Session());
             if (!($this->getSession()->getACL() instanceof SessionACL)) {
                 $acl = new SessionACL();
-                $acl->addRule('guest');
+                $acl->addRole('guest');
                 $this->getSession()->setACL($acl);
             }
             // Initialize default locale

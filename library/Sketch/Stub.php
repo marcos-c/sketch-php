@@ -41,7 +41,7 @@ try {
     $application->setSession(new Session());
     if (!($application->getSession()->getACL() instanceof SessionACL)) {
         $acl = new SessionACL();
-        $acl->addRule('guest');
+        $acl->addRole('guest');
         $application->getSession()->setACL($acl);
     }
     // Initialize default locale

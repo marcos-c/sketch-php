@@ -34,7 +34,7 @@ class SessionACL extends Object {
     /**
      * @var array
      */
-    private $rules = array();
+    private $roles = array();
 
     /**
      * @param string $key
@@ -57,11 +57,11 @@ class SessionACL extends Object {
     }
 
     /**
-     * @param string $rule
+     * @param string $role
      */
-    function addRule($rule) {
-        if (!in_array($rule, $this -> rules)) {
-            $this -> rules[] = $rule;
+    function addRole($role) {
+        if (!in_array($role, $this -> roles)) {
+            $this -> roles[] = $role;
         }
     }
 
@@ -70,10 +70,10 @@ class SessionACL extends Object {
      * @return boolean
      */
     function check($mixed) {
-        if (is_array($mixed)) foreach ($mixed as $rule) {
-            if (in_array($rule, $this -> rules)) return true;
+        if (is_array($mixed)) foreach ($mixed as $role) {
+            if (in_array($role, $this -> roles)) return true;
         } else {
-            return ($mixed != null) ? (in_array($mixed, $this -> rules)) : true;
+            return ($mixed != null) ? (in_array($mixed, $this -> roles)) : true;
         } return false;
     }
 }
