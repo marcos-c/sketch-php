@@ -205,7 +205,26 @@ class FormView extends Object {
             foreach ($attributes as $attribute => $value) {
                 if ($value instanceof ResourceFolderDescriptor) {
                 } else {
-                    $attributes[$attribute] = $this->getFieldValue(base64_decode($attribute));
+                    $set = strtolower(base64_decode($attribute));
+                    $value = $this->getFieldValue($set);
+                    $instance = $this->getInstance();
+                    if (method_exists($instance, "getTypeInformation")) {
+                        $type_information = $instance->getTypeInformation();
+                        if (array_key_exists($set, $type_information)) {
+                            switch ($type_information[$set]) {
+                                case 'number':
+                                    $value = $this->getFormatter()->formatNumber($value);
+                                    break;
+                                case 'date':
+                                    $value = $this->getFormatter()->formatDate($value);
+                                    break;
+                                case 'datetime':
+                                    $value = $this->getFormatter()->formatDateAndTime($value);
+                                    break;
+                            }
+                        }
+                    }
+                    $attributes[$attribute] = $value;
                 }
             }
             $session_attributes = $session->getAttribute('__form');
