@@ -46,19 +46,23 @@ class FormComponentSelectOneRadio extends FormComponent {
         <? if (is_array($options)): ?>
             <ul <?=$parameters['ul']?>>
                 <? foreach ($options as $key => $value):
+                    if (is_array($value)) {
+                        $add = $value[1];
+                        $value = $value[0];
+                    }
                     if ($arguments['label']['for'] != null && $arguments['input']['id'] != null): ?>
-                        <li <?=$parameters['li']?>><label <?=$parameters['label']?>><input type="radio" name="<?=$field_name?>" value="<?=$key?>" <?=(($field_value == $key) ? 'checked="checked"' : '')?><?=$parameters['input']?> /> <?=$value?></label></li>
+                        <li <?=$parameters['li']?>><label <?=$parameters['label']?>><input type="radio" name="<?=$field_name?>" value="<?=$key?>" <?=(($field_value == $key) ? 'checked="checked"' : '')?><?=$parameters['input']?> /> <?=$value?></label><?=$add?></li>
                     <? elseif ($arguments['label']['for'] != null):
                         $id = sprintf(' id="%s"', $arguments['input']['label']); ?>
-                        <li <?=$parameters['li']?>><label <?=$parameters['label']?>><input<?=$id?> type="radio" name="<?=$field_name?>" value="<?=$key?>" <?=(($field_value == $key) ? 'checked="checked"' : '')?><?=$parameters['input']?> /> <?=$value?></label></li>
+                        <li <?=$parameters['li']?>><label <?=$parameters['label']?>><input<?=$id?> type="radio" name="<?=$field_name?>" value="<?=$key?>" <?=(($field_value == $key) ? 'checked="checked"' : '')?><?=$parameters['input']?> /> <?=$value?></label><?=$add?></li>
                     <? elseif ($arguments['label']['id'] != null):
                         $for = sprintf(' for="%s"', $arguments['input']['id']); ?>
-                        <li <?=$parameters['li']?>><label<?=$for?> <?=$parameters['label']?>><input type="radio" name="<?=$field_name?>" value="<?=$key?>" <?=(($field_value == $key) ? 'checked="checked"' : '')?><?=$parameters['input']?> /> <?=$value?></label></li>
+                        <li <?=$parameters['li']?>><label<?=$for?> <?=$parameters['label']?>><input type="radio" name="<?=$field_name?>" value="<?=$key?>" <?=(($field_value == $key) ? 'checked="checked"' : '')?><?=$parameters['input']?> /> <?=$value?></label><?=$add?></li>
                     <? else:
                         $md5 = substr(md5($field_name.$key), 8);
                         $id = sprintf(' id="%s"', $md5);
                         $for = sprintf(' for="%s"', $md5); ?>
-                        <li <?=$parameters['li']?>><label<?=$for?> <?=$parameters['label']?>><input<?=$id?> type="radio" name="<?=$field_name?>" value="<?=$key?>" <?=(($field_value == $key) ? 'checked="checked"' : '')?><?=$parameters['input']?> /> <?=$value?></label></li>
+                        <li <?=$parameters['li']?>><label<?=$for?> <?=$parameters['label']?>><input<?=$id?> type="radio" name="<?=$field_name?>" value="<?=$key?>" <?=(($field_value == $key) ? 'checked="checked"' : '')?><?=$parameters['input']?> /> <?=$value?></label><?=$add?></li>
                     <? endif; ?>
                 <? endforeach; ?>
             </ul>
