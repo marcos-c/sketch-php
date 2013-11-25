@@ -167,6 +167,22 @@ class SketchResourceFolder extends SketchResource {
 
     /**
      *
+     * @param $source_file_name
+     * @param string $extra
+     * @param string $default
+     * @return string
+     */
+    function getDescriptorFromSourceFileName($source_file_name, $extra = '', $default = '') {
+        foreach ($this->getDescriptors() as $descriptor) {
+            if ($descriptor->getSourceFileName() == $source_file_name) {
+                return $descriptor;
+            }
+        }
+        return $default;
+    }
+
+    /**
+     *
      * @return array
      */
     function getDescriptors() {
