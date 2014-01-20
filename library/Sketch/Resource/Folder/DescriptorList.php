@@ -1,0 +1,72 @@
+<?php
+/**
+ * This file is part of the Sketch library
+ *
+ * @author Marcos Cooper <marcos@releasepad.com>
+ * @version 3.0
+ * @copyright 2007 Marcos Cooper
+ * @link http://releasepad.com/sketch
+ * @package Sketch
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2.1 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library; if not, you can get a copy from the
+ * following link: http://opensource.org/licenses/lgpl-2.1.php
+ */
+
+namespace Sketch\Resource\Folder;
+
+use Sketch\Core\ArrayIterator;
+use Sketch\Core\EmptyIterator;
+use Sketch\Core\SearchableObjectList;
+
+/**
+ * List of resource folder descriptors
+ *
+ * @package Sketch\Resource
+ */
+class DescriptorList extends SearchableObjectList {
+    /**
+     * @var Descriptor[]
+     */
+    private $descriptors;
+
+    /**
+     * @param Descriptor[] $descriptors
+     */
+    function __construct(array $descriptors) {
+        foreach ($descriptors as $key => $value) {
+            if (strpos($value->getReference(), '_') === false) {
+                $this->descriptors[$key] = $value;
+            }
+        }
+
+    }
+
+    /**
+     * @return integer
+     */
+    function getSize() {
+        return count($this->descriptors);
+    }
+
+    /**
+     * @return ArrayIterator
+     */
+    function getIterator() {
+        if (is_array($this->descriptors)) {
+            return new ArrayIterator(array_slice($this->descriptors, $this->getOffset(0), $this->getLimit(10), true));
+        } else {
+            return new EmptyIterator();
+        }
+    }
+}

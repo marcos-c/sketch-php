@@ -14,7 +14,8 @@
         "php": ">=5.3.0",
         "phpunit/phpunit": "3.7.20",
 	    "sami/sami": "1.0.*@dev",
-        "swiftmailer/swiftmailer": "4.3.0"
+        "swiftmailer/swiftmailer": "4.3.0",
+        "michelf/php-markdown": "1.4.*@dev"
     },
     "autoload": {
         "psr-0": { "Sketch": "library/" }

@@ -1,0 +1,416 @@
+(17:36:03) Rubén Gómez: Hola Marcos
+(17:37:20) Rubén Gómez: me dijiste que para hacel el nuevo apartado de vital-sign me basasee en  schedule-for-surgery-json.php
+(17:37:27) Rubén Gómez: tengo algunas preguntas
+(17:37:36) Rubén Gómez: cuando tengas un min me dices
+(17:40:21) Marcos Cooper: Hola Rubén
+(17:40:32) Marcos Cooper: si ves que no estoy conectado puedes buscarme en el gmail
+(17:40:39) Rubén Gómez: ok
+(17:40:39) Marcos Cooper: es que el jabber de globalred se me cuelga muchas veces
+(17:40:45) Marcos Cooper: y no me doy cuenta
+(17:40:59) Rubén Gómez: pensaba que no estarías
+(17:41:46) Rubén Gómez: para nutritic...la ventana de constante vitales hay que maquetarla?
+(17:42:04) Marcos Cooper: en lo referente a los campos, sí
+(17:42:11) Marcos Cooper: en lo referente a la ventana en si, no
+(17:42:19) Marcos Cooper: ya hay una maquetación para los dialogos
+(17:43:12) Rubén Gómez: la de schedule-for-surgery-json.php?
+(17:45:32) Marcos Cooper: si
+(17:45:50) Marcos Cooper: lo que puedes hacer es duplicar la ventana con otro nombre
+(17:45:59) Marcos Cooper: añadir un enlace y probar a abrirla
+(17:46:22) Rubén Gómez: lo he hecho ya
+(17:46:29) Rubén Gómez: lo voy a subir un momento a producción
+(17:46:39) Rubén Gómez: luego lo dejo como es´ta
+(17:46:40) Marcos Cooper: vale
+(17:46:40) Rubén Gómez: está
+(17:47:31) Marcos Cooper: donde lo has puesto=
+(17:47:32) Marcos Cooper: ?
+(17:47:43) Rubén Gómez: un min
+(17:48:48) Rubén Gómez: http://nutritic.gmade.es/patients/screening/index.php?patient_id=112
+(17:49:18) Rubén Gómez: verás que hay dos enlaces
+(17:49:22) Marcos Cooper: si, ya los veo
+(17:49:43) Marcos Cooper: esta bien, aunque en el primero sale un button por ahi en medio
+(17:50:14) Rubén Gómez: el de ver gráfica es va directamente a  schedule-for-surgery-json.php y el segundo al nuevo archivo que he creado pero contenido del otro
+(17:50:33) Marcos Cooper: oks
+(17:50:45) Rubén Gómez: voy a dejar el otro archivo con el mismo contenido del otro para que veas que el botón sale mal
+(17:52:04) Rubén Gómez: ya
+(17:52:31) Rubén Gómez: vital-sign-edit-json.php tiene exactamente el mismo contenido que  schedule-for-surgery-json.php
+(17:52:47) Rubén Gómez: porque no se ve igual y sale con el botón roto?
+(17:53:38) Marcos Cooper: en el firebug veo un /button>
+(17:53:41) Marcos Cooper: falta el <
+(17:54:52) Rubén Gómez: si abres el archivo verás que no falta
+(17:56:12) Marcos Cooper: la codificación del archivo esta mal
+(17:56:24) Marcos Cooper: me salén interrogantes por todo
+(17:57:18) Marcos Cooper: ya lo he arreglado
+(17:57:22) Marcos Cooper: bajatelo de gmade
+(17:58:29) Rubén Gómez: vuelvelo a subir please
+(17:58:41) Rubén Gómez: no te he leido y estaba haciendo pruebas y lo he machacado
+(17:58:45) Rubén Gómez: :S
+(17:59:20) Marcos Cooper: vaya, ya no lo tengo localmente...
+(17:59:33) Marcos Cooper: lo único que tienes que hacer es revisar la codificación
+(17:59:40) Rubén Gómez: bueno no te preocupes
+(17:59:42) Marcos Cooper: creo que lo estas subiendo como ISO-8859-1
+(17:59:43) Rubén Gómez: ook
+(18:00:51) Rubén Gómez: vale esto por un lado
+(18:00:58) Rubén Gómez: ahora sobre la programación
+(18:01:37) Rubén Gómez: $form = \Nutritic\Functions::getObservedForm($view, 'schedule-for-surgery-form');
+(18:02:09) Rubén Gómez: al método getobservedform le pasas la vista y ?
+(18:02:31) Marcos Cooper: un nombre para el formulario
+(18:03:08) Rubén Gómez: es decir que si si pongo vital-sign-edit-form es correcto?
+(18:03:21) Marcos Cooper: si
+(18:03:41) Marcos Cooper: de esta forma no se pisan las variables cuando hay más un formulario en la página que hace referencia a la misma instancia
+(18:03:43) Rubén Gómez: aqui que obtienes $form->getFieldNotices('currentScreening.surgeryDatetime')
+(18:03:50) Rubén Gómez: ?
+(18:03:53) Marcos Cooper: los mensajes de error
+(18:04:02) Marcos Cooper: de la validación
+(18:04:41) Rubén Gómez: para vital sign sería $form->getFieldNotices('currentVitalSign.surgeryDatetime')?
+(18:05:23) Rubén Gómez: bueno $form->getFieldNotices('currentVitalSign.VitalSignDatetime')
+(18:07:48) Marcos Cooper: si, algo asi
+(18:08:08) Rubén Gómez: algo asi?
+(18:08:11) Marcos Cooper: aunque lo de currentVitalSign realmente no hace falta
+(18:08:18) Rubén Gómez: se pude poner lo que se quiera?
+(18:08:47) Marcos Cooper: currentVitalSign.VitalSignDatetime
+(18:08:59) Marcos Cooper: hace referencia a la vista
+(18:09:02) Marcos Cooper: esto se traduce por
+(18:09:24) Marcos Cooper: getCurrentVitalSign()->getVitalSignDatetime()
+(18:10:11) Marcos Cooper: o getCurrentVitalSign()->setVitalSignDatetime()
+(18:10:29) Marcos Cooper: en función de si el formulario esta insertando o sacando información de la vista
+(18:10:45) Marcos Cooper: resumiendo
+(18:10:54) Marcos Cooper: $view es una instancia de NutriticPatient
+(18:11:08) Marcos Cooper: y lo que has puesto es dame el objeto currentVitalSign del paciente
+(18:11:19) Marcos Cooper: y de este el atributo vitalSignDatetime
+(18:11:24) Marcos Cooper: para el que hay definidos un getter y un setter
+(18:12:22) Marcos Cooper: que tal? se entiende algo?
+(18:12:30) Rubén Gómez: pero el objeto currentVItalSign no está definido
+(18:12:31) Rubén Gómez: algo
+(18:12:37) Marcos Cooper: yeah
+(18:12:43) Marcos Cooper: veo que algo has entendido, si
+(18:12:45) Marcos Cooper: ^^
+(18:12:56) Marcos Cooper: exacto, el objeto currentVitalSign no esta definido
+(18:13:08) Marcos Cooper: eso tienes que definirlo tú en la clase patient
+(18:13:14) Marcos Cooper: pero por el momento no te preocupes
+(18:13:29) Marcos Cooper: modifique Sketch para que ya no de error si te equivocas en el nombre de un campo
+(18:13:34) Marcos Cooper: ahora sólo mete una entrada en el log
+(18:13:51) Marcos Cooper: si abres el firebug verás que te esta diciendo que el campo urrentVitalSign.VitalSignDatetime no existe
+(18:14:21) Marcos Cooper: de esta forma puedes programar el formulario y después el mdelo
+(18:14:23) Marcos Cooper: modelo
+(18:14:39) Marcos Cooper: (antes no se podía, había que programar primero el modelo y luego el formulario)
+(18:15:25) Marcos Cooper: asi que sigue con los campos del formulario de constantes vitales
+(18:15:40) Marcos Cooper: cuando termines si puedo nos miramos lo de programar la lógica del modelo
+(18:15:51) Marcos Cooper: si no, puedes empezar otro de los formularios
+(18:16:12) Marcos Cooper: de esta forma avanzaremos mucho porque el trabajo es en un 90% hacer formularios
+(18:16:51) Marcos Cooper: bueno, quizas 90 es mucho, pero la mitad del trabajo esta hecha si el formulario ya esta programado
+(18:20:06) Rubén Gómez: perdona que he tenido que ausentarme 2 minutos
+(18:20:14) Rubén Gómez: te he leido todo
+(18:20:17) Rubén Gómez: ok
+(18:20:34) Rubén Gómez: es decir ahora es ir creando los formularios y la base de datos
+(18:22:03) Marcos Cooper: si, formulario y una vez el formulario se vea correcto la base de datos
+(18:22:42) Rubén Gómez: por ejemplo si en la base de datos tengo un nombre de patient_condition el input seria...
+(18:23:34) Rubén Gómez: <?=$form->inputText('patient_condition', 'tabindex="1" class="input-block-level typeahead" data-field="cie9" autocomplete="off"')?>
+(18:23:46) Rubén Gómez: ?
+(18:27:07) Marcos Cooper: casi
+(18:27:27) Marcos Cooper: lo que pones com primer parámetro es el nombre del campo en la clase, no la base de datos
+(18:27:35) Marcos Cooper: en la clase es patientCondition
+(18:28:11) Rubén Gómez: pero una clase solo para un campo?
+(18:28:17) Marcos Cooper: eh?
+(18:28:31) Marcos Cooper: veamos
+(18:28:43) Marcos Cooper: Sketch tiene un sistema de CRUD
+(18:28:53) Marcos Cooper: es lo del scaffold en las clases de nutritic
+(18:29:00) Marcos Cooper: las primeras lineas de cada clase
+(18:29:15) Marcos Cooper: estas lineas lo que hacen es generar una clase a partir de la definición de una tabla en la base de datos
+(18:29:31) Marcos Cooper: por ejemplo para nutritic_patient crean la clase NutriticPatientAbstract
+(18:29:43) Marcos Cooper: esta clase se guarda en cache/library
+(18:29:54) Marcos Cooper: y como verás NutriticPatient la extiende
+(18:30:26) Marcos Cooper: en esta clase hay definidos todas los campos de la tabla nutritic_patient
+(18:30:30) Marcos Cooper: como por ejemplo
+(18:30:59) Marcos Cooper: ageGroup, postalCode, medicalRecordNumber
+(18:31:07) Marcos Cooper: y para cada uno de ellos un get y un set
+(18:31:13) Marcos Cooper: es decir getAgeGroup, setAgeGroup
+(18:31:28) Marcos Cooper: estos get y set son los que usa la clase Form para actualizar los valores de la instancia
+(18:32:26) Rubén Gómez: pero la tabla sería nutritic_patient_vital_signs y el patient_condition sería un campo de esta tabla
+(18:32:54) Rubén Gómez: para definir el input que guardará el valor en la tabla sería
+(18:34:22) Marcos Cooper: veamos, en este caso es un poco más complicado
+(18:34:43) Marcos Cooper: por la instancia que has usado en el formulario es la del paciente
+(18:34:54) Marcos Cooper: no la de una entrada en constantes vitales
+(18:34:59) Marcos Cooper: por lo que tienes dos opciones
+(18:35:06) Marcos Cooper: instanciar una constante vital
+(18:35:11) Rubén Gómez: <?=$form->inputText('patientCondition', 'tabindex="1" class="input-block-level typeahead" data-field="cie9" autocomplete="off"')?>
+(18:35:12) Marcos Cooper: y usar esa instancia con el formulario
+(18:35:30) Marcos Cooper: o añadir un atributo a patient para guardarla
+(18:35:40) Marcos Cooper: yo haría lo primero
+(18:36:29) Marcos Cooper: por lo que tendrías que crear primero la clase para poder instanciarla
+(18:36:44) Marcos Cooper: asi que empecemos por ahi
+(18:36:52) Marcos Cooper: en library/Nutritic
+(18:37:06) Marcos Cooper: crea la clase PatientVitalSign
+(18:37:24) Rubén Gómez: voy
+(18:37:56) Marcos Cooper: puedes usar PatientAdmission como referencia
+(18:38:23) Rubén Gómez: voy
+(18:39:12) Marcos Cooper: crea también la tabla que va a almacenar los datos de cada constante vital
+(18:39:41) Rubén Gómez: ok
+(18:39:52) Marcos Cooper: creo que en lugar de llamarlo VitalSign mejor llamalo VitalSigns
+(18:40:08) Rubén Gómez: ok
+(18:40:12) Marcos Cooper: porque cada registro contiene varias constantes vitales por unidad de tiempo
+(18:40:21) Marcos Cooper: por lo tanto la tabla será patient_vital_signs
+(18:42:23) Marcos Cooper: y la tabla tiene que tener una referencia al paciente (patient_id) y un datetime para la hora en que se tomaron las medidas
+(18:42:33) Marcos Cooper: para el datime creo que puedes usar creation_datetime
+(18:42:41) Rubén Gómez: ok
+(18:42:54) Marcos Cooper: luego un campo para constante vital
+(18:43:01) Rubén Gómez: la tabla ya la tengo diseñada que no creada
+(18:43:18) Marcos Cooper: creala entonces
+(18:44:00) Rubén Gómez: voy
+(18:44:25) Rubén Gómez: la creo en local y te escribo la query
+(18:44:57) Marcos Cooper: creala en gmade
+(18:45:06) Marcos Cooper: y me la bajaré de ahi cuando integremos los cambios
+(18:45:18) Rubén Gómez: ok
+(19:06:26) Rubén Gómez: ya he subido la tabla a gmade
+(19:06:33) Marcos Cooper: voy
+(19:06:42) Rubén Gómez: quizas los tipos de datos hay que cambiarlos
+(19:07:36) Marcos Cooper: creo que veo muchos enteros
+(19:07:50) Rubén Gómez: ante la duda he puesto enteros
+(19:07:54) Marcos Cooper: systolic_stress y todos estos campos no tienen decimales?
+(19:08:08) Rubén Gómez: en la plantilla sale 123
+(19:08:30) Rubén Gómez: lo que por las unidades podrías ser
+(19:08:49) Rubén Gómez: en cualquier caso se puede cambiar cuando lo sepa seguro
+(19:09:16) Marcos Cooper: dile a Julio que le pida a Pedro varios ejemplos de constantes vitales para usar en las pruebas
+(19:09:22) Rubén Gómez: ok
+(19:09:36) Marcos Cooper: luego cuidado con el collation
+(19:09:43) Marcos Cooper: lo tienes como latin1_swedish_ci
+(19:09:59) Marcos Cooper: y debería ser  	utf8_general_ci
+(19:10:16) Marcos Cooper: lo tienes que cambiar a nivel de tabla y en el campo que has puesto como varchar
+(19:10:49) Marcos Cooper: a parte de eso sólo te falta relacionar las constantes vitales con sus respectivos pacientes
+(19:11:03) Marcos Cooper: en relation view
+(19:11:16) Marcos Cooper: mientras haces todo esto voy a hacer una pausa para cenar
+(19:11:24) Rubén Gómez: ok
+(19:11:28) Rubén Gómez: bon profit
+(19:17:35) Rubén Gómez: ya están relacionadas las tablas
+(20:09:10) Rubén Gómez: podemos seguir con Nutritic?
+(20:09:19) Marcos Cooper: hola
+(20:09:19) Marcos Cooper: si
+(20:09:37) Rubén Gómez: perfecto:)
+(20:09:56) Rubén Gómez: lo estoy cogiendo con ganas ahora
+(20:10:15) Rubén Gómez: la base de datos ya está creada
+(20:10:34) Marcos Cooper: oks
+(20:10:38) Marcos Cooper: has creado la clase ya?
+(20:10:56) Rubén Gómez: esto a lo que voy ahora
+(20:11:08) Rubén Gómez: quería comentarte unas cosas
+(20:11:11) Marcos Cooper: dime
+(20:12:13) Rubén Gómez: esta vista sería el modelo?
+(20:12:35) Rubén Gómez: aqui están todas las consultas de la base de datos
+(20:13:02) Marcos Cooper: que vista?
+(20:13:10) Marcos Cooper: ah, la clase
+(20:13:13) Rubén Gómez: vista=clase :S
+
+(20:13:14) Rubén Gómez: sorry
+(20:13:16) Marcos Cooper: si es lo que corresponde al modelo
+(20:13:30) Rubén Gómez: hoy mi caeza no esta al 100%
+(20:13:32) Marcos Cooper: y un poco el controlador
+(20:13:57) Rubén Gómez: por lo tanto aquí necesito un método insertPatienVitalSigns
+(20:14:02) Marcos Cooper: en Sketch el controlador esta un poco difuminado
+(20:14:15) Marcos Cooper: en realidad no
+(20:14:19) Marcos Cooper: ya hay uno
+(20:14:21) Marcos Cooper: updateAction
+(20:14:37) Rubén Gómez: este donde está
+(20:14:38) Rubén Gómez: ?
+(20:14:42) Marcos Cooper: en la clase generada
+(20:14:53) Marcos Cooper: busca en el servidor de pruebas
+(20:14:59) Marcos Cooper: dentro de cache
+(20:15:00) Marcos Cooper: library
+(20:15:13) Marcos Cooper: verás que hay un montón de archivos en plan md5.php
+(20:15:29) Marcos Cooper: si abres cualquiera de ellos verás lo que genera scaffold
+(20:16:07) Marcos Cooper: es una clase abstracta con varios métodos
+(20:16:13) Marcos Cooper: entre ellos update, updateAction y deleteAction
+(20:16:14) Rubén Gómez: cache/library/2.0?
+(20:16:16) Marcos Cooper: si
+(20:16:45) Marcos Cooper: update es el método que inserta ya actualiza los registros en la base de datos
+(20:16:50) Marcos Cooper: updateaction es la acción
+(20:16:58) Marcos Cooper: delete es la acción de eliminar un registro de la base de datos
+(20:17:18) Marcos Cooper: como verás las acciones tienen como primer parámetro el formulario
+(20:17:25) Marcos Cooper: es lo que define una acción
+(20:17:32) Marcos Cooper: las acciones se llaman desde dentro de form
+(20:17:45) Marcos Cooper: a partir de los botones que añades en las vistas
+(20:17:59) Marcos Cooper: $form->commandLink('updateAction'...
+(20:18:43) Rubén Gómez: es decir se crear el evento para el botono (update,delete o insert)
+(20:19:11) Rubén Gómez: por ejemplo si lo que quiero es actualizar o insertar   $form->commandLink('update'...
+(20:19:14) Marcos Cooper: sí, aunque más que eventos prefiero llamarlo acciones
+(20:19:19) Rubén Gómez: ok
+(20:19:27) Marcos Cooper: es que no son realmente eventos
+(20:19:40) Marcos Cooper: ya que no hay un observador
+(20:19:53) Marcos Cooper: en el sentido extricto de la palabra
+(20:20:07) Marcos Cooper: en cuanto a lo que has puesto antes es 'updateAction'
+(20:20:24) Marcos Cooper: si intentas llamar a update directamente probablemente te dará un error
+(20:20:39) Rubén Gómez: ok
+(20:21:05) Rubén Gómez: cuando es cuando se genera la clase, por ejemplo, patient_vital_signs?
+(20:21:18) Marcos Cooper: se generan en la llamada a scaffold
+(20:21:38) Rubén Gómez: require_once Factory::scaffold('patient_vital_signs', array('namespace' => 'Nutritic', 'class_name' => 'PatientVitalSigns'));
+(20:21:38) Marcos Cooper: el md5 corresponde a la estructura de la tabla en la base de datos
+(20:21:46) Rubén Gómez: aqui?
+(20:21:57) Marcos Cooper: si cambia la estructura cambia el md5 y se genera una nueva clase abstracta con los nuevos métodos
+(20:21:59) Marcos Cooper: es automático
+(20:22:01) Marcos Cooper: si
+(20:22:05) Marcos Cooper: ahi miso
+(20:22:10) Marcos Cooper: mismo
+(20:22:12) Marcos Cooper: ^^
+(20:22:22) Rubén Gómez: vale vale
+(20:22:30) Marcos Cooper: tiene un pequeño overhead porque tiene que ejecutar una consulta y comprobar un archivo
+(20:22:35) Marcos Cooper: pero es insignificante
+(20:22:44) Marcos Cooper: al menos para lo que lo estabamos usando hasta ahora
+(20:22:59) Marcos Cooper: si tuvieramos que usar Sketch en Lopesan, por ejemplo
+(20:23:21) Marcos Cooper: tendría que modificar esto para que los archivos no se generen en producción
+(20:23:40) Rubén Gómez: ok
+(20:23:46) Marcos Cooper: es probable que para Nutritic haga esta mejora si nos queda algo de tiempo para hacerla
+(20:24:21) Rubén Gómez: entonces en la clase library/nutritic/PatientVitalSigns.php
+(20:24:37) Marcos Cooper: basta con que pongas lo siguiente
+(20:24:46) Rubén Gómez: se llama al scaffold que crea la clase cache
+(20:25:04) Marcos Cooper: si, la clase abstracta que luego PatientVitalSigns extiende
+(20:26:07) Marcos Cooper: tú clase debería parecerse a lo siguiente
+(20:26:12) Marcos Cooper: <?php
+namespace Nutritic;
+
+use Sketch\Application;
+use Sketch\Factory;
+use Sketch\FormNotice;
+use Sketch\FormView;
+
+/** @noinspection PhpIncludeInspection */
+require_once Factory::scaffold('patient_vital_signs', array('namespace' => 'Nutritic', 'class_name' => 'PatientVitalSigns'));
+class PatientVitalSigns extends AbstractPatientVitalSigns {
+
+}
+(20:26:45) Marcos Cooper: en realidad con eso ya tienes todo lo necesario para hacer la ficha de una constante vital
+(20:27:16) Marcos Cooper: AbstractPatientVitalSigns contiene todos los get y set de la tabla y los métodos update, updateAction y deleteAction
+(20:27:52) Marcos Cooper: de esta forma si modificas la tabla se genera un nuevo AbstractPatientVitalSigns conforme a la nueva definición
+(20:28:11) Rubén Gómez: una pasada Marcos
+(20:28:19) Marcos Cooper: ^^
+(20:28:39) Marcos Cooper: es más sencillo de lo que te piensas
+(20:28:44) Marcos Cooper: y muy mejorable
+(20:28:47) Marcos Cooper: pero va muy bien
+(20:29:54) Marcos Cooper: casi todos los frameworks de PHP soportan una forma u otra de generación de código
+(20:30:25) Rubén Gómez: y ahora solo me queda crear el formulario, no?
+(20:30:35) Marcos Cooper: por ejemplo en cakephp creo que funciona como en ruby que defines los campos en la clase y luego el genera las tablas en la base de datos
+(20:31:03) Marcos Cooper: si, crear el formulario y luego añadir un método validate
+(20:31:11) Marcos Cooper: y cualqueir otro método de soporte que puedas necesitar
+(20:31:28) Rubén Gómez: antes comentabamos los nombres los campos para insertar los registros
+(20:31:36) Marcos Cooper: puedes hecharle un vistazo a las otras clases y comparar
+(20:31:56) Marcos Cooper: si, lo que tienes que hacer es modificar un poco la vista
+(20:32:06) Marcos Cooper: para que use una instancia de la clase que acabas de crear en lugar de patient
+(20:32:11) Rubén Gómez: por ejemplo, para hacer referencia al campo patient_condition de la tabla creada sería
+(20:32:13) Rubén Gómez: <?=$form->inputText('PatientCondition', 'tabindex="1" class="input-block-level typeahead" data-field="cie9" autocomplete="off"')?>?
+(20:32:26) Marcos Cooper: si pero en minúsculas la P
+(20:32:36) Marcos Cooper: y lo de typeahead quitalo
+(20:32:44) Marcos Cooper: porque es para el typeahead
+(20:32:45) Rubén Gómez: ok
+(20:33:04) Marcos Cooper: <?=$form->inputText('patientCondition', 'tabindex="1" class="input-block-level"')?>?
+(20:33:11) Marcos Cooper: asi de simple
+(20:33:36) Rubén Gómez: estoy tomando como ejemplo el index de valuation
+(20:33:53) Rubén Gómez: y aquí usas $form->inputText('currentValuation.secondaryIllness'
+(20:33:55) Rubén Gómez: ...
+(20:34:08) Marcos Cooper: donde $form es
+si
+(20:34:11) Marcos Cooper: un seg
+(20:34:11) Rubén Gómez: currentValuation. a que hacia referencia?
+(20:34:19) Marcos Cooper: te explico lo de 'currentValuation.secondaryIllness'
+(20:34:26) Rubén Gómez: (creo que me lo has explicado antes)
+(20:34:41) Marcos Cooper: te lo explico un poco mejor
+(20:34:45) Rubén Gómez: ok
+(20:35:19) Marcos Cooper: la cadena esta la llamo APE
+(20:35:24) Marcos Cooper: de attribute path expression
+(20:35:47) Marcos Cooper: es una cosa que me he inventado yo asi que no busques por Internet que probablemente no encontrarás nada
+(20:35:48) Marcos Cooper: ^^
+(20:36:04) Rubén Gómez: jaja
+(20:36:14) Marcos Cooper: es la forma que tiene Sketch de referenciar los atributos de una instancia
+(20:36:21) Rubén Gómez: ok, a lo mejor se asocia a tu nombre
+(20:36:47) Marcos Cooper: quizas, pero lo dudo, al menos por el momento
+(20:36:50) Marcos Cooper: cuando lo documente es posible
+(20:36:56) Marcos Cooper: que estoy en ello
+(20:37:06) Marcos Cooper: por cierto, voy a aprovechar esta conversación para la documentación
+(20:37:14) Marcos Cooper: bueno, volviendo al tema
+(20:37:18) Rubén Gómez: por mi perfecto
+(20:37:30) Rubén Gómez: yo me guarda tus conversaciones para documentarme
+(20:37:41) Rubén Gómez: me son muy utiles
+(20:37:47) Marcos Cooper: las reglas del ape son muy simples
+(20:37:53) Marcos Cooper: acepta cosas como
+(20:38:00) Marcos Cooper: atributo
+(20:38:06) Marcos Cooper: atributo[indice]
+(20:38:12) Marcos Cooper: atributo.atributo
+(20:38:21) Marcos Cooper: y derivados
+(20:38:31) Marcos Cooper: por ejemplo, atributo.atributo[indice].atributo
+(20:39:05) Marcos Cooper: lo que hace básicamente es usar esta expresión para encontrar el atributo al que hace referencia el campo
+(20:39:10) Marcos Cooper: por ejemplo en el último caso es
+(20:40:03) Marcos Cooper: $array = $instancia->getAtributo()->getAtributo();
+$array[indice]->getAtributo()
+o
+$array[indice]->setAtributo()
+(20:40:18) Marcos Cooper: indice es un número
+(20:40:28) Rubén Gómez: ok
+(20:41:15) Marcos Cooper: asi que si pones currentValuation.secondaryIllness
+(20:41:31) Marcos Cooper: el atributo que estas usando es secondaryIllness dentro de currentValuation
+(20:42:18) Marcos Cooper: si miras en NutriticPatient verás que hay un atributo currentValuation que se define en setCurrentScreening que a su vez se llama en el constructor
+(20:42:24) Marcos Cooper: este ejemplo es un poco complicado
+(20:42:44) Marcos Cooper: pero básicamente es un atributo anidado
+(20:43:14) Marcos Cooper: referencias un atributo en otro atributo que es una instancia de NutriticPatientValuation
+(20:43:57) Marcos Cooper: esto es porque los pacientes siempre tienen un cribado (screening) actual y su correspondiente valoración en caso de que sea positivo
+(20:44:14) Marcos Cooper: (esto es más una definición de como funcionan los pacientes en Nutritic que de Sketch en general)
+(20:44:33) Marcos Cooper: en el caso de las constantes vitales esto no es necesario
+(20:44:40) Marcos Cooper: ya que sólo es información
+(20:45:01) Marcos Cooper: y no se puede decir que haya una instancia actual, en realidad la información puede ser antigua
+(20:45:18) Marcos Cooper: por lo que yo cambiaría la vista para que no use NutriticPatient com instancia
+(20:45:26) Marcos Cooper: si no NutriticPatientVitalSigns directamente
+(20:45:34) Rubén Gómez: el currentValue vendria ser el estado más actual del campo en cuestion?
+(20:46:01) Marcos Cooper: sólo en términos de Nutritic
+(20:46:05) Marcos Cooper: no es algo general
+(20:46:18) Marcos Cooper: voy a hacer un par de modificaciones en lo que has hecho
+(20:46:24) Marcos Cooper: y creo que lo entenderás mejor
+(20:46:27) Rubén Gómez: ok
+(20:52:30) Rubén Gómez: estoy a la espera de que me indiques...
+(20:52:39) Marcos Cooper: si
+(20:52:42) Marcos Cooper: un seg que lo pruebo
+(20:52:46) Rubén Gómez: ok
+(20:53:53) Marcos Cooper: vale
+(20:53:54) Marcos Cooper: ya esta
+(20:54:05) Rubén Gómez: voy
+(20:54:12) Marcos Cooper: verás que ahora cuando le das a guardar te añade el registro a la base de datos
+(20:54:51) Marcos Cooper: bajate PatientVitalSigns y patient-info.php, vital-signs-add-json.php y vital-signs-graph-json.php
+(20:54:57) Marcos Cooper: (he cambiado un poco los nombres)
+(20:55:10) Marcos Cooper: por cierto este último lo puedes renombrar a view en lugar de graph
+(20:55:26) Marcos Cooper: verás que ahora la instancia es
+$view = new \Nutritic\PatientVitalSigns();
+(20:55:34) Marcos Cooper: en lugar de
+$view = new \Nutritic\Patient();
+(20:55:49) Marcos Cooper: y que le estoy pasando como parámetro el paciente
+$view->setPatientId($this->getRequest()->getAttribute('patient_id'));
+(20:55:57) Marcos Cooper: el resto es automático
+(20:56:07) Marcos Cooper: metes algo en patientCondition
+(20:56:17) Marcos Cooper: y le dices que cuando pulses el boton ejecute la acción updateAction
+(20:57:26) Rubén Gómez: un min que no veo vital-signd-add-jsot,php
+(20:57:58) Rubén Gómez: perdon (que mal escribo) vital-signs-vital-json.php
+(20:58:07) Marcos Cooper: he borrado los archivos antiguos que todavía estaban en gmade
+(20:58:35) Marcos Cooper: (ahora vuelvo)
+(20:59:03) Rubén Gómez: ok
+(20:59:04) Rubén Gómez: ya lo veo
+(21:02:24) Marcos Cooper: ya estoy de vuelta
+(21:02:40) Rubén Gómez: ya veo los cambios
+(21:02:50) Marcos Cooper: alguna pregunta?
+(21:04:06) Rubén Gómez: a partir de aqui crear el formulario y probar que se insertan registros
+(21:04:36) Marcos Cooper: si
+(21:04:45) Rubén Gómez: el formato del calendario es el de selector?
+(21:04:57) Marcos Cooper: si, por el momento
+(21:04:58) Rubén Gómez: en la plantilla sale la imagen de calendario
+(21:05:07) Rubén Gómez: uso el selector?
+(21:05:15) Marcos Cooper: si, es el único que hay en esta versión de Sketch
+(21:05:21) Marcos Cooper: usa ese por el momento
+(21:05:27) Rubén Gómez: ok
+(21:05:38) Marcos Cooper: ya los cambiaré yo todos más adelante
+(21:05:44) Rubén Gómez: pues nada
+(21:05:51) Rubén Gómez: voy a crear el fomulario
+(21:05:57) Rubén Gómez: y a ver si termino esta tarea ya
+(21:06:10) Rubén Gómez: supongo que las próximas irás más rápidas
+(21:06:16) Rubén Gómez: ya tengo una como referencia
+(21:06:19) Marcos Cooper: si
+(21:06:33) Rubén Gómez: ok
+(21:06:36) Marcos Cooper: ve preguntando lo que necesites
+(21:06:42) Rubén Gómez: ok
+(21:06:46) Rubén Gómez: gracias Marcos
+(21:07:20) Rubén Gómez: lo que hay en gmade se puede quedar?
+(21:07:31) Rubén Gómez: yo voy  a trabajar localmente
+(21:10:14) Marcos Cooper: mejor dejalo como estaba antes
+(21:10:30) Rubén Gómez: ok
+(22:00:48) Rubén Gómez: Marcos, hasta mañana
+(22:01:11) Marcos Cooper: hasta mañana

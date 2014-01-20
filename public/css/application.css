@@ -1,0 +1,88 @@
+.header {
+    margin-bottom: 20px;
+}
+
+h1 {
+    font-family: "ff-enzo-web", sans-serif;
+    font-weight: 600;
+    font-size: 50px;
+    line-height: 50px;
+}
+
+h2 {
+    font-family: "ff-enzo-web", sans-serif;
+    font-weight: 600;
+    font-size: 32px;
+    line-height: 32px;
+}
+
+.lead {
+    font-family: "nimbus-sans", sans-serif;
+    font-weight: 300;
+}
+
+.navbar-inner {
+    position: relative;
+}
+
+.navbar-inner .by-releasepad {
+    text-decoration: none;
+    display: block;
+    position: absolute;
+    right: 20px;
+    top: 0;
+    font-size: 14px;
+    color: #777;
+    text-shadow: 0 1px 0 white;
+}
+
+.navbar-inner .by-releasepad .by {
+    display: block;
+    float: left;
+    padding: 10px 3px 10px;
+}
+
+.navbar-inner .by-releasepad .release {
+    display: block;
+    float: left;
+    padding: 10px 1px 10px 3px;
+}
+
+.navbar-inner .by-releasepad .pad {
+    display: block;
+    float: left;
+    padding: 10px 3px 10px 1px;
+}
+
+.task a {
+    color: #333;
+    text-decoration: none;
+}
+
+.task .task-time,
+.task .task-time-today {
+    width: 15%;
+    text-align: center;
+}
+
+/* Large desktop */
+@media (min-width: 1200px) {
+}
+
+/* Portrait tablet to landscape and desktop */
+@media (min-width: 768px) and (max-width: 979px) {
+
+}
+
+/* Landscape phone to portrait tablet */
+@media (max-width: 767px) {
+    .navbar-inner .nav {
+        float: none;
+        clear: both;
+    }
+}
+
+/* Landscape phones and down */
+@media (max-width: 480px) {
+
+}
