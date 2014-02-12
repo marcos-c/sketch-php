@@ -33,7 +33,7 @@ class SketchFormComponentSelectMultiple extends SketchFormComponent {
     function javascript() {
         $form_name = $this->getForm()->getFormName();
         ob_start(); ?>
-        <?=$form_name?>Stack("<?=$form_name?>SelectMultipleSubmit()");var <?=$form_name?>SelectMultipleArray=new Array();function <?=$form_name?>SelectMultipleSubmit(){for(var b=0;b<<?=$form_name?>SelectMultipleArray.length;b++){select=document.getElementById(<?=$form_name?>SelectMultipleArray[b]);for(var a=0;a<select.options.length;a++){select.options[a].selected=true}}}function <?=$form_name?>SelectMultipleMove(e,d,b){var e=document.getElementById(e);var d=document.getElementById(d);var c=new Array();if(e.options.length>0){for(var a=0;a<d.options.length;a++){c[c.length]=new Option(d.options[a].text,d.options[a].value)}var a=0;do{if(e.options[a].selected){c[c.length]=new Option(e.options[a].text,e.options[a].value,e.options[a].defaultSelected,e.options[a].selected);e.options[e.selectedIndex]=null}else{a++}}while(a<e.options.length);if(b){c.sort(function(g,f){if((g.text+"")<(f.text+"")){return -1}if((g.text+"")>(f.text+"")){return 1}return 0})}for(var a=0;a<c.length;a++){d.options[a]=new Option(c[a].text,c[a].value,c[a].defaultSelected,c[a].selected)}}}function <?=$form_name?>SelectMultipleSortUp(a){var a=document.getElementById(a);var f=a.options;var d=-1;for(var b=0;b<a.options.length;b++){j=b-1;if(f[b].selected){if(j>d){var e=new Option(f[b].text,f[b].value,f[b].defaultSelected,f[b].selected);var c=new Option(f[j].text,f[j].value,f[j].defaultSelected,f[j].selected);f[b]=c;f[j]=e}else{d=b}}}}function <?=$form_name?>SelectMultipleSortDown(a){var a=document.getElementById(a);var f=a.options;var d=f.length;for(var b=(f.length-1);b>-1;b=b-1){j=b+1;if(f[b].selected){if(j<d){var e=new Option(f[b].text,f[b].value,f[b].defaultSelected,f[b].selected);var c=new Option(f[j].text,f[j].value,f[j].defaultSelected,f[j].selected);f[b]=c;f[j]=e}else{d=b}}}};
+        <?=$form_name?>Stack("<?=$form_name?>SelectMultipleSubmit()");var <?=$form_name?>SelectMultipleArray=new Array();function <?=$form_name?>SelectMultipleSubmit(){for(var b=0;b<<?=$form_name?>SelectMultipleArray.length;b++){select=document.getElementById(<?=$form_name?>SelectMultipleArray[b]);for(var a=0;a<select.options.length;a++){select.options[a].selected=true}}}function <?=$form_name?>SelectMultipleMove(e,d,b){$(document.getElementById(e)).find('option:selected').appendTo(document.getElementById(d));}function <?=$form_name?>SelectMultipleSortUp(a){var a=document.getElementById(a);var f=a.options;var d=-1;for(var b=0;b<a.options.length;b++){j=b-1;if(f[b].selected){if(j>d){var e=new Option(f[b].text,f[b].value,f[b].defaultSelected,f[b].selected);var c=new Option(f[j].text,f[j].value,f[j].defaultSelected,f[j].selected);f[b]=c;f[j]=e}else{d=b}}}}function <?=$form_name?>SelectMultipleSortDown(a){var a=document.getElementById(a);var f=a.options;var d=f.length;for(var b=(f.length-1);b>-1;b=b-1){j=b+1;if(f[b].selected){if(j<d){var e=new Option(f[b].text,f[b].value,f[b].defaultSelected,f[b].selected);var c=new Option(f[j].text,f[j].value,f[j].defaultSelected,f[j].selected);f[b]=c;f[j]=e}else{d=b}}}};
         <?php return ob_get_clean();
     }
 
@@ -65,18 +65,25 @@ class SketchFormComponentSelectMultiple extends SketchFormComponent {
             foreach ($options as $object) {
                 $key = $object->getId();
                 $value = method_exists($object, '__toString') ? $object->__toString() : (method_exists($object, 'getDefaultDescription') ? $object->getDefaultDescription() : $object->getDescription());
+                $value_styles = method_exists($object, '__toStringStyles') ? $object->__toStringStyles() : '';
                 if (is_array($field_value) && in_array($key, $field_value)) {
-                    $to[array_search($key, $field_value)] = '<option value="'.htmlspecialchars($key).'" selected="selected" class="select-option selected">'.htmlspecialchars($value).'</option>';
+                    $to[array_search($key, $field_value)] = '<option value="'.htmlspecialchars($key).'" selected="selected" class="'.$value_styles.' select-option selected">'.htmlspecialchars($value).'</option>';
                 } else {
-                    $from[] = '<option value="'.htmlspecialchars($key).'" class="select-option">'.htmlspecialchars($value).'</option>';
+                    $from[] = '<option value="'.htmlspecialchars($key).'" class="'.$value_styles.' select-option">'.htmlspecialchars($value).'</option>';
                 }
             }
         } elseif (is_array($options)) {
-            foreach ($options as $key => $value) {
-                if (is_array($field_value) && in_array($key, $field_value)) {
-                    $to[array_search($key, $field_value)] = '<option value="'.htmlspecialchars($key).'" selected="selected" class="select-option selected">'.htmlspecialchars($value).'</option>';
+            foreach ($options as $key => $object) {
+                if (is_object($object)) {
+                    $value = method_exists($object, '__toString') ? $object->__toString() : (method_exists($object, 'getDefaultDescription') ? $object->getDefaultDescription() : $object->getDescription());
+                    $value_styles = method_exists($object, '__toStringStyles') ? $object->__toStringStyles() : '';
                 } else {
-                    $from[] = '<option value="'.htmlspecialchars($key).'" class="select-option">'.htmlspecialchars($value).'</option>';
+                    $value = $object;
+                }
+                if (is_array($field_value) && in_array($key, $field_value)) {
+                    $to[array_search($key, $field_value)] = '<option value="'.htmlspecialchars($key).'" selected="selected" class="'.$value_styles.' select-option">'.htmlspecialchars($value).'</option>';
+                } else {
+                    $from[] = '<option value="'.htmlspecialchars($key).'" class="'.$value_styles.' select-option">'.htmlspecialchars($value).'</option>';
                 }
             }
         }
