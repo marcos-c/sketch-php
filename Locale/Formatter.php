@@ -80,6 +80,37 @@ class SketchLocaleFormatter extends SketchObject {
 
     /**
      *
+     * @param string $string
+     * @return string
+     */
+    function formatMarkitUpText($text) {
+        $allowed = array('strong', 'em', 'del', 'ul', 'ol', 'li', 'img', 'a');
+        $i = 0;
+        $search = array();
+        $replace = array();
+        preg_match_all("/<([\w]+)[^>]*>.*?<\/\\1>/is", $text, $matches, PREG_SET_ORDER);
+        foreach ($matches as $value) {
+            if (in_array($value[1], $allowed)) {
+                $search[$i] = '{'.md5($value[0]).'}';
+                $replace[$i] = $value[0];
+                $text = str_replace($replace[$i], $search[$i], $text);
+                $i++;
+            }
+        }
+        preg_match_all("/<([\w]+)[^>]*>/is", $text, $matches, PREG_SET_ORDER);
+        foreach ($matches as $value) {
+            if (in_array($value[1], $allowed)) {
+                $search[$i] = '{'.md5($value[0]).'}';
+                $replace[$i] = $value[0];
+                $text = str_replace($replace[$i], $search[$i], $text);
+                $i++;
+            }
+        }
+        return str_replace($search, $replace, nl2br($this->escapeString($text)));
+    }
+
+    /**
+     *
      * @param float $number
      * @return string
      */

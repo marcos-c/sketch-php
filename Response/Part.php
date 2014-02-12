@@ -296,6 +296,15 @@ class SketchResponsePart extends SketchObject {
 
     /**
      *
+     * @param string $text
+     * @return string
+     */
+    function formatMarkItUpText($text) {
+        return $this->getFormatter()->formatMarkItUpText($text);
+    }
+
+    /**
+     *
      * @param float $number
      * @return string
      */
