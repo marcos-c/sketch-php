@@ -83,7 +83,7 @@ class SketchResourceFolder extends SketchResource {
         $this->geometry = null;
         if ($parent_id = $this->getParentId()) {
             $table = $this->getName();
-            foreach ($connection->executeQuery("SELECT * FROM $table WHERE parent_id = $parent_id") as $current) {
+            foreach ($connection->executeQuery("SELECT * FROM $table WHERE parent_id = $parent_id ORDER BY source_file_name") as $current) {
                 $this->descriptors[$current['reference']] = new SketchResourceFolderDescriptor($current);
             }
         }
@@ -193,7 +193,7 @@ class SketchResourceFolder extends SketchResource {
         }
     }
 
-    function exportDescriptor($reference) {
+    function exportDescriptor($reference, $force_download = false) {
         ob_end_clean();
         $descriptor = $this->getDescriptor($reference);
         $file = $this->getDocumentRoot().$descriptor->getFileName();
@@ -204,7 +204,11 @@ class SketchResourceFolder extends SketchResource {
         header('Last-Modified: '.gmdate ('D, d M Y H:i:s', filemtime($file)).' GMT');
         header('Cache-Control: private', false);
         header('Content-Type: '.$descriptor->getFileType());
-        header('Content-Disposition: attachment; filename="'.$descriptor->getSourceFileName().'"');
+        if ($descriptor->isImage() && !$force_download) {
+            header('Content-Disposition: inline; filename="'.$descriptor->getSourceFileName().'"');
+        } else {
+            header('Content-Disposition: attachment; filename="'.$descriptor->getSourceFileName().'"');
+        }
         header('Content-Transfer-Encoding: binary');
         header('Content-Length: '.filesize($file));
         header('Connection: close');
@@ -268,6 +272,19 @@ class SketchResourceFolder extends SketchResource {
                 $application->addNotice(new SketchApplicationNotice(sprintf($this->getTranslator()->_("Descriptor <b>%s</b> (%s) couldn't be added to folder"), $descriptor->getReference(), $descriptor->getFileType())));
             }
         }
+    }
+
+    /**
+     *
+     * @param SketchResourceFolderDescriptor $descriptor
+     * @return boolean
+     */
+    function updateDescriptor(SketchResourceFolderDescriptor $descriptor) {
+        $connection = $this->getConnection();
+        $table_name = $this->getName();
+        $reference = $connection->escapeString($descriptor->getReference());
+        $caption = $connection->escapeString($descriptor->getCaption());
+        return $connection->executeUpdate("UPDATE $table_name SET caption = '$caption' WHERE reference = '$reference'");
     }
 
     /**
