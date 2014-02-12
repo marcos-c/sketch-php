@@ -61,6 +61,22 @@ class SketchDateTime extends SketchObject {
 
     /**
      *
+     * @return array
+     */
+    static function getTimeZoneIdentifiers() {
+        $time_zones = array();
+        foreach (timezone_identifiers_list() as $s) {
+            $r = explode('/', $s);
+            if (in_array($r[0], array('GMT', 'Africa', 'America', 'Antarctica', 'Arctic', 'Asia', 'Atlantic', 'Australia', 'Europe', 'Indian', 'Pacific'))) {
+                $time_zones[$s] = $s;
+            }
+        }
+        ksort($time_zones);
+        return $time_zones;
+    }
+
+    /**
+     *
      * @param mixed $date_time
      */
     function __construct($date_time = null) {

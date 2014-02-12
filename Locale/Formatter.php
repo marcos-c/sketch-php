@@ -101,6 +101,22 @@ class SketchLocaleFormatter extends SketchObject {
     }
 
     /**
+     * 
+     * @param SketchDateTime $date
+     * @param string $time_zone
+     * @return string
+     */
+    function formatDateWithTimeZone(SketchDateTime $date, $time_zone) {
+        $t = new DateTime($date->toString('Y-m-d'), new DateTimeZone('GMT'));
+        try {
+            $t->setTimeZone(new DateTimeZone($time_zone));
+        } catch (Exception $e) {
+            $t->setTimeZone(new DateTimeZone('GMT'));
+        }
+        return $t->format('d/m/Y');
+    }
+
+    /**
      *
      * @param SketchDateTime $date
      * @return string
@@ -116,5 +132,21 @@ class SketchLocaleFormatter extends SketchObject {
      */
     function formatDateAndTime(SketchDateTime $date) {
         return $date->toString('d/m/Y H:i');
+    }
+
+    /**
+     *
+     * @param SketchDateTime $date
+     * @param string $time_zone
+     * @return string
+     */
+    function formatDateAndTimeWithTimeZone(SketchDateTime $date, $time_zone) {
+        $t = new DateTime($date->toString('Y-m-d H:i'), new DateTimeZone('GMT'));
+        try {
+            $t->setTimeZone(new DateTimeZone($time_zone));
+        } catch (Exception $e) {
+            $t->setTimeZone(new DateTimeZone('GMT'));
+        }
+        return $t->format('d/m/Y H:i');
     }
 }
