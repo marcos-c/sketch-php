@@ -331,7 +331,7 @@ class SketchFormView extends SketchObject {
         $path = $this->decodeAttributePathExpression($ape);
         $instance = $this->instance;
         foreach ($path as $attribute) {
-            if (preg_match('/(\w+)\[([\w-]+)\]/i', $attribute, $matches)) {
+            if (preg_match('/(\w+)\[([\w-|]+)\]/i', $attribute, $matches)) {
                 $attribute = $matches[1];
                 $key = $matches[2];
             } else {
@@ -354,18 +354,20 @@ class SketchFormView extends SketchObject {
         if ($value instanceof SketchResourceFolderDescriptor && method_exists($instance, "addDescriptor")) {
             // addDescriptor has to be called after the command is executed
         } else {
-            if (preg_match('/(\w+)\[([\w-]+)\]/i', $set, $matches)) {
+            if (preg_match('/(\w+)\[([\w-|]+)\]/i', $set, $matches)) {
                 $set = $matches[1];
                 $tmp = $this->getFieldValue(implode('.', array_merge($path, array($set))));
                 $tmp[$matches[2]] = $value;
                 $value = $tmp;
             }
-            if (method_exists($instance, "set${set}")) {
-                eval('$instance->set'.$set.'($value);');
-                // Make sure that we have the same value inside form attributes
-                $this->form['attributes'][base64_encode($ape)] = $value;
-            } else {
-                throw new Exception(sprintf("Can't set %1\$s field for %2\$s", $set, get_class($instance)));
+            if ($instance instanceof SketchObjectView) {
+                if (method_exists($instance, "set${set}")) {
+                    eval('$instance->set'.$set.'($value);');
+                    // Make sure that we have the same value inside form attributes
+                    $this->form['attributes'][base64_encode($ape)] = $value;
+                } else {
+                    throw new Exception(sprintf("Can't set %1\$s field for %2\$s", $set, get_class($instance)));
+                }
             }
         }
     }
@@ -425,7 +427,7 @@ class SketchFormView extends SketchObject {
 
     function commandButton($command, $location = null, $label = null, $parameters = null) {
         $label = ($label != null) ? $label : $command;
-        return '<span><input type="button" value="'.$label.'" onclick="return '.$this->command($command, $location).'" '.trim(!strpos(" $parameters", 'class="') ? "$parameters class=\"command-button\"" : $parameters).' /></span>';
+        return '<span><button type="button" onclick="return '.$this->command($command, $location).'" '.trim(!strpos(" $parameters", 'class="') ? "$parameters class=\"command-button\"" : $parameters).'>'.$label.'</button></span>';
     }
 
     function commandLink($command, $location = null, $label = null, $parameters = null) {
