@@ -2,12 +2,12 @@
 <context name="tests" locale="es" layer="development">
     <layer name="development,production">
         <!-- Locale -->
-        <driver type="SketchLocaleTranslatorDriver" class="GetTextLocaleTranslatorDriver">
+        <driver type="Sketch\Locale\Translator\Driver" class="GetTextLocaleTranslatorDriver">
             <folder>/locale</folder>
             <domain>default</domain>
         </driver>
         <!-- Sketch Response Filter Extension -->
-        <extension type="SketchResponseFilter" class="Sketch\ResponseFilterLayout">
+        <extension type="Sketch\Response\Filter\Filter" class="Sketch\Response\Filter\TemplateFilter">
             <layout for="C:">tests</layout>
         </extension>
         <parameters for="library" name="Application.php">
@@ -24,12 +24,12 @@
             <user>root</user>
             <password>570tnky1</password>
         </driver> -->
-        <extension type="SketchResponseFilter" class="Sketch\ResponseFilterFirebug">
+        <extension type="Sketch\Response\Filter\Filter" class="Sketch\Response\Filter\FirebugFilter">
             <debug-level>3</debug-level>
         </extension>
     </layer>
     <layer name="production">
-        <driver type="ResourceConnectionDriver" class="Sketch\ResourceConnectionDriverMySQL">
+        <driver type="Sketch\Response\Filter\Filter" class="Sketch\Resource\Connection\Driver\MySQLDriver">
             <table-prefix>gbook</table-prefix>
             <host>127.0.0.1</host>
             <database>gbook</database>
