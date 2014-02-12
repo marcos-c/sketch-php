@@ -456,6 +456,22 @@ class FormView extends Object {
         return false;
     }
 
+    /**
+     * @param $attribute
+     * @return array
+     */
+    function getAllFieldNotices($attribute) {
+        $output = array();
+        foreach ($this->getApplication()->getNotices(false) as $notice) {
+            if ($notice instanceof FormNotice) {
+                if ($this->getFieldName($attribute) == $notice->getFieldName()) {
+                    $output[] = $notice;
+                }
+            }
+        }
+        return $output;
+    }
+
     function openForm($parameters = null) {
         $this->javascript = true;
         $form_name = $this->getFormName();
@@ -503,6 +519,12 @@ class FormView extends Object {
         $label = ($label != null) ? $label : $command;
         $action = $this->getAction();
         return '<a href="'.$action.'" onclick="return '.$this->command($command, $location).'" '.trim(!strpos(" $parameters", 'class="') ? "$parameters class=\"command-link\"" : $parameters).'>'.$label.'</a>';
+    }
+
+    function commandLinkWithLoading($command, $location = null, $label = null, $parameters = null) {
+        $label = ($label != null) ? $label : $command;
+        $action = $this->getAction();
+        return '<a href="'.$action.'" onclick="$(this).addClass(\'btn-loading\'); return '.$this->command($command, $location).'" '.trim(!strpos(" $parameters", 'class="') ? "$parameters class=\"command-link\"" : $parameters).'>'.$label.'</a>';
     }
 
     function commandLinkWithConfirmation($command, $location = null, $label = null, $confirmation_message = null, $parameters = null) {
