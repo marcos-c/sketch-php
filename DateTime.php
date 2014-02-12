@@ -95,6 +95,8 @@ class SketchDateTime extends SketchObject {
                     $date_time = sprintf('%04d-%02d-%02d 00:00:00', intval(substr($date_time['year_month'], 0, 4)), intval(substr($date_time['year_month'], 4)), $date_time['day']);
                 } else if (array_key_exists('hour', $date_time) && array_key_exists('minute', $date_time)) {
                     $date_time = sprintf('1970-01-01 %02d:%02d', $date_time['hour'], $date_time['minute']);
+                } else {
+                    throw new SketchDateTimeException(print_r($date_time, true));
                 }
             } else if (preg_match('/^\d+$/', $date_time)) {
                 $date_time = date('Y-m-d H:i:s', $date_time);
