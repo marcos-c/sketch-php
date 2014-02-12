@@ -49,7 +49,7 @@ class Session extends Object {
         session_set_cookie_params(self::SESSION_LIFETIME);
         session_cache_expire(self::SESSION_LIFETIME / 60);
         session_cache_limiter('nocache');
-        $drivers = $this->getContext()->query("//driver[@type='SketchSessionSaveHandler']");
+        $drivers = $this->getContext()->query("//driver[@type='SessionSaveHandler']");
         foreach ($drivers as $driver) {
             $class = $driver->getAttribute('class');
             if (class_exists($class)) {

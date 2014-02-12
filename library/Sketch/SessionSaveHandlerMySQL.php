@@ -54,7 +54,7 @@ class SessionSaveHandlerMySQL extends Object {
     static function open($save_path, $session_name) {
         self::$savePath = $save_path;
         self::$sessionName = $session_name;
-        $driver = Application::getInstance()->getContext()->queryFirst("//driver[@type='SketchConnectionDriver']");
+        $driver = Application::getInstance()->getContext()->queryFirst("//driver[@type='ResourceConnectionDriver']");
         self::$prefix = $driver->queryCharacterData('//table-prefix');
         $host = $driver->queryCharacterData('//host', 'localhost');
         $user = $driver->queryCharacterData('//user');
@@ -83,7 +83,8 @@ class SessionSaveHandlerMySQL extends Object {
         $id = "'".mysql_real_escape_string($id, self::$connection)."'";
         $save_path = "'".mysql_real_escape_string(self::$savePath, self::$connection)."'";
         $session_name = "'".mysql_real_escape_string(self::$sessionName, self::$connection)."'";
-        $q = mysql_query("SELECT data FROM gbook_session WHERE id = $id AND save_path = $save_path AND session_name = $session_name", self::$connection);
+        $prefix = mysql_real_escape_string(self::$prefix, self::$connection);
+        $q = mysql_query("SELECT data FROM ${prefix}_session WHERE id = $id AND save_path = $save_path AND session_name = $session_name", self::$connection);
         $r = mysql_fetch_array($q, MYSQL_ASSOC);
         return (string) $r['data'];
     }
@@ -93,7 +94,10 @@ class SessionSaveHandlerMySQL extends Object {
         $data = "'".mysql_real_escape_string($data, self::$connection)."'";
         $save_path = "'".mysql_real_escape_string(self::$savePath, self::$connection)."'";
         $session_name = "'".mysql_real_escape_string(self::$sessionName, self::$connection)."'";
-        mysql_query("REPLACE INTO gbook_session (id, data, save_path, session_name) VALUES ($id, $data, $save_path, $session_name)", self::$connection);
+        $prefix = mysql_real_escape_string(self::$prefix, self::$connection);
+        $user_id = intval(Application::getInstance()->getSession()->getACL()->getAttribute('user_id'));
+        if ($user_id == 0) $user_id = 'NULL';
+        mysql_query("INSERT INTO ${prefix}_session (id, user_id, data, save_path, session_name) VALUES ($id, $user_id, $data, $save_path, $session_name) ON DUPLICATE KEY UPDATE user_id = $user_id, data = $data", self::$connection);
         return true;
     }
 
@@ -101,14 +105,16 @@ class SessionSaveHandlerMySQL extends Object {
         $id = "'".mysql_real_escape_string($id, self::$connection)."'";
         $save_path = "'".mysql_real_escape_string(self::$savePath, self::$connection)."'";
         $session_name = "'".mysql_real_escape_string(self::$sessionName, self::$connection)."'";
-        mysql_query("DELETE FROM gbook_session WHERE id = $id AND save_path = $save_path AND session_name = $session_name", self::$connection);
+        $prefix = mysql_real_escape_string(self::$prefix, self::$connection);
+        mysql_query("DELETE FROM ${prefix}_session WHERE id = $id AND save_path = $save_path AND session_name = $session_name", self::$connection);
         return true;
     }
 
     static function gc() {
         $save_path = "'".mysql_real_escape_string(self::$savePath, self::$connection)."'";
         $session_name = "'".mysql_real_escape_string(self::$sessionName, self::$connection)."'";
-        mysql_query("DELETE FROM gbook_session WHERE save_path = $save_path AND session_name = $session_name AND DATE_ADD(creation_timestamp, INTERVAL ".Session::SESSION_LIFETIME." SECOND) < CURRENT_TIMESTAMP()", self::$connection);
+        $prefix = mysql_real_escape_string(self::$prefix, self::$connection);
+        mysql_query("DELETE FROM ${prefix}_session WHERE save_path = $save_path AND session_name = $session_name AND DATE_ADD(creation_timestamp, INTERVAL ".Session::SESSION_LIFETIME." SECOND) < CURRENT_TIMESTAMP()", self::$connection);
         return true;
     }
 }
