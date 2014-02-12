@@ -3,7 +3,7 @@
  * This file is part of the Sketch Framework
  * (http://code.google.com/p/sketch-framework/)
  *
- * Copyright (C) 2010 Marcos Albaladejo Cooper
+ * Copyright (C) 2011 Marcos Albaladejo Cooper
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -26,41 +26,19 @@ require_once 'Sketch/Object/View.php';
 
 /**
  * SketchObjectList
- *
- * @package Sketch
  */
 abstract class SketchObjectList extends SketchObjectView {
-    /**
-     *
-     * @var string
-     */
+    /** @var string */
     private $orderBy;
 
-    /**
-     *
-     * @var integer
-     */
+    /** @var integer */
     private $limit;
 
-    /**
-     *
-     * @var integer
-     */
+    /** @var integer */
     private $offset;
 
     /**
-     *
-     * @param SketchFormList $form
-     * @param string $parameters
-     * @return boolean
-     */
-    final function orderBy(SketchFormList $form, $parameters) {
-        $connection = $this->getConnection();
-        $this->setOrderBy($connection->escapeString($parameters));
-        return true;
-    }
-
-    /**
+     * Get order by
      *
      * @return string
      */
@@ -72,8 +50,10 @@ abstract class SketchObjectList extends SketchObjectView {
     }
 
     /**
+     * Set order by
      *
-     * @param <type> string
+     * @param $order_by
+     * @return void
      */
     final function setOrderBy($order_by) {
         $this->orderBy = $order_by;
@@ -83,23 +63,10 @@ abstract class SketchObjectList extends SketchObjectView {
     }
 
     /**
+     * Set default order by
      *
-     * @param SketchFormView $form
-     * @param mixed $parameters
-     * @return boolean
-     */
-    final function setOrderByAction(SketchFormView $form, $parameters = null) {
-        if (is_array($parameters)) {
-            if (array_key_exists('order_by', $parameters)) {
-                $form->setFieldValue('orderBy', $parameters['order_by']);
-            }
-        }
-        return true;
-    }
-
-    /**
-     *
-     * @param string $order_by
+     * @param $order_by
+     * @return void
      */
     final function setDefaultOrderBy($order_by) {
         if ($this->getOrderBy() == null) {
@@ -107,11 +74,41 @@ abstract class SketchObjectList extends SketchObjectView {
         }
     }
 
+    /**
+     * Set order by action
+     *
+     * @param SketchFormView $form
+     * @param null|array $parameters
+     * @return bool
+     */
+    final function setOrderByAction(SketchFormView $form, $parameters = null) {
+        $connection = $this->getConnection();
+        if (is_array($parameters) && array_key_exists('order_by', $parameters)) {
+            $form->setFieldValue('orderBy', $connection->escapeString($parameters['order_by']));
+        } elseif (is_string($parameters)) {
+            $form->setFieldValue('orderBy', $connection->escapeString($parameters));
+        }
+        return true;
+    }
+
+    /**
+     * Shorter alias for set order by action
+     *
+     * @param SketchFormList $form
+     * @param $parameters
+     * @return bool
+     */
+    final function orderBy(SketchFormList $form, $parameters) {
+        return $this->setOrderByAction($form, $parameters);
+    }
+
     abstract function getSize();
 
     /**
+     * Get limit
      *
-     * @return integer
+     * @param bool $default
+     * @return bool|int
      */
     final function getLimit($default = false) {
         if ($this->limit == null && $this->getUseSessionObject()) {
@@ -121,8 +118,10 @@ abstract class SketchObjectList extends SketchObjectView {
     }
 
     /**
+     * Set limit
      *
-     * @param integer $limit
+     * @param $limit
+     * @return void
      */
     final function setLimit($limit) {
         $this->limit = $limit;
@@ -140,8 +139,10 @@ abstract class SketchObjectList extends SketchObjectView {
     }
 
     /**
+     * Set default limit
      *
-     * @param integer $limit
+     * @param $limit
+     * @return void
      */
     final function setDefaultLimit($limit) {
         if ($this->getLimit() == 0) {
@@ -150,19 +151,10 @@ abstract class SketchObjectList extends SketchObjectView {
     }
 
     /**
+     * Get offset
      *
-     * @param SketchFormList $form
-     * @param integer $parameters
-     * @return integer
-     */
-    final function offset(SketchFormList $form, $parameters) {
-        $this->setOffset(intval($parameters));
-        return true;
-    }
-
-    /**
-     *
-     * @return integer
+     * @param bool $default
+     * @return bool|int
      */
     final function getOffset($default = false) {
         if ($this->offset == null && $this->getUseSessionObject()) {
@@ -177,8 +169,10 @@ abstract class SketchObjectList extends SketchObjectView {
     }
 
     /**
+     * Set offset
      *
-     * @param integer $offset
+     * @param $offset
+     * @return void
      */
     final function setOffset($offset) {
         $this->offset = $offset;
@@ -188,9 +182,39 @@ abstract class SketchObjectList extends SketchObjectView {
     }
 
     /**
+     * Set offset action
+     *
+     * @param SketchFormList $form
+     * @param $parameters
+     * @return bool
+     */
+    final function setOffsetAction(SketchFormList $form, $parameters) {
+        if (is_array($parameters) && array_key_exists('offset', $parameters)) {
+            $form->setFieldValue('offset', intval($parameters['offset']));
+        } elseif (is_string($parameters)) {
+            $form->setFieldValue('offset', intval($parameters));
+        } elseif (is_int($parameters)) {
+            $form->setFieldValue('offset', $parameters);
+        }
+        return true;
+    }
+
+    /**
+     * Shorter alias for set order by action
+     *
+     * @param SketchFormList $form
+     * @param $parameters
+     * @return bool
+     */
+    final function offset(SketchFormList $form, $parameters) {
+        return $this->setOffsetAction($form, $parameters);
+    }
+
+    /**
+     * Clear offset action
      *
      * @param SketchFormView $form
-     * @return boolean
+     * @return bool
      */
     final function clearOffsetAction(SketchFormView $form) {
         $form->setFieldValue('offset', 0);
