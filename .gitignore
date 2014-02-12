@@ -4,3 +4,4 @@ public/api
 vendor
 composer.phar
 composer.lock
+phpunit.phar
