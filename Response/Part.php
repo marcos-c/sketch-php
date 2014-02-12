@@ -239,7 +239,7 @@ class SketchResponsePart extends SketchObject {
                 ob_get_clean();
                 throw $e;
             }
-        } else throw new Exception();
+        } else throw new Exception($file_name);
     }
 
     /**
