@@ -36,11 +36,15 @@ class SketchFormList extends SketchFormView {
     }
 
     function getPager($size, $parameters = null) {
-        $form_name = $this->getFormName();
         $limit = $this->getInstance()->getLimit();
         $current_offset = $this->getInstance()->getOffset();
-        $last_page = ceil($size / $limit);
-        $current_page = intval($current_offset / $limit) + 1;
+        if ($limit > 0) {
+            $last_page = ceil($size / $limit);
+            $current_page = intval($current_offset / $limit) + 1;
+        } else {
+            $last_page = 1;
+            $current_page = 1;
+        }
         if ($current_page > 5 && $current_page < ($last_page - 5)) {
             $from = $current_page - 5;
             $to = $current_page + 5;
@@ -53,11 +57,8 @@ class SketchFormList extends SketchFormView {
         }
         $translator = $this->getTranslator();
         $parameters = $this->extend(array(
-            'show-first' => false,
-            'show-previous' => true,
-            'show-next' => true,
-            'show-last' => false,
-            'show-size' => false,
+            'show' => 'first,previous,pages,of_pages,next,last,page_size',
+            'page_size_label' => $translator->_('showing %s per page'),
             'first-label' => $translator->_('First'),
             'previous-label' => $translator->_('Previous'),
             'next-label' => $translator->_('Next'),
@@ -70,16 +71,34 @@ class SketchFormList extends SketchFormView {
             'last' => array('id' => null, 'class' => 'last', 'style' => null),
             'size' => array('id' => null, 'class' => 'size', 'style' => null)
         ), $parameters);
-        $first = ($parameters['show-first'] && $from > 1) ? '<li'.$parameters['first'].'>'.$this->commandLink(new SketchFormCommand('offset', 0), null, $parameters['first-label']).'</li>' : '';
-        $previous = ($parameters['show-previous'] && $current_page > 1) ? '<li'.$parameters['previous'].'>'.$this->commandLink(new SketchFormCommand('offset', $current_offset - $limit), null, $parameters['previous-label']).'</li>' : '';
-        $size = ($parameters['show-size']) ? "<li".$parameters['size']."\">of $last_page</li>" : '';
-        $next = ($parameters['show-next'] !== false && $current_page < $last_page) ? '<li'.$parameters['next'].'>'.$this->commandLink(new SketchFormCommand('offset', $current_offset + $limit), null, $parameters['next-label']).'</li>' : '';
-        $last = ($parameters['show-last'] && $last_page > 10 && $current_page < ($last_page - 5)) ? '<li'.$parameters['last'].'>'.$this->commandLink(new SketchFormCommand('offset', ($last_page - 1) * $limit), null, $parameters['last-label']).'</li>' : '';
-        $o = array();
+        $show = array_map('trim', explode(',', $parameters['show']));
+        $current = in_array('current', $show) ? '<li>'.intval($current_offset + 1).' - '.(($current_page == $last_page) ? $size : intval($current_offset + $limit)).'</li>' : '';
+        $of_rows = in_array('of_rows', $show) ? '<li'.$parameters['rows'].'>'.sprintf($translator->_('of %s'), $size).'</li>' : '';
+        $pages = array();
         for ($i = $from; $i <= $to; $i++) {
-            $o[] = (($offset = ($i - 1) * $limit) == $current_offset) ? '<li'.$parameters['selected'].'>'.$i.'</li>' : '<li>'.$this->commandLink(new SketchFormCommand('offset', $offset), null, $i).'</li>';
+            $pages[] = (($offset = ($i - 1) * $limit) == $current_offset) ? '<li'.$parameters['selected'].'>'.$i.'</li>' : '<li>'.$this->commandLink(new SketchFormCommand('offset', $offset), null, '<span>'.$i.'</span>').'</li>';
         }
-        return '<ul'.$parameters['pager'].'>'.trim(implode(' ', array('first' => $first, 'previous' => $previous) + $o + array('size' => $size, 'next' => $next, 'last' => $last))).'</ul>';
+        $of_pages = (in_array('of_pages', $show)) ? "<li".$parameters['size']."\">of $last_page</li>" : '';
+        $first = (in_array('first', $show) && $from > 1) ? '<li'.$parameters['first'].'>'.$this->commandLink(new SketchFormCommand('offset', 0), null, $parameters['first-label']).'</li>' : '';
+        $previous = (in_array('previous', $show) && $current_page > 1) ? '<li'.$parameters['previous'].'>'.$this->commandLink(new SketchFormCommand('offset', $current_offset - $limit), null, $parameters['previous-label']).'</li>' : '';
+        $next = (in_array('next', $show) !== false && $current_page < $last_page) ? '<li'.$parameters['next'].'>'.$this->commandLink(new SketchFormCommand('offset', $current_offset + $limit), null, $parameters['next-label']).'</li>' : '';
+        $last = (in_array('last', $show) && $last_page > 10 && $current_page < ($last_page - 5)) ? '<li'.$parameters['last'].'>'.$this->commandLink(new SketchFormCommand('offset', ($last_page - 1) * $limit), null, $parameters['last-label']).'</li>' : '';
+        $page_size = (in_array('page_size', $show) && $size > 10) ? '<li'.$parameters['page_size'].'>'.sprintf($parameters['page_size_label'], $this->selectOne(array(10 => 10, 25 => 25, 50 => 50), 'limit', 'onchange="'.$this->command(new SketchFormCommandPropagate(), null).'"')).'</li>' : '';
+        $output = array();
+        foreach ($show as $key) {
+            switch ($key) {
+                case 'current': $output[$key] = $current; break;
+                case 'of_rows': $output[$key] = $of_rows; break;
+                case 'pages': $output[$key] = implode(' ', $pages); break;
+                case 'of_pages': $output[$key] = $of_pages; break;
+                case 'first': $output[$key] = $first; break;
+                case 'previous': $output[$key] = $previous; break;
+                case 'next': $output[$key] = $next; break;
+                case 'last': $output[$key] = $last; break;
+                case 'page_size': $output[$key] = $page_size; break;
+            }
+        }
+        return '<ul'.$parameters['pager'].'>'.trim(implode(' ', $output)).'</ul>';
     }
 
     function getLimitedPager() {
