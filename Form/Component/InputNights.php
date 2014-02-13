@@ -38,10 +38,10 @@ class SketchFormComponentInputNights extends SketchFormComponent {
             'disabled' => false,
             'from_attribute' => null,
             'to_attribute' => null,
+            'limit' => null,
             'span' => array('id' => null, 'class' => 'input-date', 'style' => null),
             'input-nights' => array('id' => null, 'class' => 'input-nights', 'style' => null)
         ), array_shift($arguments));
-        $default = array_shift($arguments);
         $form_name = $form->getFormName();
         $from_field_name = $form->getFieldName($parameters['from_attribute']);
         $from_calendar_field_id = md5($form->getFieldName($parameters['from_attribute']));
@@ -49,6 +49,14 @@ class SketchFormComponentInputNights extends SketchFormComponent {
         $to_calendar_field_id = md5($form->getFieldName($parameters['to_attribute']));
         $nights_field_name = $form->getFieldName($attribute);
         $nights_field_value = $form->getFieldValue($attribute);
-        return '<span'.$parameters['span'].'><input type="text" id="'.$nights_field_name.'" name="'.$nights_field_name.'" value="'.$nights_field_value.'" onchange="'.$form_name.'OnNightsChange(\''.$from_field_name.'\', \''.$to_field_name.'\', \''.$nights_field_name.'\', \''.$from_calendar_field_id.'\', \''.$to_calendar_field_id.'\')"'.$parameters['input-nights'].' /></span>';
+        if ($parameters['limit'] != null) {
+            $options = array();
+            foreach (array_map('trim', explode(',', $parameters['limit'])) as $step) {
+                $options[$step] = $step;
+            }
+            return $form->selectOne($options, $attribute, 'onchange="'.$form_name.'OnNightsChange(\''.$from_field_name.'\', \''.$to_field_name.'\', \''.$nights_field_name.'\', \''.$from_calendar_field_id.'\', \''.$to_calendar_field_id.'\')"');
+        } else {
+            return '<span'.$parameters['span'].'><input type="text" id="'.$nights_field_name.'" name="'.$nights_field_name.'" value="'.$nights_field_value.'" onchange="'.$form_name.'OnNightsChange(\''.$from_field_name.'\', \''.$to_field_name.'\', \''.$nights_field_name.'\', \''.$from_calendar_field_id.'\', \''.$to_calendar_field_id.'\')"'.$parameters['input-nights'].' /></span>';
+        }
     }
 }
