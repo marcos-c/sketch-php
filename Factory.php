@@ -99,7 +99,8 @@ class SketchFactory extends SketchObject {
         $document_root = $application->getDocumentRoot();
         if ($document_root != null) {
             $cache_path = $document_root.DIRECTORY_SEPARATOR.'cache';
-            $write_path = $cache_path.DIRECTORY_SEPARATOR.'library'.(($version != null) ? DIRECTORY_SEPARATOR.$version : '');
+            $library_path = $cache_path.DIRECTORY_SEPARATOR.'library';
+            $write_path = $library_path.(($version != null) ? DIRECTORY_SEPARATOR.$version : '');
             if (is_readable($write_path.DIRECTORY_SEPARATOR.$filename)) {
                 return $write_path.DIRECTORY_SEPARATOR.$filename;
             } else if (is_writable($cache_path)) {
@@ -282,6 +283,7 @@ class SketchFactory extends SketchObject {
                         $contents[] = "\t}\n";
                     }
                     $contents[] = "}";
+                    if (!file_exists($library_path)) mkdir($library_path);
                     if (!file_exists($write_path)) mkdir($write_path);
                     $handle = fopen($write_path.DIRECTORY_SEPARATOR.$filename, 'w');
                     if ($handle) {
