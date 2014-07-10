@@ -290,6 +290,16 @@ class SketchResourceFolderDescriptor extends SketchResource {
     private $data;
 
     /**
+     * @var integer
+     */
+    private $clipX;
+
+    /**
+     * @var integer
+     */
+    private $clipY;
+
+    /**
      *
      * @param array $parameters
      */
@@ -303,6 +313,8 @@ class SketchResourceFolderDescriptor extends SketchResource {
         $this->setFileSize($parameters['file_size']);
         $this->setImageWidth($parameters['image_width']);
         $this->setImageHeight($parameters['image_height']);
+        $this->setClipX($parameters['clip_x']);
+        $this->setClipY($parameters['clip_y']);
         $this->setTableName($parameters['table_name']);
     }
 
@@ -506,6 +518,34 @@ class SketchResourceFolderDescriptor extends SketchResource {
      */
     function setData($data) {
         $this->data = $data;
+    }
+
+    /**
+     * @return integer
+     */
+    function getClipX() {
+        return $this->clipX;
+    }
+
+    /**
+     * @param integer $clip_x
+     */
+    function setClipX($clip_x) {
+        $this->clipX = intval($clip_x);
+    }
+
+    /**
+     * @return integer
+     */
+    function getClipY() {
+        return $this->clipY;
+    }
+
+    /**
+     * @param integer $clip_y
+     */
+    function setClipY($clip_y) {
+        $this->clipY = intval($clip_y);
     }
 
     private function queryData() {
