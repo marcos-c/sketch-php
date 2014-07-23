@@ -316,8 +316,8 @@ class ResponsePart extends Object {
      * @param float $number
      * @return string
      */
-    function formatNumber($number) {
-        return $this->getFormatter()->formatNumber($number);
+    function formatNumber($number, $decimals = 3) {
+        return $this->getFormatter()->formatNumber($number, $decimals);
     }
 
     /**

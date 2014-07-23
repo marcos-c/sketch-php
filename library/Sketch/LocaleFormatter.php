@@ -102,11 +102,11 @@ class LocaleFormatter extends Object {
      * @param float $number
      * @return string
      */
-    function formatNumber($number) {
+    function formatNumber($number, $decimals = 3) {
         if ($this->localeString == 'es') {
-            return str_replace(',00', '', number_format($number, 2, ',', ''));
+            return str_replace(sprintf(',%0'.$decimals.'d', 0), '', number_format($number, $decimals, ',', ''));
         } else {
-            return number_format($number, 2, '.', ',');
+            return number_format($number, $decimals, '.', ',');
         }
     }
 
@@ -117,9 +117,9 @@ class LocaleFormatter extends Object {
     function formatInputNumber($number) {
         if ($number != 0) {
             if ($this->localeString == 'es') {
-                return str_replace(',00', '', number_format($number, 2, ',', ''));
+                return str_replace(',000', '', number_format($number, 3, ',', ''));
             } else {
-                return number_format($number, 2, '.', ',');
+                return number_format($number, 3, '.', ',');
             }
         } else {
             return '';
@@ -152,8 +152,12 @@ class LocaleFormatter extends Object {
      * @return DateTime
      */
     function parseFormattedDate($date) {
-        list($day, $month, $year) = explode('/', $date);
-        return $year.'-'.$month.'-'.$day;
+        if ($date instanceof DateTime) {
+            return $date->toString('Y-m-d');
+        } else {
+            list($day, $month, $year) = explode('/', $date);
+            return $year.'-'.$month.'-'.$day;
+        }
     }
 
     /**
