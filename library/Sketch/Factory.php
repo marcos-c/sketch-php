@@ -28,7 +28,7 @@ namespace Sketch;
 class Factory extends Object {
     const QUOTED_IDENTIFIERS = 1;
 
-    const AFFIX = "_17";
+    const AFFIX = "_25";
 
     /**
      * @var string
@@ -191,6 +191,11 @@ class Factory extends Object {
                                 $contents[] = "\t\treturn (\$this->${attribute_name} > 0) ? \$this->${attribute_name} : \$default;\n";
                                 $contents[] = "\t}\n\n";
                                 $contents[] = "\tfunction set${method_name}(\$${column}) {\n";
+                            } else if (preg_match('/^decimal/', $definition['type'])) {
+                                $contents[] = "\tfunction get${method_name}(\$default = null) {\n";
+                                $contents[] = "\t\treturn (\$this->${attribute_name} !== null) ? \$this->${attribute_name} : \$default;\n";
+                                $contents[] = "\t}\n\n";
+                                $contents[] = "\tfunction set${method_name}(\$${column}) {\n";
                             } else if (!preg_match('/^(date|time)/', $definition['type']) || $definition['null']) {
                                 if (preg_match('/^bool/', $definition['type']) || preg_match('/^enum\(\'f\',\'t\'|enum\(\'t\',\'f\'/', $definition['type'])) {
                                     if (preg_match('/^is/', $attribute_name)) {
@@ -202,16 +207,16 @@ class Factory extends Object {
                                     $contents[] = "\t}\n\n";
                                 }
                                 $contents[] = "\tfunction get${method_name}(\$default = null) {\n";
-                                $contents[] = "\t\treturn (\$this->${attribute_name} != null) ? \$this->${attribute_name} : \$default;\n";
+                                $contents[] = "\t\treturn (\$this->${attribute_name} !== null) ? \$this->${attribute_name} : \$default;\n";
                                 $contents[] = "\t}\n\n";
                                 $contents[] = "\tfunction set${method_name}(\$${column}) {\n";
                             } else {
                                 $contents[] = "\t/**\n\t *\n\t * @return DateTime\n\t **/\n\tfunction get${method_name}() {\n";
                                 $contents[] = "\t\tif (!(\$this->${attribute_name} instanceof DateTime && \$this->${attribute_name}->isValid())) {\n";
-                                if (preg_match('/^(date)/', $definition['type'])) {
-                                    $contents[] = "\t\t\t\$this->set${method_name}(DateTime::Today());\n";
-                                } else {
+                                if (preg_match('/^(datetime|time)/', $definition['type'])) {
                                     $contents[] = "\t\t\t\$this->set${method_name}(DateTime::Now());\n";
+                                } else if (preg_match('/^date/', $definition['type'])) {
+                                    $contents[] = "\t\t\t\$this->set${method_name}(DateTime::Today());\n";
                                 }
                                 $contents[] = "\t\t} return \$this->${attribute_name};\n";
                                 $contents[] = "\t}\n\n";
@@ -258,6 +263,8 @@ class Factory extends Object {
                             }
                             if (preg_match('/^int/', $definition['type']) || preg_match('/^smallint/', $definition['type']) || preg_match('/^tinyint/', $definition['type'])) {
                                 $contents[] = "\t\t\$${column} = \$this->get${method_name}(".($definition['null'] ? "'NULL'" : '').");\n";
+                            } else if (preg_match('/^decimal/', $definition['type'])) {
+                                $contents[] = "\t\t\$${column} = \$this->get${method_name}(".($definition['null'] ? "'NULL'" : 0).");\n";
                             } else if (preg_match('/^bool/', $definition['type']) || preg_match('/^enum\(\'f\',\'t\'|enum\(\'t\',\'f\'/', $definition['type'])) {
                                 $contents[] = "\t\t\$${column} = \$this->get${method_name}() ? 't' : 'f';\n";
                             } else if (preg_match('/^(date|time)/', $definition['type']) && $definition['null']) {
