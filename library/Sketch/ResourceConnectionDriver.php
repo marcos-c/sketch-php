@@ -32,18 +32,23 @@ abstract class ResourceConnectionDriver extends Resource {
     private $tablePrefix;
 
     /**
+     * @var string
+     */
+    private $database;
+
+    /**
      * @param Resource $resource
      * @throws ResourceConnectionException
      */
     final function __construct(Resource $resource) {
         try {
-            $this->setTablePrefix($resource->queryCharacterData('//table-prefix'));
+            $this->tablePrefix = $resource->queryCharacterData('//table-prefix');
             $host = $resource->queryCharacterData('//host', 'localhost');
             $user = $resource->queryCharacterData('//user');
             $password = $resource->queryCharacterData('//password');
-            $database = $resource->queryCharacterData('//database', $user);
+            $this->database = $resource->queryCharacterData('//database', $user);
             $encoding = $resource->queryCharacterData('//encoding', 'utf8');
-            $this->connect($host, $database, $user, $password, $encoding);
+            $this->connect($host, $this->database, $user, $password, $encoding);
         } catch (\Exception $e) {
             throw new ResourceConnectionException($e->getMessage());
         }
@@ -73,10 +78,10 @@ abstract class ResourceConnectionDriver extends Resource {
     }
 
     /**
-     * @param string $table_prefix
+     * @return string
      */
-    function setTablePrefix($table_prefix) {
-        $this->tablePrefix = $table_prefix;
+    function getDatabase() {
+        return $this->database;
     }
     
     /**
