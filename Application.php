@@ -331,17 +331,17 @@ class SketchApplication {
 
     /**
      *
-     * @param SketchLocale $locale 
+     * @param SketchLocale $default_locale
      */
     function setDefaultLocale(SketchLocale $default_locale) {
         try {
-            try {
-                $this->setLocale(new SketchLocale($this->getRequest()->getAttribute('language')));
-            } catch (Exception $e) {
-                $this->locale = SketchLocale::fromString($this->getSession()->getAttribute('__locale'));
-            }
+            $this->setLocale(new SketchLocale($this->getRequest()->getAttribute('language')));
         } catch (Exception $e) {
-            $this->setLocale($default_locale);
+            try {
+                $this->locale = SketchLocale::fromString($this->getSession()->getAttribute('__locale'));
+            } catch (Exception $e) {
+               $this->setLocale($default_locale);
+            }
         }
     }
 
