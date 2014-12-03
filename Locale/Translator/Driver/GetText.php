@@ -120,6 +120,19 @@ class GetTextLocaleTranslatorDriver extends SketchLocaleTranslatorDriver {
 
     /**
      *
+     * @param $a
+     * @param $b
+     * @return int
+     */
+    private function sortAvailableLanguages($a, $b) {
+        if ($a == $b) {
+            return 0;
+        }
+        return ($a == $this->getLocaleString()) ? -1 : (($b == $this->getLocaleString()) ? 1 : (($a < $b) ? -1 : 1));
+    }
+
+    /**
+     *
      * @param $folder
      */
     private function setAvailableLanguages($folder) {
@@ -129,12 +142,15 @@ class GetTextLocaleTranslatorDriver extends SketchLocaleTranslatorDriver {
                 while (($s = readdir($r)) !== false) {
                     if (is_dir($this->getApplication()->getDocumentRoot().$folder.'/'.$s) && !in_array($s, array('.', '..'))) {
                         list($language) = explode('_', $s);
-                        $this->availableLanguages[$language] = $language;
+                        if (!in_array($language, $this->availableLanguages)) {
+                            $this->availableLanguages[] = $language;
+                        }
                     }
                 }
                 closedir($r);
             }
         }
+        usort($this->availableLanguages, array($this, 'sortAvailableLanguages'));
     }
 
     /**

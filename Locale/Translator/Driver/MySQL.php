@@ -70,6 +70,20 @@ class MySQLLocaleTranslatorDriver extends SketchLocaleTranslatorDriver {
         return (array_key_exists($md5, $this->data)) ? $this->data[$md5] : $text;
     }
 
+
+    /**
+     *
+     * @param $a
+     * @param $b
+     * @return int
+     */
+    private function sortAvailableLanguages($a, $b) {
+        if ($a == $b) {
+            return 0;
+        }
+        return ($a == $this->getLocaleString()) ? -1 : (($b == $this->getLocaleString()) ? 1 : (($a < $b) ? -1 : 1));
+    }
+
     /**
      *
      * @return array
@@ -78,7 +92,9 @@ class MySQLLocaleTranslatorDriver extends SketchLocaleTranslatorDriver {
         $connection = $this->getConnection();
         if ($connection instanceof SketchResourceConnection) {
             $prefix = $connection->getTablePrefix();
-            return $connection->queryArray("SELECT DISTINCT locale_string FROM ${prefix}_locale");
+            $available_languages = $connection->queryArray("SELECT DISTINCT locale_string FROM ${prefix}_locale ORDER BY locale_string");
+            usort($available_languages, array($this, 'sortAvailableLanguages'));
+            return $available_languages;
         } else {
             return array('en');
         }
