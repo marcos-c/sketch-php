@@ -364,8 +364,18 @@ class SketchFormView extends SketchObject {
             if ($instance instanceof SketchObjectView || $instance instanceof SketchResourceFolderDescriptor) {
                 if (method_exists($instance, "set${set}")) {
                     eval('$instance->set'.$set.'($value);');
-                    // Make sure that we have the same value inside form attributes
-                    $this->form['attributes'][base64_encode($ape)] = $value;
+                    // Update the form attribute
+                    $key = base64_encode($ape);
+                    $this->form['attributes'][$key] = $value;
+                    // Update the propagated session attribute if it exists
+                    $session = $this->getSession();
+                    $session_attributes = $session->getAttribute('__form');
+                    if (is_array($session_attributes) &&
+                        array_key_exists($this->getFormName(), $session_attributes) &&
+                        array_key_exists($key, $session_attributes[$this->getFormName()])) {
+                        $session_attributes[$this->getFormName()][$key] = $value;
+                        $session->setAttribute('__form', $session_attributes);
+                    }
                 } else {
                     throw new Exception(sprintf("Can't set %1\$s field for %2\$s", $set, get_class($instance)));
                 }
