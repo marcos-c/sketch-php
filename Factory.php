@@ -184,7 +184,7 @@ class SketchFactory extends SketchObject {
                             }
                             if (preg_match('/^int/', $definition['type']) || preg_match('/^smallint/', $definition['type']) || preg_match('/^tinyint/', $definition['type'])) {
                                 $contents[] = "\t\t\$this->${attribute_name} = intval(\$${column});\n";
-                            } else if (preg_match('/^char/', $definition['type']) || preg_match('/^varchar/', $definition['type']) || preg_match('/^text/', $definition['type'])) {
+                            } else if (preg_match('/^char/', $definition['type']) || preg_match('/^binary/', $definition['type']) || preg_match('/^varchar/', $definition['type']) || preg_match('/^varbinary/', $definition['type']) || preg_match('/^text/', $definition['type']) || preg_match('/^blob/', $definition['type'])) {
                                 $contents[] = "\t\t\$this->${attribute_name} = trim(\$${column});\n";
                             } else if (preg_match('/^bool/', $definition['type']) || preg_match('/^enum\(\'f\',\'t\'|enum\(\'t\',\'f\'/', $definition['type'])) {
                                 $contents[] = "\t\t\$this->${attribute_name} = is_bool(\$${column}) ? \$${column} : (\$${column} == 't');\n";
@@ -211,7 +211,7 @@ class SketchFactory extends SketchObject {
                                 $contents[] = "\t\t\$${column} = \$this->get${method_name}()->isNull() ? 'NULL' : \"'\".\$this->get${method_name}()->toString().\"'\";\n";
                             } else if (preg_match('/^(date|time)/', $definition['type'])) {
                                 $contents[] = "\t\t\$${column} = \$this->get${method_name}()->toString();\n";
-                            } else if (preg_match('/^char/', $definition['type']) || preg_match('/^varchar/', $definition['type']) || preg_match('/^text/', $definition['type']) || preg_match('/^time/', $definition['type'])) {
+                            } else if (preg_match('/^char/', $definition['type']) || preg_match('/^binary/', $definition['type']) || preg_match('/^varchar/', $definition['type']) || preg_match('/^varbinary/', $definition['type']) || preg_match('/^text/', $definition['type']) || preg_match('/^blob/', $definition['type'])) {
                                 if ($definition['null']) {
                                     $contents[] = "\t\t\$${column} = \$connection->escapeString(\$this->get${method_name}());\n";
                                     $contents[] = "\t\t\$${column} = (\$${column} != null) ? \"'\$${column}'\" : 'NULL';\n";
@@ -232,7 +232,7 @@ class SketchFactory extends SketchObject {
                             if (preg_match('/^int/', $definition['type']) || preg_match('/^smallint/', $definition['type']) || preg_match('/^tinyint/', $definition['type'])) {
                                 $fields['update'][] = "${column} = \$${column}";
                                 $fields['values'][] = "\$${column}";
-                            } else if (preg_match('/^char/', $definition['type']) || preg_match('/^varchar/', $definition['type']) || preg_match('/^text/', $definition['type'])) {
+                            } else if (preg_match('/^char/', $definition['type']) || preg_match('/^binary/', $definition['type']) || preg_match('/^varchar/', $definition['type']) || preg_match('/^varbinary/', $definition['type']) || preg_match('/^text/', $definition['type']) || preg_match('/^blob/', $definition['type'])) {
                                 $fields['update'][] = "${column} = \$${column}";
                                 $fields['values'][] = "\$${column}";
                             } else if (preg_match('/^bool/', $definition['type'])) {
