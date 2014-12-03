@@ -28,7 +28,7 @@ require_once 'Sketch/Resource/Folder/Descriptor/List.php';
 
 define('FORCE_GEOMETRY', 1);
 define('FILL_GEOMETRY', 2);
-define('CLIP_GEOMETRY', 3);
+define('CROP_GEOMETRY', 3);
 define('FOLDER_MD5_SIZE', 20);
 
 /**
@@ -272,19 +272,21 @@ class SketchResourceFolder extends SketchResource {
                 $file_size = $descriptor->getFileSize();
                 $image_width = $descriptor->getImageWidth();
                 $image_height = $descriptor->getImageHeight();
-                $clip_x = $descriptor->getClipX() ? $descriptor->getClipX() : 0;
-                $clip_y = $descriptor->getClipY() ? $descriptor->getClipY() : 0;
+                $crop_x = $descriptor->getCropX() ? $descriptor->getCropX() : 0;
+                $crop_y = $descriptor->getCropY() ? $descriptor->getCropY() : 0;
+                $crop_width = $descriptor->getCropWidth() ? $descriptor->getCropWidth() : 0;
+                $crop_height = $descriptor->getCropHeight() ? $descriptor->getCropHeight() : 0;
                 if (array_key_exists($descriptor->getReference(), $this->descriptors)) {
-                    $test = $connection->executeUpdate("UPDATE $table_name SET file_name = '$file_name', source_file_name = '$source_file_name', file_type = '$file_type', file_size = $file_size, image_width = $image_width, image_height = $image_height, clip_x = $clip_x, clip_y = $clip_y WHERE parent_id = $parent_id AND reference = '$reference'");
+                    $test = $connection->executeUpdate("UPDATE $table_name SET file_name = '$file_name', source_file_name = '$source_file_name', file_type = '$file_type', file_size = $file_size, image_width = $image_width, image_height = $image_height, crop_x = $crop_x, crop_y = $crop_y, crop_width = $crop_width, crop_height = $crop_height WHERE parent_id = $parent_id AND reference = '$reference'");
                     if ($test) {
                         $application->addNotice(new SketchApplicationNotice(sprintf($this->getTranslator()->_("Descriptor <b>%s</b> (%s) has been updated"), $reference, $file_type)));
                     }
                 } else {
                     if ($connection->supports('nextval')) {
                         $descriptor->setId($connection->queryFirst("SELECT nextval('${table_name}_id_seq')"));
-                        $test = $connection->executeUpdate(sprintf("INSERT INTO ${table_name} (id, parent_id, reference, file_name, source_file_name, file_type, file_size, image_width, image_height, clip_x, clip_y) VALUES (%d, $parent_id, '$reference', '$file_name', '$source_file_name', '$file_type', $file_size, $image_width, $image_height, $clip_x, $clip_y)", $descriptor->getId()));
+                        $test = $connection->executeUpdate(sprintf("INSERT INTO ${table_name} (id, parent_id, reference, file_name, source_file_name, file_type, file_size, image_width, image_height, crop_x, crop_y, crop_width, crop_height) VALUES (%d, $parent_id, '$reference', '$file_name', '$source_file_name', '$file_type', $file_size, $image_width, $image_height, $crop_x, $crop_y, $crop_width, $crop_height)", $descriptor->getId()));
                     } else {
-                        $test = $connection->executeUpdate("INSERT INTO $table_name (parent_id, reference, file_name, source_file_name, file_type, file_size, image_width, image_height, clip_x, clip_y) VALUES ($parent_id, '$reference', '$file_name', '$source_file_name', '$file_type', $file_size, $image_width, $image_height, $clip_x, $clip_y)");
+                        $test = $connection->executeUpdate("INSERT INTO $table_name (parent_id, reference, file_name, source_file_name, file_type, file_size, image_width, image_height, crop_x, crop_y, crop_width, crop_height) VALUES ($parent_id, '$reference', '$file_name', '$source_file_name', '$file_type', $file_size, $image_width, $image_height, $crop_x, $crop_y, $crop_width, $crop_height)");
                         if ($test) {
                             $descriptor->setId($connection->queryFirst("SELECT LAST_INSERT_ID()"));
                         }
@@ -441,91 +443,97 @@ class SketchResourceFolder extends SketchResource {
         } else {
             $file_name = 'f'.substr(md5(uniqid(rand())), 0, FOLDER_MD5_SIZE).'.'.$descriptor->getFileExtension();
         }
-        list($width, $height) = getimagesize($descriptor->getFileName());
+        list($src_w, $src_h) = getimagesize($descriptor->getFileName());
         if ($geometry = $this->getOutputGeometry()) {
-            if ($geometry['width'] == null || $geometry['width'] > $width) {
-                $geometry['width'] = $width;
+            if ($geometry['width'] == null || $geometry['width'] > $src_w) {
+                $geometry['width'] = $src_w;
             }
-            if ($geometry['height'] == null || $geometry['height'] > $height) {
-                $geometry['height'] = $height;
+            if ($geometry['height'] == null || $geometry['height'] > $src_h) {
+                $geometry['height'] = $src_h;
             }
             $src_x = 0;
             $src_y = 0;
-            $output_width = $geometry['width'];
-            $output_height = $geometry['height'];
+            $dst_w = $geometry['width'];
+            $dst_h = $geometry['height'];
             if ($geometry['model'] == FORCE_GEOMETRY) {
             } else if ($geometry['model'] == FILL_GEOMETRY) {
-                if ($width != $geometry['width'] || $height != $geometry['height']) {
-                    if ($width > $height) {
-                        $aux_width = round($geometry['height'] * $width / $height);
+                if ($src_w != $geometry['width'] || $src_h != $geometry['height']) {
+                    if ($src_w > $src_h) {
+                        $aux_width = round($geometry['height'] * $src_w / $src_h);
                         if ($aux_width < $geometry['width']) {
-                            $output_height = round($geometry['width'] * $height / $width);
+                            $dst_h = round($geometry['width'] * $src_h / $src_w);
                         } else {
-                            $output_width = $aux_width;
+                            $dst_w = $aux_width;
                         }
                     } else {
-                        $aux_height = round($geometry['width'] * $height / $width);
+                        $aux_height = round($geometry['width'] * $src_h / $src_w);
                         if ($aux_height < $geometry['height']) {
-                            $output_width = round($geometry['height'] * $width / $height);
+                            $dst_w = round($geometry['height'] * $src_w / $src_h);
                         } else {
-                            $output_height = $aux_height;
+                            $dst_h = $aux_height;
                         }
                     }
                 } else $geometry = null;
-            } else if ($geometry['model'] == CLIP_GEOMETRY) {
-                if ($width != $geometry['width'] || $height != $geometry['height']) {
-                    if ($width > $height) {
-                        $aux_width = round($geometry['height'] * $width / $height);
-                        if ($aux_width < $geometry['width']) {
-                            $aux_height = round($geometry['width'] * $height / $width);
-                            $src_y = round($descriptor->getClipY() * $height / $aux_height);
-                            $height = round($output_height * $height / $aux_height);
-                        } else {
-                            $src_x = round($descriptor->getClipX() * $width / $aux_width);
-                            $width = round($output_width * $width / $aux_width);
-                        }
-                    } else {
-                        $aux_height = round($geometry['width'] * $height / $width);
-                        if ($aux_height < $geometry['height']) {
-                            $aux_width = round($geometry['height'] * $width / $height);
-                            $src_x = round($descriptor->getClipX() * $width / $aux_width);
-                            $width = round($output_width * $width / $aux_width);
-                        } else {
-                            $src_y = round($descriptor->getClipY() * $height / $aux_height);
-                            $height = round($output_height * $height / $aux_height);
-                        }
+            } else if ($geometry['model'] == CROP_GEOMETRY) {
+                $src_w = $descriptor->getCropWidth() ? $descriptor->getCropWidth() : $src_w;
+                $src_h = $descriptor->getCropHeight() ? $descriptor->getCropHeight() : $src_h;
+                $src_a = $src_w / $src_h;
+                $geo_a = $geometry['width'] / $geometry['height'];
+                if ($src_a != $geo_a) {
+                    if ($src_a > 1 && $geo_a > 1) {
+                        $src_h = $src_w / $geo_a;
+                    } elseif ($src_a > 1 && $geo_a == 1) {
+                        $src_h = $src_w;
+                    } elseif ($src_a > 1 && $geo_a < 1) {
+                        $src_w = $src_h * $geo_a;
+                    } elseif ($src_a == 1 && $geo_a > 1) {
+                        $src_w = $src_h * $geo_a;
+                    } elseif ($src_a == 1 && $geo_a < 1) {
+                        $src_h = $src_w / $geo_a;
+                    } elseif ($src_a < 1 && $geo_a > 1) {
+                        $src_h = $src_w / $geo_a;
+                    } elseif ($src_a < 1 && $geo_a == 1) {
+                        $src_w = $src_h;
+                    } elseif ($src_a < 1 && $geo_a < 1) {
+                        $src_w = $src_h * $geo_a;
                     }
-                } else $geometry = null;
+                }
+                $src_x = $descriptor->getCropX();
+                $src_y = $descriptor->getCropY();
             } else {
-                $in_factor = $width / $height;
+                $in_factor = $src_w / $src_h;
                 $out_factor = $geometry['width'] / $geometry['height'];
-                $zoom_factor = ($geometry['width'] / $width) + ($geometry['height'] / $height);
+                $zoom_factor = ($geometry['width'] / $src_w) + ($geometry['height'] / $src_h);
                 if ($in_factor > $out_factor) {
-                    $output_height = round($geometry['width'] / $in_factor);
+                    $dst_h = round($geometry['width'] / $in_factor);
                 } else if ($in_factor < $out_factor) {
-                    $output_width = round($geometry['height'] * $in_factor);
+                    $dst_w = round($geometry['height'] * $in_factor);
                 } else if ($zoom_factor == 2) {
-                    $output_width = $output_height = null;
+                    $dst_w = $dst_h = null;
                 }
             }
-            if ($output_width > 0 && $output_height > 0) {
+            if ($dst_w > 0 && $dst_h > 0) {
                 if (in_array($descriptor->getFileType(), array('image/jpeg', 'image/pjpeg'))) {
                     $src = imagecreatefromjpeg($descriptor->getFileName());
                     if (function_exists('imagecreatetruecolor')) {
-                        $dst = imagecreatetruecolor($output_width, $output_height);
+                        $dst = imagecreatetruecolor($dst_w, $dst_h);
                     } else {
-                        $dst = imagecreate($output_width, $output_height);
+                        $dst = imagecreate($dst_w, $dst_h);
                     }
                     if (function_exists('imagecopyresampled')) {
-                        imagecopyresampled($dst, $src, 0, 0, $src_x, $src_y, $output_width, $output_height, $width, $height);
+                        imagecopyresampled($dst, $src, 0, 0, $src_x, $src_y, $dst_w, $dst_h, $src_w, $src_h);
                     } else {
-                        imagecopyresized($dst, $src, 0, 0, $src_x, $src_y, $output_width, $output_height, $width, $height);
+                        imagecopyresized($dst, $src, 0, 0, $src_x, $src_y, $dst_w, $dst_h, $src_w, $src_h);
                     }
                     if (imagejpeg($dst, $this->getDocumentRoot().$file_name, 90)) {
                         $descriptor->setFileName($file_name);
-                        $descriptor->setImageWidth($output_width);
-                        $descriptor->setImageHeight($output_height);
+                        $descriptor->setImageWidth($dst_w);
+                        $descriptor->setImageHeight($dst_h);
                         $descriptor->setFileSize(filesize($this->getDocumentRoot().$file_name));
+                        $descriptor->setCropX($src_x);
+                        $descriptor->setCropY($src_y);
+                        $descriptor->setCropWidth($src_w);
+                        $descriptor->setCropHeight($src_h);
                         return true;
                     } else {
                         return false;
@@ -533,20 +541,24 @@ class SketchResourceFolder extends SketchResource {
                 } else if ($descriptor->getFileType() == 'image/png') {
                     $src = imagecreatefrompng($descriptor->getFileName());
                     if (function_exists('imagecreatetruecolor')) {
-                        $dst = imagecreatetruecolor($output_width, $output_height);
+                        $dst = imagecreatetruecolor($dst_w, $dst_h);
                     } else {
-                        $dst = imagecreate($output_width, $output_height);
+                        $dst = imagecreate($dst_w, $dst_h);
                     }
                     if (function_exists('imagecopyresampled')) {
-                        imagecopyresampled($dst, $src, 0, 0, 0, 0, $output_width, $output_height, $width, $height);
+                        imagecopyresampled($dst, $src, 0, 0, 0, 0, $dst_w, $dst_h, $src_w, $src_h);
                     } else {
-                        imagecopyresized($dst, $src, 0, 0, 0, 0, $output_width, $output_height, $width, $height);
+                        imagecopyresized($dst, $src, 0, 0, 0, 0, $dst_w, $dst_h, $src_w, $src_h);
                     }
                     if (imagepng($dst, $this->getDocumentRoot().$file_name, 9)) {
                         $descriptor->setFileName($file_name);
-                        $descriptor->setImageWidth($output_width);
-                        $descriptor->setImageHeight($output_height);
+                        $descriptor->setImageWidth($dst_w);
+                        $descriptor->setImageHeight($dst_h);
                         $descriptor->setFileSize(filesize($this->getDocumentRoot().$file_name));
+                        $descriptor->setCropX($src_x);
+                        $descriptor->setCropY($src_y);
+                        $descriptor->setCropWidth($src_w);
+                        $descriptor->setCropHeight($src_h);
                         return true;
                     } else {
                         return false;
@@ -556,8 +568,12 @@ class SketchResourceFolder extends SketchResource {
         }
         if ($result = copy($descriptor->getFileName(), $this->getDocumentRoot().$file_name)) {
             $descriptor->setFileName($file_name);
-            $descriptor->setImageWidth($width);
-            $descriptor->setImageHeight($height);
+            $descriptor->setImageWidth($src_w);
+            $descriptor->setImageHeight($src_h);
+            $descriptor->setCropX($src_x);
+            $descriptor->setCropY($src_y);
+            $descriptor->setCropWidth($src_w);
+            $descriptor->setCropHeight($src_h);
         }
         return $result;
     }

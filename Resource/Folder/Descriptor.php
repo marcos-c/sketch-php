@@ -292,12 +292,22 @@ class SketchResourceFolderDescriptor extends SketchResource {
     /**
      * @var integer
      */
-    private $clipX;
+    private $cropX;
 
     /**
      * @var integer
      */
-    private $clipY;
+    private $cropY;
+
+    /**
+     * @var integer
+     */
+    private $cropWidth;
+
+    /**
+     * @var integer
+     */
+    private $cropHeight;
 
     /**
      *
@@ -313,8 +323,10 @@ class SketchResourceFolderDescriptor extends SketchResource {
         $this->setFileSize($parameters['file_size']);
         $this->setImageWidth($parameters['image_width']);
         $this->setImageHeight($parameters['image_height']);
-        $this->setClipX($parameters['clip_x']);
-        $this->setClipY($parameters['clip_y']);
+        $this->setCropX($parameters['crop_x']);
+        $this->setCropY($parameters['crop_y']);
+        $this->setCropWidth($parameters['crop_width']);
+        $this->setCropHeight($parameters['crop_height']);
         $this->setTableName($parameters['table_name']);
     }
 
@@ -523,29 +535,57 @@ class SketchResourceFolderDescriptor extends SketchResource {
     /**
      * @return integer
      */
-    function getClipX() {
-        return $this->clipX;
+    function getCropX() {
+        return $this->cropX;
     }
 
     /**
-     * @param integer $clip_x
+     * @param integer $crop_x
      */
-    function setClipX($clip_x) {
-        $this->clipX = intval($clip_x);
+    function setCropX($crop_x) {
+        $this->cropX = intval($crop_x);
     }
 
     /**
      * @return integer
      */
-    function getClipY() {
-        return $this->clipY;
+    function getCropY() {
+        return $this->cropY;
     }
 
     /**
-     * @param integer $clip_y
+     * @param integer $crop_y
      */
-    function setClipY($clip_y) {
-        $this->clipY = intval($clip_y);
+    function setCropY($crop_y) {
+        $this->cropY = intval($crop_y);
+    }
+
+    /**
+     * @return integer
+     */
+    function getCropWidth() {
+        return $this->cropWidth;
+    }
+
+    /**
+     * @param integer $crop_width
+     */
+    function setCropWidth($crop_width) {
+        $this->cropWidth = intval($crop_width);
+    }
+
+    /**
+     * @return integer
+     */
+    function getCropHeight() {
+        return $this->cropHeight;
+    }
+
+    /**
+     * @param integer $crop_height
+     */
+    function setCropHeight($crop_height) {
+        $this->cropHeight = intval($crop_height);
     }
 
     private function queryData() {
