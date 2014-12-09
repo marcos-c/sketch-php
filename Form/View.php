@@ -347,33 +347,35 @@ class SketchFormView extends SketchObject {
         } return $instance;
     }
 
-    function setFieldValue($ape, $value) {
+    function setFieldValue($ape, $original_value) {
         $path = $this->decodeAttributePathExpression($ape);
         $set = array_pop($path);
         $instance = $this->getFieldValue(implode('.', $path));
         // if (!($instance instanceof SketchObjectView)) $instance = $this->instance;
-        if ($value instanceof SketchResourceFolderDescriptor && method_exists($instance, "addDescriptor")) {
+        if ($original_value instanceof SketchResourceFolderDescriptor && method_exists($instance, "addDescriptor")) {
             // addDescriptor has to be called after the command is executed
         } else {
             if (preg_match('/(\w+)\[([\w-|]+)\]/i', $set, $matches)) {
                 $set = $matches[1];
                 $tmp = $this->getFieldValue(implode('.', array_merge($path, array($set))));
-                $tmp[$matches[2]] = $value;
+                $tmp[$matches[2]] = $original_value;
                 $value = $tmp;
+            } else {
+                $value = $original_value;
             }
             if ($instance instanceof SketchObjectView || $instance instanceof SketchResourceFolderDescriptor) {
                 if (method_exists($instance, "set${set}")) {
                     eval('$instance->set'.$set.'($value);');
                     // Update the form attribute
                     $key = base64_encode($ape);
-                    $this->form['attributes'][$key] = $value;
+                    $this->form['attributes'][$key] = $original_value;
                     // Update the propagated session attribute if it exists
                     $session = $this->getSession();
                     $session_attributes = $session->getAttribute('__form');
                     if (is_array($session_attributes) &&
                         array_key_exists($this->getFormName(), $session_attributes) &&
                         array_key_exists($key, $session_attributes[$this->getFormName()])) {
-                        $session_attributes[$this->getFormName()][$key] = $value;
+                        $session_attributes[$this->getFormName()][$key] = $original_value;
                         $session->setAttribute('__form', $session_attributes);
                     }
                 } else {
