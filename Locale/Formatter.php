@@ -115,7 +115,7 @@ class SketchLocaleFormatter extends SketchObject {
      * @return string
      */
     function formatNumber($number) {
-        if ($this->localeString == 'es_ES') {
+        if (substr($this->localeString, 0, 2) == 'es') {
             return number_format($number, 2, ',', '.');
         } else {
             return number_format($number, 2, '.', ',');

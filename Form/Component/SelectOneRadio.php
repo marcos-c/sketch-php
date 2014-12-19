@@ -36,6 +36,7 @@ class SketchFormComponentSelectOneRadio extends SketchFormComponent {
         $options = array_shift($arguments);
         $attribute = array_shift($arguments);
         $parameters = $this->extend(array(
+            'template' => null,
             'wrapper' => true,
             'columns' => 3,
             'input' => array('id' => null, 'class' => null, 'style' => null),
@@ -53,7 +54,17 @@ class SketchFormComponentSelectOneRadio extends SketchFormComponent {
         ob_start(); ?>
         <? if (is_array($options)):
             $i = 1; ?>
-            <? if ($parameters['wrapper']): ?>
+            <? if ($parameters['template'] != null):
+                foreach ($options as $key => $value):
+                    $input = '<input type="radio" name="'.$field_name.'" value="'.$key.'" '.(($field_value == $key) ? 'checked="checked"' : '').$parameters['input'].' />';
+                    if (is_array($value)):
+                        list($p1, $p2, $p3, $p4, $p5) = $value; ?>
+                        <?=sprintf($parameters['template'], $input, $p1, $p2, $p3, $p4, $p5)?>
+                    <? else: ?>
+                        <?=sprintf($parameters['template'], $input, $value)?>
+                    <? endif; ?>
+                <? endforeach; ?>
+            <? elseif ($parameters['wrapper']): ?>
                 <? foreach ($options as $key => $value): ?>
                     <? if ($i  == count($options) || !($i++ % $parameters['columns'])): ?>
                         <div<?=$parameters['right-div'] != null ? $parameters['right-div'] : $parameters['div']?>>

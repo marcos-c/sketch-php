@@ -49,10 +49,19 @@ class SketchRouterRewrite extends SketchRouter {
             $base = '';
         }
         foreach ($this->getContext()->query('//rewrite/rule') as $r) {
-            $t1 = ($r->getAttribute('uri') == $uri);
-            $t2 = in_array($language, array_map('trim', explode(',', $r->getAttribute('language'))));
-            if ($t1 && $t2) {
-                return $base.$r->getCharacterData();
+            if ($r->getAttribute('match') == 'preg') {
+                $pattern = sprintf('@%s@', str_replace('\\\\\\\\1', '(\w+)', preg_quote($r->getAttribute('uri'))));
+                $t2 = in_array($language, array_map('trim', explode(',', $r->getAttribute('language'))));
+                if (preg_match($pattern, $uri, $matches) && $t2) {
+                    $replacement = str_replace('\\\\1', '$1', $r->getCharacterData());
+                    return preg_replace($pattern, $replacement, $uri);
+                }
+            } else {
+                $t1 = ($r->getAttribute('uri') == $uri);
+                $t2 = in_array($language, array_map('trim', explode(',', $r->getAttribute('language'))));
+                if ($t1 && $t2) {
+                    return $base.$r->getCharacterData();
+                }
             }
         }
         throw new Exception(sprintf('Could not resolve route for %s (%s).', $uri, $language));
@@ -70,7 +79,18 @@ class SketchRouterRewrite extends SketchRouter {
             $application->setLocale(new SketchLocale($matches[1]));
         }
         foreach ($this->getContext()->query('//rewrite/rule') as $r) {
-            if ($r->getCharacterData() == $redirect_url) {
+            if ($r->getAttribute('match') == 'preg') {
+                $pattern = sprintf('@%s@', str_replace('\\\\\\\\1', '(\w+)', preg_quote($r->getCharacterData())));
+                if (preg_match($pattern, $redirect_url, $matches)) {
+                    $replacement = str_replace('\\\\1', '$1', $r->getAttribute('uri'));
+                    list($request_uri, $parameters) = array_map('trim', explode('?', preg_replace($pattern, $replacement, $redirect_url)));
+                    foreach (explode('&', $parameters) as $t) {
+                        list($key, $value) = array_map('trim', explode('=', $t));
+                        $this->getRequest()->setAttribute($key, $value);
+                    }
+                    return $request_uri;
+                }
+            } elseif ($r->getCharacterData() == $redirect_url) {
                 // Rule URIs can have parameters
                 list($request_uri, $parameters) = array_map('trim', explode('?', $r->getAttribute('uri')));
                 foreach (explode('&', $parameters) as $t) {

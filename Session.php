@@ -46,6 +46,9 @@ class SketchSession extends SketchObject {
     private $contextName;
 
     function __construct($session_name = 'sketch_session') {
+        if ($this->getRequest()->getAttribute($session_name) != '') {
+            session_id($this->getRequest()->getAttribute($session_name));
+        }
         $context_name = strtr($this->getContext()->getAttribute('name'), '.', '_');
         if (defined('CONTEXT_PREFIX')) {
             $this->setContextName(CONTEXT_PREFIX.'_'.$context_name);

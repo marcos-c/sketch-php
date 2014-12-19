@@ -36,22 +36,15 @@ class MySQLLocaleTranslatorDriver extends SketchLocaleTranslatorDriver {
      */
     private $data = array();
 
-    /**
-     *
-     * @var string
-     */
-    private $domain = 'default';
-
     private function readData() {
         $connection = $this->getConnection();
         if ($connection instanceof SketchResourceConnection) {
             $prefix = $connection->getTablePrefix();
             $locale_string = $this->getLocaleString();
-            $q = $this->getConnection()->query("SELECT md5, translated_text FROM ${prefix}_locale WHERE locale_string = '$locale_string'");
-            $this->data = array($this->domain => array());
+            $q = $connection->query("SELECT md5, translated_text FROM ${prefix}_locale WHERE locale_string = '$locale_string'");
             foreach ($q as $r) {
                 if ($r['translated_text'] != '') {
-                    $this->data[$this->domain][$r['md5']] = $r['translated_text'];
+                    $this->data[$r['md5']] = $r['translated_text'];
                 }
             }
         }
@@ -74,7 +67,21 @@ class MySQLLocaleTranslatorDriver extends SketchLocaleTranslatorDriver {
      */
     function translate($text) {
         $md5 = md5($text);
-        return (array_key_exists($md5, $this->data[$this->domain])) ? $this->data[$this->domain][$md5] : $text;
+        return (array_key_exists($md5, $this->data)) ? $this->data[$md5] : $text;
+    }
+
+
+    /**
+     *
+     * @param $a
+     * @param $b
+     * @return int
+     */
+    private function sortAvailableLanguages($a, $b) {
+        if ($a == $b) {
+            return 0;
+        }
+        return ($a == $this->getLocaleString()) ? -1 : (($b == $this->getLocaleString()) ? 1 : (($a < $b) ? -1 : 1));
     }
 
     /**
@@ -82,6 +89,14 @@ class MySQLLocaleTranslatorDriver extends SketchLocaleTranslatorDriver {
      * @return array
      */
     function getAvailableLanguages() {
-        return array('es', 'en', 'de');
+        $connection = $this->getConnection();
+        if ($connection instanceof SketchResourceConnection) {
+            $prefix = $connection->getTablePrefix();
+            $available_languages = $connection->queryArray("SELECT DISTINCT locale_string FROM ${prefix}_locale ORDER BY locale_string");
+            usort($available_languages, array($this, 'sortAvailableLanguages'));
+            return $available_languages;
+        } else {
+            return array('en');
+        }
     }
 }

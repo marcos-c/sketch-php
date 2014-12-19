@@ -48,6 +48,6 @@ class DummyLocaleTranslatorDriver extends SketchLocaleTranslatorDriver {
      * @return array
      */
     function getAvailableLanguages() {
-        return array('es', 'en', 'de');
+        return array('en');
     }
 }
