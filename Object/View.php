@@ -89,14 +89,24 @@ abstract class SketchObjectView extends SketchObject {
      * @param $value
      * @param bool $global
      * @return void
-     * @internal param $ <type> $key
-     * @internal param $ <type> $value
      */
     protected final function setSessionObjectAttribute($key, $value, $global = false) {
         $session = $this->getSession();
         $data = $session->getAttribute('__list');
         $view_name = ($global) ? '__global' : $this->getViewName();
         $data[$view_name][$key] = $value;
+        $session->setAttribute('__list', $data);
+    }
+
+    final function clearOtherSessionObjectAttributes() {
+        $session = $this->getSession();
+        $data = $session->getAttribute('__list');
+        $current_view_name = $this->getViewName();
+        foreach (array_keys($data) as $view_name) {
+            if ($view_name != $current_view_name) {
+                unset($data[$view_name]);
+            }
+        }
         $session->setAttribute('__list', $data);
     }
 
