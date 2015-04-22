@@ -66,7 +66,7 @@ class MySQLLocaleTranslatorDriver extends SketchLocaleTranslatorDriver {
      * @return string
      */
     function translate($text) {
-        $md5 = md5($text);
+        $md5 = md5($this->getConnection()->escapeString($text));
         return (array_key_exists($md5, $this->data)) ? $this->data[$md5] : $text;
     }
 
