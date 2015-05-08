@@ -40,6 +40,6 @@ class SketchFormComponentInputCheckbox extends SketchFormComponent {
         $parameters = (($parameters != null && strpos(" $parameters", 'class="')) ? $parameters : implode(' ', array($parameters, 'class="input-checkbox"')));
         $true = ($true != null) ? $true : 't';
         $check = is_bool($field_value) ? $field_value : ($field_value == $true);
-        return '<input type="hidden" name="'.$field_name.'" value="" /><input type="checkbox" id="'.$field_name.'" name="'.$field_name.'" value="'.$true.'"'.($check ? ' checked="checked"' : '').' '.$parameters.' />';
+        return '<input type="hidden" name="'.$field_name.'" value="'.($true == 't' ? 'f' : '').'" /><input type="checkbox" id="'.$field_name.'" name="'.$field_name.'" value="'.$true.'"'.($check ? ' checked="checked"' : '').' '.$parameters.' />';
     }
 }
