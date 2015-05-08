@@ -75,7 +75,7 @@ class SketchRouterRewrite extends SketchRouter {
         $application = $this->getApplication();
         $redirect_url = str_replace($application->getURI(), '', $_SERVER['REDIRECT_URL']);
         // Set language if present
-        if (preg_match('/^\/(\w{2})\/[\w\.-]+$/', $redirect_url, $matches)) {
+        if (preg_match('/^\/(\w{2})\/[\w\/\.-]+$/', $redirect_url, $matches)) {
             $application->setLocale(new SketchLocale($matches[1]));
         }
         foreach ($this->getContext()->query('//rewrite/rule') as $r) {
