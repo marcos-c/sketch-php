@@ -77,7 +77,12 @@ class SketchRouterRewrite extends SketchRouter {
         // Set language if present
         if (preg_match('/^\/(\w{2})\/[\w\/\.-]+$/', $redirect_url, $matches)) {
             $application->setLocale(new SketchLocale($matches[1]));
+            $not_found = sprintf("/^\/%s\/404.*/", $application->getLocale()->getLanguage());
+        } else {
+            $not_found = "/404.*/";
         }
+        $not_found_parameters = null;
+        $not_found_request_uri = null;
         foreach ($this->getContext()->query('//rewrite/rule') as $r) {
             if ($r->getAttribute('match') == 'preg') {
                 $pattern = sprintf('@%s@', str_replace('\\\\\\\\1', '(\w+)', preg_quote($r->getCharacterData())));
@@ -90,18 +95,30 @@ class SketchRouterRewrite extends SketchRouter {
                     }
                     return $request_uri;
                 }
-            } elseif ($r->getCharacterData() == $redirect_url) {
+            } else {
                 // Rule URIs can have parameters
                 list($request_uri, $parameters) = array_map('trim', explode('?', $r->getAttribute('uri')));
-                foreach (explode('&', $parameters) as $t) {
-                    list($key, $value) = array_map('trim', explode('=', $t));
-                    $this->getRequest()->setAttribute($key, $value);
+                if ($r->getCharacterData() == $redirect_url) {
+                    foreach (explode('&', $parameters) as $t) {
+                        list($key, $value) = array_map('trim', explode('=', $t));
+                        $this->getRequest()->setAttribute($key, $value);
+                    }
+                    return $request_uri;
+                } else if (preg_match($not_found, $r->getCharacterData())) {
+                    $not_found_request_uri = $request_uri;
+                    $not_found_parameters = $parameters;
                 }
-                return $request_uri;
             }
         }
-        header($_SERVER["SERVER_PROTOCOL"]." 404 Not Found");
-        exit($_SERVER["SERVER_PROTOCOL"]." 404 Not Found");
-        // throw new Exception(sprintf('No route found for %s.', $redirect_url));
+        if ($not_found_request_uri) {
+            foreach (explode('&', $not_found_parameters) as $t) {
+                list($key, $value) = array_map('trim', explode('=', $t));
+                $this->getRequest()->setAttribute($key, $value);
+            }
+            return $not_found_request_uri;
+        } else {
+            header($_SERVER["SERVER_PROTOCOL"]." 404 Not Found");
+            exit($_SERVER["SERVER_PROTOCOL"]." 404 Not Found");
+        }
     }
 }
