@@ -107,17 +107,19 @@ class DateTime extends Object {
             if (preg_match('/^(\d{2}):(\d{2})(?::(\d{2}))?$/', $date_time)) {
                 $date_time = "1970-01-01 $date_time";
             }
-            if (preg_match('/^((?:19|20)\d{2})-(\d{1,2})-(\d{1,2})(?: (\d{2}):(\d{2}))?(?::(\d{2}))?/', $date_time, $matches)) {
+            if (preg_match('/^((?:18|19|20|21|22)\d{2})-(\d{1,2})-(\d{1,2})(?: (\d{2}):(\d{2}))?(?::(\d{2}))?/', $date_time, $matches)) {
                 if (checkdate($matches[2], $matches[3], $matches[1])) {
-                    $this->dateTime = new \DateTime($date_time, new \DateTimeZone('GMT'));
-                    $this->dateTimeArray = array(
-                        $this->dateTime->format('Y'),
-                        $this->dateTime->format('n'),
-                        $this->dateTime->format('j'),
-                        $this->dateTime->format('G'),
-                        intval($this->dateTime->format('i')),
-                        intval($this->dateTime->format('s')),
-                    );
+                    try {
+                        $this->dateTime = new \DateTime($date_time, new \DateTimeZone('GMT'));
+                        $this->dateTimeArray = array(
+                            $this->dateTime->format('Y'),
+                            $this->dateTime->format('n'),
+                            $this->dateTime->format('j'),
+                            $this->dateTime->format('G'),
+                            intval($this->dateTime->format('i')),
+                            intval($this->dateTime->format('s')),
+                        );
+                    } catch (\Exception $e) {}
                 }
             }
         }
