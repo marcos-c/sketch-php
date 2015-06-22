@@ -43,7 +43,7 @@ class Factory extends Object {
     /**
      * @param $table_name
      * @param null $options
-     * @return Object
+     * @return string
      */
     static function scaffold($table_name, $options = null) {
         try {
@@ -78,7 +78,7 @@ class Factory extends Object {
             } else {
                 $namespace = 'Common';
             }
-            return self::scaffoldFrom(self::$version, $class_name, $namespace, $table_name, $options['prefix'], $options['primary_key'], $options['generate_iterator'], $connection->getTableDefinition($table_name));
+            return self::scaffoldFrom(self::$version, $class_name, $namespace, $table_name, $options['prefix'], $options['primary_key'], $options['generate_iterator']);
         } catch (\Exception $e) {
             exit($e);
         }
@@ -86,273 +86,286 @@ class Factory extends Object {
 
     /**
      * @param $version
-     * @param string $class_name
-     * @param string $namespace
-     * @param string $table_name
+     * @param $class_name
+     * @param $namespace
+     * @param $table_name
      * @param $prefix
-     * @param string $primary_key
+     * @param $primary_key
      * @param $generate_iterator
-     * @param $table_definition
-     * @throws \Exception
      * @return string
+     * @throws \Exception
      */
-    private static function scaffoldFrom($version, $class_name, $namespace, $table_name, $prefix, $primary_key, $generate_iterator, $table_definition) {
+    private static function scaffoldFrom($version, $class_name, $namespace, $table_name, $prefix, $primary_key, $generate_iterator) {
         $application = Application::getInstance();
-        $translator = $application->getLocale()->getTranslator();
-        $signature = md5(serialize(array($version, $class_name, $table_definition['fields'])));
-        $filename = $class_name.'_'.substr($signature, 0, 8).".php";
         $document_root = $application->getDocumentRoot();
         if ($document_root != null) {
             $cache_path = dirname($document_root).DIRECTORY_SEPARATOR.'cache';
             $write_path = $cache_path.DIRECTORY_SEPARATOR.'library'.(($version != null) ? DIRECTORY_SEPARATOR.$version : '');
-            if (is_readable($write_path.DIRECTORY_SEPARATOR.$filename)) {
-                return $write_path.DIRECTORY_SEPARATOR.$filename;
-            } else if (is_writable($cache_path)) {
-                try {
-                    // Generate Class
-                    $contents = array();
-                    $contents[] = "<?php\n";
-                    $contents[] = "/**\n * WARNING! This file was automatically generated!\n */\n\n";
-                    $contents[] = "namespace ${namespace};\n\nuse Sketch\\DateTime;\nuse Sketch\\FormView;\nuse Sketch\\ObjectIterator;\nuse Sketch\\ObjectView;\n\n";
-                    $contents[] = "abstract class ${prefix}${class_name} extends ObjectView {\n";
-                    // Attributes
-                    $i = 0; foreach ($table_definition['fields'] as $column => $definition) {
-                        if ($column != $primary_key) {
-                            $method_name = null; foreach (explode('_', $column) as $value) {
-                                $method_name .= ucfirst($value);
-                            }
-                            $attribute_name = strtolower(substr($method_name, 0, 1)).substr($method_name, 1);
-                            $contents[] = (($i++ > 0) ? "\t\n" : "")."\tprivate \$${attribute_name};\n";
-                        }
-                    }
-                    // Constructor
-                    if ($table_name != null) {
-                        $contents[] = "\t\n";
-                        $contents[] = "\tfunction __construct(\$mixed = null) {\n";
-                        $contents[] = "\t\tif (!is_array(\$mixed) && \$mixed != null) {\n";
-                        $contents[] = sprintf($table_definition['templates']['constructor'], $primary_key);
-                        $contents[] = "\t\t}\n\t\tif (!is_array(\$mixed)) \$mixed = array();\n";
-                        foreach ($table_definition['fields'] as $column => $definition) {
-                            $method_name = null;
-                            foreach (explode('_', $column) as $value) {
-                                $method_name .= ucfirst($value);
-                            }
-                            if (preg_match('/^int/', $definition['type']) || preg_match('/^smallint/', $definition['type']) || preg_match('/^tinyint/', $definition['type'])) {
-                                $default = intval($definition['default']);
-                                $contents[] = ($column == $primary_key) ? "\t\t\$this->setId(array_key_exists('${column}', \$mixed) ? \$mixed['${column}'] : ${default});\n" : "\t\t\$this->set${method_name}(array_key_exists('${column}', \$mixed) ? \$mixed['${column}'] : ${default});\n";
-                            } elseif (preg_match('/^bool/', $definition['type']) || preg_match('/^enum\(\'f\',\'t\'|enum\(\'t\',\'f\'/', $definition['type'])) {
-                                $default = ($definition['default'] == 't') ? 'true' : 'false';
-                                $contents[] = "\t\t\$this->set${method_name}((array_key_exists('${column}', \$mixed) && \$mixed['${column}'] != null) ? \$mixed['${column}'] : ${default});\n";
-                            } else {
-                                $contents[] = ($column == $primary_key) ? "\t\t\$this->setId(array_key_exists('${column}', \$mixed) ? \$mixed['${column}'] : null);\n" : "\t\t\$this->set${method_name}(array_key_exists('${column}', \$mixed) ? \$mixed['${column}'] : null);\n";
-                            }
-                        }
-                        $contents[] = "\t}\n";
-                        // Type information
-                        $contents[] = "\t\n";
-                        $contents[] = "\tfunction getTypeInformation(\$mixed = null) {\n";
-                        $contents[] = "\t\treturn array(\n\t\t\t";
+            if ($application->getContext()->getLayerName() == 'production') {
+                $cached_signatures = json_decode(file_get_contents($write_path.DIRECTORY_SEPARATOR.'index.json'), true);
+                return $write_path.DIRECTORY_SEPARATOR.$cached_signatures[$table_name];
+            } else {
+                if (is_readable($write_path.DIRECTORY_SEPARATOR.'index.json')) {
+                    $cached_signatures = json_decode(file_get_contents($write_path.DIRECTORY_SEPARATOR.'index.json'), true);
+                } else {
+                    $cached_signatures = array();
+                }
+                $connection = $application->getConnection();
+                $table_definition = $connection->getTableDefinition($table_name);
+                $signature = md5(serialize(array($version, $class_name, $table_definition['fields'])));
+                $filename = $class_name.'_'.substr($signature, 0, 8).".php";
+                if (is_readable($write_path.DIRECTORY_SEPARATOR.$filename)) {
+                    return $write_path.DIRECTORY_SEPARATOR.$filename;
+                } else if (is_writable($cache_path)) {
+                    try {
+                        // Generate Class
+                        $contents = array();
+                        $contents[] = "<?php\n";
+                        $contents[] = "/**\n * WARNING! This file was automatically generated!\n */\n\n";
+                        $contents[] = "namespace ${namespace};\n\nuse Sketch\\DateTime;\nuse Sketch\\FormView;\nuse Sketch\\ObjectIterator;\nuse Sketch\\ObjectView;\n\n";
+                        $contents[] = "abstract class ${prefix}${class_name} extends ObjectView {\n";
+                        // Attributes
                         $i = 0; foreach ($table_definition['fields'] as $column => $definition) {
-                            $method_name = null;
-                            foreach (explode('_', $column) as $value) {
-                                $method_name .= $value;
-                            }
-                            if ($i++ > 0) {
-                                $contents[] = ",\n\t\t\t";
-                            }
-                            if (preg_match('/^int/', $definition['type']) || preg_match('/^smallint/', $definition['type']) || preg_match('/^tinyint/', $definition['type']) || preg_match('/^decimal/', $definition['type'])) {
-                                $contents[] = "'$method_name' => 'number'";
-                            } elseif (preg_match('/^bool/', $definition['type']) || preg_match('/^enum\(\'f\',\'t\'|enum\(\'t\',\'f\'/', $definition['type'])) {
-                                $contents[] = "'$method_name' => 'boolean'";
-                            } elseif (preg_match('/^datetime/', $definition['type'])) {
-                                $contents[] = "'$method_name' => 'datetime',\n\t\t\t";
-                                $contents[] = "'${method_name}tz' => 'datetime'";
-                            } elseif (preg_match('/^date/', $definition['type'])) {
-                                $contents[] = "'$method_name' => 'date'";
-                            } elseif (preg_match('/^time/', $definition['type'])) {
-                                $contents[] = "'$method_name' => 'time'";
-                            } else {
-                                $contents[] = "'$method_name' => 'mixed'";
+                            if ($column != $primary_key) {
+                                $method_name = null; foreach (explode('_', $column) as $value) {
+                                    $method_name .= ucfirst($value);
+                                }
+                                $attribute_name = strtolower(substr($method_name, 0, 1)).substr($method_name, 1);
+                                $contents[] = (($i++ > 0) ? "\t\n" : "")."\tprivate \$${attribute_name};\n";
                             }
                         }
-                        $contents[] = "\n\t\t);\n";
-                        $contents[] = "\t}\n";
-
-                    }
-                    // Getters and Setters
-                    foreach ($table_definition['fields'] as $column => $definition) {
-                        if ($column != $primary_key) {
-                            $method_name = null; foreach (explode('_', $column) as $value) {
-                                $method_name .= ucfirst($value);
-                            } $attribute_name = strtolower(substr($method_name, 0, 1)).substr($method_name, 1);
+                        // Constructor
+                        if ($table_name != null) {
                             $contents[] = "\t\n";
-                            if (preg_match('/^int/', $definition['type']) || preg_match('/^smallint/', $definition['type']) || preg_match('/^tinyint/', $definition['type'])) {
-                                $contents[] = "\tfunction get${method_name}(\$default = false) {\n";
-                                $contents[] = "\t\treturn (\$this->${attribute_name} > 0) ? \$this->${attribute_name} : \$default;\n";
-                                $contents[] = "\t}\n\n";
-                                $contents[] = "\tfunction set${method_name}(\$${column}) {\n";
-                            } else if (!preg_match('/^(date|time)/', $definition['type']) || $definition['null']) {
-                                if (preg_match('/^bool/', $definition['type']) || preg_match('/^enum\(\'f\',\'t\'|enum\(\'t\',\'f\'/', $definition['type'])) {
-                                    if (preg_match('/^is/', $attribute_name)) {
-                                        $contents[] = "\tfunction ${attribute_name}() {\n";
-                                    } else {
-                                        $contents[] = "\tfunction is${method_name}() {\n";
-                                    }
-                                    $contents[] = "\t\treturn \$this->${attribute_name};\n";
-                                    $contents[] = "\t}\n\n";
+                            $contents[] = "\tfunction __construct(\$mixed = null) {\n";
+                            $contents[] = "\t\tif (!is_array(\$mixed) && \$mixed != null) {\n";
+                            $contents[] = sprintf($table_definition['templates']['constructor'], $primary_key);
+                            $contents[] = "\t\t}\n\t\tif (!is_array(\$mixed)) \$mixed = array();\n";
+                            foreach ($table_definition['fields'] as $column => $definition) {
+                                $method_name = null;
+                                foreach (explode('_', $column) as $value) {
+                                    $method_name .= ucfirst($value);
                                 }
-                                $contents[] = "\tfunction get${method_name}(\$default = null) {\n";
-                                $contents[] = "\t\treturn (\$this->${attribute_name} != null) ? \$this->${attribute_name} : \$default;\n";
-                                $contents[] = "\t}\n\n";
-                                $contents[] = "\tfunction set${method_name}(\$${column}) {\n";
-                            } else {
-                                $contents[] = "\t/**\n\t *\n\t * @return DateTime\n\t **/\n\tfunction get${method_name}() {\n";
-                                $contents[] = "\t\tif (!(\$this->${attribute_name} instanceof DateTime && \$this->${attribute_name}->isValid())) {\n";
-                                if (preg_match('/^(date)/', $definition['type'])) {
-                                    $contents[] = "\t\t\t\$this->set${method_name}(DateTime::Today());\n";
+                                if (preg_match('/^int/', $definition['type']) || preg_match('/^smallint/', $definition['type']) || preg_match('/^tinyint/', $definition['type'])) {
+                                    $default = intval($definition['default']);
+                                    $contents[] = ($column == $primary_key) ? "\t\t\$this->setId(array_key_exists('${column}', \$mixed) ? \$mixed['${column}'] : ${default});\n" : "\t\t\$this->set${method_name}(array_key_exists('${column}', \$mixed) ? \$mixed['${column}'] : ${default});\n";
+                                } elseif (preg_match('/^bool/', $definition['type']) || preg_match('/^enum\(\'f\',\'t\'|enum\(\'t\',\'f\'/', $definition['type'])) {
+                                    $default = ($definition['default'] == 't') ? 'true' : 'false';
+                                    $contents[] = "\t\t\$this->set${method_name}((array_key_exists('${column}', \$mixed) && \$mixed['${column}'] != null) ? \$mixed['${column}'] : ${default});\n";
                                 } else {
-                                    $contents[] = "\t\t\t\$this->set${method_name}(DateTime::Now());\n";
+                                    $contents[] = ($column == $primary_key) ? "\t\t\$this->setId(array_key_exists('${column}', \$mixed) ? \$mixed['${column}'] : null);\n" : "\t\t\$this->set${method_name}(array_key_exists('${column}', \$mixed) ? \$mixed['${column}'] : null);\n";
                                 }
-                                $contents[] = "\t\t} return \$this->${attribute_name};\n";
-                                $contents[] = "\t}\n\n";
-                                $contents[] = "\t/**\n\t *\n\t * @param DateTime\n\t **/\n\tfunction set${method_name}(\$${column}) {\n";
-                            }
-                            if (preg_match('/^int/', $definition['type']) || preg_match('/^smallint/', $definition['type']) || preg_match('/^tinyint/', $definition['type'])) {
-                                $contents[] = "\t\t\$this->${attribute_name} = intval(\$${column});\n";
-                            } else if (preg_match('/^char/', $definition['type']) || preg_match('/^varchar/', $definition['type']) || preg_match('/^text/', $definition['type'])) {
-                                $contents[] = "\t\t\$this->${attribute_name} = trim(\$${column});\n";
-                            } else if (preg_match('/^bool/', $definition['type']) || preg_match('/^enum\(\'f\',\'t\'|enum\(\'t\',\'f\'/', $definition['type'])) {
-                                $contents[] = "\t\t\$this->${attribute_name} = is_bool(\$${column}) ? \$${column} : (\$${column} == 't');\n";
-                            } else if (preg_match('/^(date|time)/', $definition['type'])) {
-                                $contents[] = "\t\t\$this->${attribute_name} = new DateTime(\$${column});\n";
-                            } else {
-                                $contents[] = "\t\t\$this->${attribute_name} = \$${column};\n";
                             }
                             $contents[] = "\t}\n";
-                            if (preg_match('/^(date|time)/', $definition['type'])) {
-                                $contents[] = "\t/**\n\t *\n\t * @return string\n\t **/\n\tfunction get${method_name}TZ() {\n";
-                                $contents[] = "\t\t\$t = \$this->${attribute_name}->toPHPDateTime();\n";
-                                $contents[] = "\t\tif (\$t instanceof \\DateTime) {\n";
-                                $contents[] = "\t\t\t\$t->setTimeZone(new \\DateTimeZone(\$this->getSession()->getACL()->getAttribute('time_zone')));\n";
-                                $contents[] = "\t\t\treturn new DateTime(\$t->format('Y-m-d H:i'));\n";
-                                $contents[] = "\t\t} else {\n";
-                                $contents[] = "\t\t\treturn \$this->${attribute_name};\n";
-                                $contents[] = "\t\t}\n";
-                                $contents[] = "\t}\n\n";
-                                $contents[] = "\t/**\n\t *\n\t * @param DateTime\n\t **/\n\tfunction set${method_name}TZ(\$${column}) {\n";
-                                $contents[] = "\t\ttry {\n";
-                                $contents[] = "\t\t\t\$t = new \\DateTime(\$${column}, new \\DateTimeZone(\$this->getSession()->getACL()->getAttribute('time_zone')));\n";
-                                $contents[] = "\t\t\t\$t->setTimeZone(new \\DateTimeZone('GMT'));\n";
-                                $contents[] = "\t\t\t\$this->set${method_name}(\$t->format('Y-m-d H:i'));\n";
-                                $contents[] = "\t\t} catch (\\Exception \$e) {}\n";
-                                $contents[] = "\t}\n";
-                            }
-                        }
-                    }
-                    // Update and remove action methods
-                    $contents[] = "\t\n\tfunction update() {\n\t\t\$connection = \$this->getConnection();\n\t\t\$id = \$this->getId();\n";
-                    foreach ($table_definition['fields'] as $column => $definition) {
-                        if ($column != $primary_key) {
-                            $method_name = null; foreach (explode('_', $column) as $value) {
-                                $method_name .= ucfirst($value);
-                            }
-                            if (preg_match('/^int/', $definition['type']) || preg_match('/^smallint/', $definition['type']) || preg_match('/^tinyint/', $definition['type'])) {
-                                $contents[] = "\t\t\$${column} = \$this->get${method_name}(".($definition['null'] ? "'NULL'" : '').");\n";
-                            } else if (preg_match('/^bool/', $definition['type']) || preg_match('/^enum\(\'f\',\'t\'|enum\(\'t\',\'f\'/', $definition['type'])) {
-                                $contents[] = "\t\t\$${column} = \$this->get${method_name}() ? 't' : 'f';\n";
-                            } else if (preg_match('/^(date|time)/', $definition['type']) && $definition['null']) {
-                                $contents[] = "\t\t\$${column} = \$this->get${method_name}()->isNull() ? 'NULL' : \"'\".\$this->get${method_name}()->toString().\"'\";\n";
-                            } else if (preg_match('/^(date|time)/', $definition['type'])) {
-                                $contents[] = "\t\t\$${column} = \$this->get${method_name}()->toString();\n";
-                            } else if (preg_match('/^char/', $definition['type']) || preg_match('/^varchar/', $definition['type']) || preg_match('/^text/', $definition['type']) || preg_match('/^time/', $definition['type'])) {
-                                if ($definition['null']) {
-                                    $contents[] = "\t\t\$${column} = \$connection->escapeString(\$this->get${method_name}());\n";
-                                    $contents[] = "\t\t\$${column} = (\$${column} != null) ? \"'\$${column}'\" : 'NULL';\n";
+                            // Type information
+                            $contents[] = "\t\n";
+                            $contents[] = "\tfunction getTypeInformation(\$mixed = null) {\n";
+                            $contents[] = "\t\treturn array(\n\t\t\t";
+                            $i = 0; foreach ($table_definition['fields'] as $column => $definition) {
+                                $method_name = null;
+                                foreach (explode('_', $column) as $value) {
+                                    $method_name .= $value;
+                                }
+                                if ($i++ > 0) {
+                                    $contents[] = ",\n\t\t\t";
+                                }
+                                if (preg_match('/^int/', $definition['type']) || preg_match('/^smallint/', $definition['type']) || preg_match('/^tinyint/', $definition['type']) || preg_match('/^decimal/', $definition['type'])) {
+                                    $contents[] = "'$method_name' => 'number'";
+                                } elseif (preg_match('/^bool/', $definition['type']) || preg_match('/^enum\(\'f\',\'t\'|enum\(\'t\',\'f\'/', $definition['type'])) {
+                                    $contents[] = "'$method_name' => 'boolean'";
+                                } elseif (preg_match('/^datetime/', $definition['type'])) {
+                                    $contents[] = "'$method_name' => 'datetime',\n\t\t\t";
+                                    $contents[] = "'${method_name}tz' => 'datetime'";
+                                } elseif (preg_match('/^date/', $definition['type'])) {
+                                    $contents[] = "'$method_name' => 'date'";
+                                } elseif (preg_match('/^time/', $definition['type'])) {
+                                    $contents[] = "'$method_name' => 'time'";
                                 } else {
-                                    $contents[] = "\t\t\$${column} = \"'\".\$connection->escapeString(\$this->get${method_name}()).\"'\";\n";
+                                    $contents[] = "'$method_name' => 'mixed'";
                                 }
-                            } else {
-                                $contents[] = "\t\t\$${column} = \$this->get${method_name}();\n";
-                                if ($definition['null']) {
-                                    $contents[] = "\t\tif (\$${column} == null) \$${column} = 'NULL';\n";
+                            }
+                            $contents[] = "\n\t\t);\n";
+                            $contents[] = "\t}\n";
+
+                        }
+                        // Getters and Setters
+                        foreach ($table_definition['fields'] as $column => $definition) {
+                            if ($column != $primary_key) {
+                                $method_name = null; foreach (explode('_', $column) as $value) {
+                                    $method_name .= ucfirst($value);
+                                } $attribute_name = strtolower(substr($method_name, 0, 1)).substr($method_name, 1);
+                                $contents[] = "\t\n";
+                                if (preg_match('/^int/', $definition['type']) || preg_match('/^smallint/', $definition['type']) || preg_match('/^tinyint/', $definition['type'])) {
+                                    $contents[] = "\tfunction get${method_name}(\$default = false) {\n";
+                                    $contents[] = "\t\treturn (\$this->${attribute_name} > 0) ? \$this->${attribute_name} : \$default;\n";
+                                    $contents[] = "\t}\n\n";
+                                    $contents[] = "\tfunction set${method_name}(\$${column}) {\n";
+                                } else if (!preg_match('/^(date|time)/', $definition['type']) || $definition['null']) {
+                                    if (preg_match('/^bool/', $definition['type']) || preg_match('/^enum\(\'f\',\'t\'|enum\(\'t\',\'f\'/', $definition['type'])) {
+                                        if (preg_match('/^is/', $attribute_name)) {
+                                            $contents[] = "\tfunction ${attribute_name}() {\n";
+                                        } else {
+                                            $contents[] = "\tfunction is${method_name}() {\n";
+                                        }
+                                        $contents[] = "\t\treturn \$this->${attribute_name};\n";
+                                        $contents[] = "\t}\n\n";
+                                    }
+                                    $contents[] = "\tfunction get${method_name}(\$default = null) {\n";
+                                    $contents[] = "\t\treturn (\$this->${attribute_name} != null) ? \$this->${attribute_name} : \$default;\n";
+                                    $contents[] = "\t}\n\n";
+                                    $contents[] = "\tfunction set${method_name}(\$${column}) {\n";
+                                } else {
+                                    $contents[] = "\t/**\n\t *\n\t * @return DateTime\n\t **/\n\tfunction get${method_name}() {\n";
+                                    $contents[] = "\t\tif (!(\$this->${attribute_name} instanceof DateTime && \$this->${attribute_name}->isValid())) {\n";
+                                    if (preg_match('/^(date)/', $definition['type'])) {
+                                        $contents[] = "\t\t\t\$this->set${method_name}(DateTime::Today());\n";
+                                    } else {
+                                        $contents[] = "\t\t\t\$this->set${method_name}(DateTime::Now());\n";
+                                    }
+                                    $contents[] = "\t\t} return \$this->${attribute_name};\n";
+                                    $contents[] = "\t}\n\n";
+                                    $contents[] = "\t/**\n\t *\n\t * @param DateTime\n\t **/\n\tfunction set${method_name}(\$${column}) {\n";
+                                }
+                                if (preg_match('/^int/', $definition['type']) || preg_match('/^smallint/', $definition['type']) || preg_match('/^tinyint/', $definition['type'])) {
+                                    $contents[] = "\t\t\$this->${attribute_name} = intval(\$${column});\n";
+                                } else if (preg_match('/^char/', $definition['type']) || preg_match('/^varchar/', $definition['type']) || preg_match('/^text/', $definition['type'])) {
+                                    $contents[] = "\t\t\$this->${attribute_name} = trim(\$${column});\n";
+                                } else if (preg_match('/^bool/', $definition['type']) || preg_match('/^enum\(\'f\',\'t\'|enum\(\'t\',\'f\'/', $definition['type'])) {
+                                    $contents[] = "\t\t\$this->${attribute_name} = is_bool(\$${column}) ? \$${column} : (\$${column} == 't');\n";
+                                } else if (preg_match('/^(date|time)/', $definition['type'])) {
+                                    $contents[] = "\t\t\$this->${attribute_name} = new DateTime(\$${column});\n";
+                                } else {
+                                    $contents[] = "\t\t\$this->${attribute_name} = \$${column};\n";
+                                }
+                                $contents[] = "\t}\n";
+                                if (preg_match('/^(date|time)/', $definition['type'])) {
+                                    $contents[] = "\t/**\n\t *\n\t * @return string\n\t **/\n\tfunction get${method_name}TZ() {\n";
+                                    $contents[] = "\t\t\$t = \$this->${attribute_name}->toPHPDateTime();\n";
+                                    $contents[] = "\t\tif (\$t instanceof \\DateTime) {\n";
+                                    $contents[] = "\t\t\t\$t->setTimeZone(new \\DateTimeZone(\$this->getSession()->getACL()->getAttribute('time_zone')));\n";
+                                    $contents[] = "\t\t\treturn new DateTime(\$t->format('Y-m-d H:i'));\n";
+                                    $contents[] = "\t\t} else {\n";
+                                    $contents[] = "\t\t\treturn \$this->${attribute_name};\n";
+                                    $contents[] = "\t\t}\n";
+                                    $contents[] = "\t}\n\n";
+                                    $contents[] = "\t/**\n\t *\n\t * @param DateTime\n\t **/\n\tfunction set${method_name}TZ(\$${column}) {\n";
+                                    $contents[] = "\t\ttry {\n";
+                                    $contents[] = "\t\t\t\$t = new \\DateTime(\$${column}, new \\DateTimeZone(\$this->getSession()->getACL()->getAttribute('time_zone')));\n";
+                                    $contents[] = "\t\t\t\$t->setTimeZone(new \\DateTimeZone('GMT'));\n";
+                                    $contents[] = "\t\t\t\$this->set${method_name}(\$t->format('Y-m-d H:i'));\n";
+                                    $contents[] = "\t\t} catch (\\Exception \$e) {}\n";
+                                    $contents[] = "\t}\n";
                                 }
                             }
                         }
-                    }
-                    $fields = array('update', 'insert', 'values'); foreach ($table_definition['fields'] as $column => $definition) {
-                        if ($column != $primary_key) {
-                            $fields['insert'][] = $column;
-                            if (preg_match('/^int/', $definition['type']) || preg_match('/^smallint/', $definition['type']) || preg_match('/^tinyint/', $definition['type'])) {
-                                $fields['update'][] = "${column} = \$${column}";
-                                $fields['values'][] = "\$${column}";
-                            } else if (preg_match('/^char/', $definition['type']) || preg_match('/^varchar/', $definition['type']) || preg_match('/^text/', $definition['type'])) {
-                                $fields['update'][] = "${column} = \$${column}";
-                                $fields['values'][] = "\$${column}";
-                            } else if (preg_match('/^bool/', $definition['type'])) {
-                                $fields['update'][] = "${column} = '\$${column}'";
-                                $fields['values'][] = "'\$${column}'";
-                            } else if (preg_match('/^enum\(\'f\',\'t\'|enum\(\'t\',\'f\'/', $definition['type'])) {
-                                $fields['update'][] = "${column} = '\$${column}'";
-                                $fields['values'][] = "'\$${column}'";
-                            } else if (preg_match('/^(date|time)/', $definition['type']) && $definition['null']) {
-                                $fields['update'][] = "${column} = \$${column}";
-                                $fields['values'][] = "\$${column}";
-                            } else if (preg_match('/^(date|time)/', $definition['type'])) {
-                                $fields['update'][] = "${column} = '\$${column}'";
-                                $fields['values'][] = "'\$${column}'";
-                            } else {
-                                $fields['update'][] = "${column} = \$${column}";
-                                $fields['values'][] = "\$${column}";
+                        // Update and remove action methods
+                        $contents[] = "\t\n\tfunction update() {\n\t\t\$connection = \$this->getConnection();\n\t\t\$id = \$this->getId();\n";
+                        foreach ($table_definition['fields'] as $column => $definition) {
+                            if ($column != $primary_key) {
+                                $method_name = null; foreach (explode('_', $column) as $value) {
+                                    $method_name .= ucfirst($value);
+                                }
+                                if (preg_match('/^int/', $definition['type']) || preg_match('/^smallint/', $definition['type']) || preg_match('/^tinyint/', $definition['type'])) {
+                                    $contents[] = "\t\t\$${column} = \$this->get${method_name}(".($definition['null'] ? "'NULL'" : '').");\n";
+                                } else if (preg_match('/^bool/', $definition['type']) || preg_match('/^enum\(\'f\',\'t\'|enum\(\'t\',\'f\'/', $definition['type'])) {
+                                    $contents[] = "\t\t\$${column} = \$this->get${method_name}() ? 't' : 'f';\n";
+                                } else if (preg_match('/^(date|time)/', $definition['type']) && $definition['null']) {
+                                    $contents[] = "\t\t\$${column} = \$this->get${method_name}()->isNull() ? 'NULL' : \"'\".\$this->get${method_name}()->toString().\"'\";\n";
+                                } else if (preg_match('/^(date|time)/', $definition['type'])) {
+                                    $contents[] = "\t\t\$${column} = \$this->get${method_name}()->toString();\n";
+                                } else if (preg_match('/^char/', $definition['type']) || preg_match('/^varchar/', $definition['type']) || preg_match('/^text/', $definition['type']) || preg_match('/^time/', $definition['type'])) {
+                                    if ($definition['null']) {
+                                        $contents[] = "\t\t\$${column} = \$connection->escapeString(\$this->get${method_name}());\n";
+                                        $contents[] = "\t\t\$${column} = (\$${column} != null) ? \"'\$${column}'\" : 'NULL';\n";
+                                    } else {
+                                        $contents[] = "\t\t\$${column} = \"'\".\$connection->escapeString(\$this->get${method_name}()).\"'\";\n";
+                                    }
+                                } else {
+                                    $contents[] = "\t\t\$${column} = \$this->get${method_name}();\n";
+                                    if ($definition['null']) {
+                                        $contents[] = "\t\tif (\$${column} == null) \$${column} = 'NULL';\n";
+                                    }
+                                }
                             }
                         }
-                    }
-                    $contents[] = "\t\tif (\$id) {\n";
-                    $contents[] = sprintf($table_definition['templates']['update'], $primary_key, implode(', ', $fields['update']));
-                    $contents[] = "\t\t} else {\n";
-                    $contents[] = sprintf($table_definition['templates']['insert'], $primary_key, implode(', ', $fields['insert']), implode(', ', $fields['values']));
-                    $contents[] = "\t\t}\n";
-                    $contents[] = "\t}\n";
-                    $contents[] = "\t\n\tfunction updateAction(FormView \$form) {\n\t\t\$validate = method_exists(\$this, 'validate');\n\t\tif (!\$validate || (\$validate && \$this->validate(\$form))) {\n\t\t\treturn \$this->update();\n\t\t} else return false;\n\t}\n";
-                    $contents[] = "\t\n\tfunction removeAction(FormView \$form) {\n\t\t\$connection = \$this->getConnection();\n\t\t\$id = \$this->getId();\n\t\tif (\$id) {\n";
-                    $contents[] = sprintf($table_definition['templates']['delete'], $primary_key);
-                    $contents[] = "\t\t} else return false;\n\t}\n";
-                    // Generate Iterator
-                    if ($generate_iterator) {
-                        $contents[] = "}\n\nclass ${class_name}Iterator extends ObjectIterator {\n";
-                        $contents[] = "\tfunction rows() {\n";
-                        $contents[] = "\t\tif (\$this->result instanceof ObjectIterator) {\n";
-                        $contents[] = "\t\t\treturn \$this->result->rows();\n";
-                        $contents[] = "\t\t} else return 0;\n";
-                        $contents[] = "\t}\n\n";
-                        $contents[] = "\tfunction fetch(\$key) {\n";
-                        $contents[] = "\t\tif (\$this->result instanceof ObjectIterator) {\n";
-                        $contents[] = "\t\t\treturn new ${class_name}(\$this->result->fetch(\$key));\n";
-                        $contents[] = "\t\t} else return false;\n";
-                        $contents[] = "\t}\n\n";
-                        $contents[] = "\tfunction free() {\n";
-                        $contents[] = "\t\tif (\$this->result instanceof ObjectIterator) {\n";
-                        $contents[] = "\t\t\treturn \$this->result->free();\n";
+                        $fields = array('update', 'insert', 'values'); foreach ($table_definition['fields'] as $column => $definition) {
+                            if ($column != $primary_key) {
+                                $fields['insert'][] = $column;
+                                if (preg_match('/^int/', $definition['type']) || preg_match('/^smallint/', $definition['type']) || preg_match('/^tinyint/', $definition['type'])) {
+                                    $fields['update'][] = "${column} = \$${column}";
+                                    $fields['values'][] = "\$${column}";
+                                } else if (preg_match('/^char/', $definition['type']) || preg_match('/^varchar/', $definition['type']) || preg_match('/^text/', $definition['type'])) {
+                                    $fields['update'][] = "${column} = \$${column}";
+                                    $fields['values'][] = "\$${column}";
+                                } else if (preg_match('/^bool/', $definition['type'])) {
+                                    $fields['update'][] = "${column} = '\$${column}'";
+                                    $fields['values'][] = "'\$${column}'";
+                                } else if (preg_match('/^enum\(\'f\',\'t\'|enum\(\'t\',\'f\'/', $definition['type'])) {
+                                    $fields['update'][] = "${column} = '\$${column}'";
+                                    $fields['values'][] = "'\$${column}'";
+                                } else if (preg_match('/^(date|time)/', $definition['type']) && $definition['null']) {
+                                    $fields['update'][] = "${column} = \$${column}";
+                                    $fields['values'][] = "\$${column}";
+                                } else if (preg_match('/^(date|time)/', $definition['type'])) {
+                                    $fields['update'][] = "${column} = '\$${column}'";
+                                    $fields['values'][] = "'\$${column}'";
+                                } else {
+                                    $fields['update'][] = "${column} = \$${column}";
+                                    $fields['values'][] = "\$${column}";
+                                }
+                            }
+                        }
+                        $contents[] = "\t\tif (\$id) {\n";
+                        $contents[] = sprintf($table_definition['templates']['update'], $primary_key, implode(', ', $fields['update']));
+                        $contents[] = "\t\t} else {\n";
+                        $contents[] = sprintf($table_definition['templates']['insert'], $primary_key, implode(', ', $fields['insert']), implode(', ', $fields['values']));
                         $contents[] = "\t\t}\n";
                         $contents[] = "\t}\n";
+                        $contents[] = "\t\n\tfunction updateAction(FormView \$form) {\n\t\t\$validate = method_exists(\$this, 'validate');\n\t\tif (!\$validate || (\$validate && \$this->validate(\$form))) {\n\t\t\treturn \$this->update();\n\t\t} else return false;\n\t}\n";
+                        $contents[] = "\t\n\tfunction removeAction(FormView \$form) {\n\t\t\$connection = \$this->getConnection();\n\t\t\$id = \$this->getId();\n\t\tif (\$id) {\n";
+                        $contents[] = sprintf($table_definition['templates']['delete'], $primary_key);
+                        $contents[] = "\t\t} else return false;\n\t}\n";
+                        // Generate Iterator
+                        if ($generate_iterator) {
+                            $contents[] = "}\n\nclass ${class_name}Iterator extends ObjectIterator {\n";
+                            $contents[] = "\tfunction rows() {\n";
+                            $contents[] = "\t\tif (\$this->result instanceof ObjectIterator) {\n";
+                            $contents[] = "\t\t\treturn \$this->result->rows();\n";
+                            $contents[] = "\t\t} else return 0;\n";
+                            $contents[] = "\t}\n\n";
+                            $contents[] = "\tfunction fetch(\$key) {\n";
+                            $contents[] = "\t\tif (\$this->result instanceof ObjectIterator) {\n";
+                            $contents[] = "\t\t\treturn new ${class_name}(\$this->result->fetch(\$key));\n";
+                            $contents[] = "\t\t} else return false;\n";
+                            $contents[] = "\t}\n\n";
+                            $contents[] = "\tfunction free() {\n";
+                            $contents[] = "\t\tif (\$this->result instanceof ObjectIterator) {\n";
+                            $contents[] = "\t\t\treturn \$this->result->free();\n";
+                            $contents[] = "\t\t}\n";
+                            $contents[] = "\t}\n";
+                        }
+                        $contents[] = "}";
+                        if (!file_exists($write_path)) mkdir($write_path);
+                        $handle = fopen($write_path.DIRECTORY_SEPARATOR.$filename, 'w');
+                        if ($handle) {
+                            // Write the generated class
+                            foreach ($contents as $line) {
+                                fwrite($handle, $line);
+                            } fclose($handle);
+                            // Update the signature index
+                            $cached_signatures[$table_name] = $filename;
+                            file_put_contents($write_path.DIRECTORY_SEPARATOR.'index.json', json_encode($cached_signatures));
+                        }
+                        return $write_path.DIRECTORY_SEPARATOR.$filename;
+                    } catch (\Exception $e) {
+                        throw new \Exception(sprintf($application->getLocale()->getTranslator()->_s("Can't write file %s"), $write_path.DIRECTORY_SEPARATOR.$filename));
                     }
-                    $contents[] = "}";
-                    if (!file_exists($write_path)) mkdir($write_path);
-                    $handle = fopen($write_path.DIRECTORY_SEPARATOR.$filename, 'w');
-                    if ($handle) {
-                        // Write the generated class
-                        foreach ($contents as $line) {
-                            fwrite($handle, $line);
-                        } fclose($handle);
-                    }
-                    return $write_path.DIRECTORY_SEPARATOR.$filename;
-                } catch (\Exception $e) {
-                    throw new \Exception(sprintf($translator->_s("Can't write file %s"), $write_path.DIRECTORY_SEPARATOR.$filename));
+                } else {
+                    throw new \Exception($application->getLocale()->getTranslator()->_s("Cache folder not defined"));
                 }
-            } else {
-                throw new \Exception($translator->_s("Cache folder not defined"));
             }
         } else {
-            throw new \Exception($translator->_s("Application path not defined"));
+            throw new \Exception($application->getLocale()->getTranslator()->_s("Application path not defined"));
         }
     }
 }
