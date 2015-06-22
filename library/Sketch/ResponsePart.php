@@ -75,13 +75,11 @@ class ResponsePart extends Object {
      * @throws \Exception
      */
     private function __construct($file_name, $etag, $attributes, $update_include_path) {
-        $document_root = $this->getApplication()->getRequest()->getDocumentRoot();
         if (substr($file_name, 0, 1) == '/') {
-            list($request_uri) = explode('?', $this->getRequest()->getResolvedURI());
-            $t1 = dirname($request_uri);
+            $t1 = pathinfo($this->getRequest()->getURI(), PATHINFO_DIRNAME);
             $path = '';
             while (strpos(" $file_name", " $t1") === false) {
-                $t1 = dirname($t1);
+                $t1 = pathinfo($t1, PATHINFO_DIRNAME);
                 $path .= '../';
             }
             if ($t1 == '/') {
@@ -91,6 +89,7 @@ class ResponsePart extends Object {
                 $file_name = $path.preg_replace("/^$t1\//", '', $file_name);
             }
         }
+        $document_root = $this->getApplication()->getDocumentRoot();
         $this->relativePath = str_replace($document_root, '', realpath(dirname($file_name)));
         // Add to the include path the path to the template
         if ($update_include_path && strpos($this->relativePath, get_include_path()) === false) {
@@ -100,7 +99,7 @@ class ResponsePart extends Object {
         try {
             ob_start();
             /** @noinspection PhpIncludeInspection */
-            require $file_name;
+            require realpath($file_name);
             // Trimming the source before feeding it to the XML parser helps bad formed documents
             $source = ob_get_clean();
             if ($source != '') {

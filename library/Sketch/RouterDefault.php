@@ -33,7 +33,7 @@ class RouterDefault extends Router {
     function resolve($uri) {
         // If relative path
         if (substr($uri, 0, 1) != DIRECTORY_SEPARATOR) {
-            list($resolved_uri) = explode('?', $this->getRequest()->getResolvedURI());
+            list($resolved_uri) = explode('?', $this->getRequest()->getURI());
             $base = rtrim(dirname($resolved_uri), DIRECTORY_SEPARATOR);
             $uri = $base.DIRECTORY_SEPARATOR.$uri;
         }

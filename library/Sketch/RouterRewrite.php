@@ -38,7 +38,7 @@ class RouterRewrite extends Router {
         }
         // If relative path
         if (substr($uri, 0, 1) != DIRECTORY_SEPARATOR) {
-            list($resolved_uri) = explode('?', $this->getRequest()->getResolvedURI());
+            list($resolved_uri) = explode('?', $this->getRequest()->getURI());
             $base = rtrim(dirname($resolved_uri), DIRECTORY_SEPARATOR);
         } else {
             $base = '';

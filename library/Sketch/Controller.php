@@ -111,7 +111,7 @@ class Controller extends Object {
                         if ($location != null) {
                             // If relative path
                             if (substr($location, 0, 1) != DIRECTORY_SEPARATOR) {
-                                $base = rtrim(dirname($this->getRequest()->getResolvedURI()), DIRECTORY_SEPARATOR);
+                                $base = rtrim(pathinfo($this->getRequest()->getURI(), PATHINFO_DIRNAME), DIRECTORY_SEPARATOR);
                                 $location = $base.DIRECTORY_SEPARATOR.$location;
                             }
                             header("Location: https://$server_name".$location, true, 303);
@@ -123,7 +123,7 @@ class Controller extends Object {
                         if ($location != null) {
                             // If relative path
                             if (substr($location, 0, 1) != DIRECTORY_SEPARATOR) {
-                                $base = rtrim(dirname($this->getRequest()->getResolvedURI()), DIRECTORY_SEPARATOR);
+                                $base = rtrim(pathinfo($this->getRequest()->getURI(), PATHINFO_DIRNAME), DIRECTORY_SEPARATOR);
                                 $location = $base.DIRECTORY_SEPARATOR.$location;
                             }
                             header("Location: http://$server_name$server_port".$location, true, 303);
