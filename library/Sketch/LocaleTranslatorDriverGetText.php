@@ -42,12 +42,12 @@ class LocaleTranslatorDriverGetText extends LocaleTranslatorDriver {
     private $domain = 'default';
 
     /**
-     * @param string folder
-     * @param sstring $domain
+     * @param $locale_string
+     * @param $filename
+     * @param $domain
      * @throws \Exception
      */
-    private function readData($folder, $domain) {
-        $filename = dirname($this->getApplication()->getDocumentRoot()).$folder.'/'.$this->getLocaleString().'/LC_MESSAGES/'.$domain.'.mo';
+    private function readFileData($locale_string, $filename, $domain) {
         $file = fopen($filename, 'rb');
         if (!$file) throw new \Exception();
         if (filesize($filename) < 10) throw new \Exception();
@@ -76,7 +76,6 @@ class LocaleTranslatorDriverGetText extends LocaleTranslatorDriver {
         $original_strings = unpack($byte_order.(2 * $total), fread($file, 8 * $total));
         fseek($file, $tranlation_offset);
         $translation_strings = unpack($byte_order.(2 * $total), fread($file, 8 * $total));
-        $this->data[$domain] = array();
         for($count = 0; $count < $total; ++$count) {
             if ($original_strings[$count * 2 + 1] != 0) {
                 fseek($file, $original_strings[$count * 2 + 2]);
@@ -84,8 +83,42 @@ class LocaleTranslatorDriverGetText extends LocaleTranslatorDriver {
                 if ($translation_strings[$count * 2 + 1] != 0) {
                     fseek($file, $translation_strings[$count * 2 + 2]);
                     // Remove adapter information
-                    $this->data[$domain][md5($original)] = fread($file, $translation_strings[$count * 2 + 1]);
+                    $this->data[$locale_string][$domain][md5($original)] = fread($file, $translation_strings[$count * 2 + 1]);
                 }
+            }
+        }
+    }
+
+    /**
+     * @param $folder
+     * @param $domain
+     * @throws Exception
+     */
+    private function readData($folder, $domain) {
+        $locale_string = $this->getLocaleString();
+        $parsed_url = parse_url($folder);
+        if ($parsed_url['scheme'] == 'gs') {
+            $filename = $folder.'/'.$locale_string.'/LC_MESSAGES/'.$domain.'.mo';
+        } else {
+            $filename = dirname($this->getApplication()->getDocumentRoot()).$folder.'/'.$this->getLocaleString().'/LC_MESSAGES/'.$domain.'.mo';
+        }
+        if (class_exists('\Memcache')) {
+            $memcache = new \Memcache();
+            $this->data[$locale_string][$domain] = $memcache->get('gettext-data-'.$locale_string.'-'.$domain);
+            if ($this->data[$locale_string][$domain] === false || $this->getRequest()->getAttribute('memcache') == 'clear') {
+                $this->readFileData($locale_string, $filename, $domain);
+                // Cache locale data for one hour
+                $memcache->set('gettext-data-'.$locale_string.'-'.$domain, $this->data[$locale_string][$domain]);
+                if ($this->getContext()->getLayerName() != 'production') {
+                    $this->getLogger()->log("Locale: ".$filename);
+                }
+            } elseif ($this->getContext()->getLayerName() != 'production') {
+                $this->getLogger()->log("Locale: ".$filename." (memcache)");
+            }
+        } else {
+            $this->readFileData($locale_string, $filename, $domain);
+            if ($this->getContext()->getLayerName() != 'production') {
+                $this->getLogger()->log("Locale: ".$filename);
             }
         }
     }
@@ -96,6 +129,9 @@ class LocaleTranslatorDriverGetText extends LocaleTranslatorDriver {
      */
     function  __construct($locale_string, ResourceXML $resource) {
         $folder = $resource->queryCharacterData('//folder');
+        if ($this->getContext()->getLayerName() != 'production') {
+            $this->getLogger()->log("Locale: $locale_string");
+        }
         foreach ($resource->query('//domain') as $domain) {
             $domain = $domain->getCharacterData();
             try {
@@ -141,13 +177,17 @@ class LocaleTranslatorDriverGetText extends LocaleTranslatorDriver {
 
     /**
      * @param string $text
-     * @param null $in_domain
+     * @param $in_domain
      * @return string
      */
     function translate($text, $in_domain = null) {
         $md5 = md5($text);
+        $locale_string = $this->getLocaleString();
         $domain = ($in_domain == null) ? $this->domain : $in_domain;
-        return (array_key_exists($domain, $this->data) && array_key_exists($md5, $this->data[$domain])) ? $this->data[$domain][$md5] : $text;
+        return (
+            array_key_exists($locale_string, $this->data) &&
+            array_key_exists($domain, $this->data[$locale_string]) &&
+            array_key_exists($md5, $this->data[$locale_string][$domain])) ? $this->data[$locale_string][$domain][$md5] : $text;
     }
 
     /**
@@ -159,9 +199,13 @@ class LocaleTranslatorDriverGetText extends LocaleTranslatorDriver {
      */
     function translate_plural($singular, $plural, $number, $in_domain = null) {
         $md5 = md5($singular.chr(0).$plural);
+        $locale_string = $this->getLocaleString();
         $domain = ($in_domain == null) ? $this->domain : $in_domain;
-        if (array_key_exists($domain, $this->data) && array_key_exists($md5, $this->data[$domain])) {
-            list($singular, $plural) = explode(chr(0), $this->data[$domain][$md5]);
+        if (
+            array_key_exists($locale_string, $this->data) &&
+            array_key_exists($domain, $this->data[$locale_string]) &&
+            array_key_exists($md5, $this->data[$locale_string][$domain])) {
+            list($singular, $plural) = explode(chr(0), $this->data[$locale_string][$domain][$md5]);
         }
         return sprintf(($number > 1) ? $plural : $singular, $number);
     }
@@ -174,7 +218,11 @@ class LocaleTranslatorDriverGetText extends LocaleTranslatorDriver {
      */
     function translate_with_context($text, $context, $in_domain = null) {
         $md5 = md5($context.chr(4).$text);
+        $locale_string = $this->getLocaleString();
         $domain = ($in_domain == null) ? $this->domain : $in_domain;
-        return (array_key_exists($domain, $this->data) && array_key_exists($md5, $this->data[$domain])) ? $this->data[$domain][$md5] : $text;
+        return (
+            array_key_exists($locale_string, $this->data) &&
+            array_key_exists($domain, $this->data[$locale_string]) &&
+            array_key_exists($md5, $this->data[$locale_string][$domain])) ? $this->data[$locale_string][$domain][$md5] : $text;
     }
 }
