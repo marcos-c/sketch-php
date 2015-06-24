@@ -121,7 +121,7 @@ class ResourceConnectionDriverMySQL extends ResourceConnectionDriver {
      * @return MySQLResultSet
      */
     function executeQuery($expression) {
-        if ($this->getContext()->getLayerName() == 'development') {
+        if ($this->getContext()->getLayerName() != 'production') {
             $this->getLogger()->log(trim($expression).' ('.number_format(microtime(true) - $this->getApplication()->getStartTime(), 3).')', 4);
         }
         $result = mysql_query($expression, $this->connection);
@@ -140,7 +140,7 @@ class ResourceConnectionDriverMySQL extends ResourceConnectionDriver {
      * @return boolean
      */
     function executeUpdate($expression) {
-        if ($this->getContext()->getLayerName() == 'development') {
+        if ($this->getContext()->getLayerName() != 'production') {
             $this->getLogger()->log($expression, 3);
         }
         mysql_query($expression, $this->connection);

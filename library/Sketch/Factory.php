@@ -101,7 +101,7 @@ class Factory extends Object {
         if ($document_root != null) {
             $cache_path = dirname($document_root).DIRECTORY_SEPARATOR.'cache';
             $write_path = $cache_path.DIRECTORY_SEPARATOR.'library'.(($version != null) ? DIRECTORY_SEPARATOR.$version : '');
-            if ($application->getContext()->getLayerName() == 'production') {
+            if (in_array($application->getContext()->getLayerName(), array('staging', 'production'))) {
                 $cached_signatures = json_decode(file_get_contents($write_path.DIRECTORY_SEPARATOR.'index.json'), true);
                 return $write_path.DIRECTORY_SEPARATOR.$cached_signatures[$table_name];
             } else {
