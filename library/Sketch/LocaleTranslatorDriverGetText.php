@@ -106,11 +106,15 @@ class LocaleTranslatorDriverGetText extends LocaleTranslatorDriver {
             $memcache = new \Memcache();
             $this->data[$locale_string][$domain] = $memcache->get('gettext-data-'.$locale_string.'-'.$domain);
             if ($this->data[$locale_string][$domain] === false || $this->getRequest()->getAttribute('memcache') == 'clear') {
-                $this->readFileData($locale_string, $filename, $domain);
-                // Cache locale data for one hour
-                $memcache->set('gettext-data-'.$locale_string.'-'.$domain, $this->data[$locale_string][$domain]);
-                if ($this->getContext()->getLayerName() != 'production') {
-                    $this->getLogger()->log("Locale: ".$filename);
+                try {
+                    $this->readFileData($locale_string, $filename, $domain);
+                    // Cache locale data for one hour
+                    $memcache->set('gettext-data-'.$locale_string.'-'.$domain, $this->data[$locale_string][$domain]);
+                    if ($this->getContext()->getLayerName() != 'production') {
+                        $this->getLogger()->log("Locale: ".$filename);
+                    }
+                } catch (\Exception $e) {
+                    unset($this->data[$locale_string][$domain]);
                 }
             } elseif ($this->getContext()->getLayerName() != 'production') {
                 $this->getLogger()->log("Locale: ".$filename." (memcache)");
@@ -139,9 +143,11 @@ class LocaleTranslatorDriverGetText extends LocaleTranslatorDriver {
                 $this->readData($folder, $domain);
             } catch (\Exception $e) {
                 // If there's any problem to read a full locale_string try with only the language
-                list($locale_string) = explode('_', $locale_string);
-                $this->setLocaleString($locale_string);
-                $this->readData($folder, $domain);
+                list($language) = explode('_', $locale_string);
+                if ($language != $locale_string) {
+                    $this->setLocaleString($language);
+                    $this->readData($folder, $domain);
+                }
             }
             if ($domain == 'default') {
                 $this->setAvailableLanguages($folder);
