@@ -135,7 +135,7 @@ class LocaleFormatter extends Object {
         if ($this->localeString == 'es') {
             return floatval(str_replace(',', '.', $number));
         } else {
-            return $number;
+            return floatval($number);
         }
     }
 
